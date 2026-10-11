@@ -113,7 +113,7 @@ Con el historial ya sincronizado, el push se realiza exitosamente.
 
 ---
 
-### **Sobreescribir el Repositorio Remoto con el Local:**
+### **Sobreescribir el Rep. Remoto con el Local:**
 Primera opcion:
 ```
     $ git push --force remote-repo main
