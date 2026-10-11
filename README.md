@@ -11,7 +11,9 @@ En este archi se detalla todo acerca de las dependencias informativas para el eq
     
     > [Limpiar el cache del repositorio](#limpiar-el-cache)  
     
-    > [Sincronizar el repositorio local después de un amend](#sincronizar-el-repo-tras-un-amend)  
+    > [Sincronizar el repositorio local después de un amend](#sincronizar-el-repo-tras-un-amend) 
+
+    > [Sobreescribir el Rep. Remoto con el Local](#sobreescribir-el-rep-remoto-con-el-local) 
 
 
 ## **1. Resources Folder**
@@ -111,6 +113,18 @@ Con el historial ya sincronizado, el push se realiza exitosamente.
 
 ---
 
+### **Sobreescribir el Repositorio Remoto con el Local:**
+Primera opcion:
+```
+    $ git push --force remote-repo main
+```
+Segunda opcion:
+
+```
+    $ git push --force-with-lease remote-repo main
+```
+
+    
 
 
 
