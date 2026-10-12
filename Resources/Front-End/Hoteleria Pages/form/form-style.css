@@ -1,0 +1,176 @@
+:root{
+    --color-white: #E9F7FC;
+    --color-white-slightly-sky: #C1EAF6;
+    --color-white-sky: #98DCF0;
+    --color-at-point-white-sky: #5DC8E8;
+    --color-whiter-sky: #48C0E5;
+    --color-sky: #20B3DF;
+    --color-blackest-blue: #1A92B7;
+    --color-blacker-blue: #14728F;
+    --color-sky-blue-to-black: #0F5267;
+    --color-blue-too-black: #09323E;
+    --color-blue-ultra-black: #031216;
+
+    --color-circle-buttons: #64cfec;
+
+    --color-white-orange: #fef4e4;
+}
+/*
+.grand-hotel-regular {
+  font-family: "Grand Hotel", cursive;
+  font-weight: 400;
+  font-style: normal;
+}*/
+
+
+*, *::before, *::after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+    font-family: "Grand Hotel", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+body{
+    background-color: var(--color-whiter-sky);
+    background-image: url("images/form-background.jpg");
+    background-size: cover;
+    background-repeat:no-repeat;
+    background-position: 50% 65%;
+    /*Establece los puntos de coincidencia de la foto y la imagen por las 
+    cuales empezara a cargarse y tomar forma la imagen segun las configuraciones
+  establecidas*/
+    background-origin:content-box;
+    background-attachment: fixed;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100vw;
+    height: 100vh;
+    
+}
+
+.form-container{
+    position: relative;
+    width: 250px;
+    height: 460px;
+
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--color-white-orange);
+    border-radius:10px;
+    box-shadow: 0px 0px 10px 5px var(--color-blue-too-black);
+
+    overflow: hidden;
+    
+}  
+
+.form-container > p{
+    
+    display: inline-block;
+    
+}
+
+.inner-form-image{
+    position: absolute;
+    top: 0;
+    left:0;
+
+
+    background-image: url("images/hotel-fachada-form.jpg");
+    background-size: contain;
+    background-repeat:no-repeat;
+    background-position: center;
+    background-origin:content-box;
+    background-attachment: fixed;
+
+    width: 100%;
+    height: 50%;   
+
+    clip-path: polygon(0% 0%, 100% 0%, 100% 70%, 0% 100%);
+
+}
+
+.cicle-form{
+    position: absolute;
+    top: 35%;
+    left: calc(50% - 30px);
+
+    width: 60px;
+    height: 60px;
+
+    background-color: var(--color-circle-buttons);
+    border-radius : 50%;
+
+    text-align: center;
+    line-height: 60px;
+    /*padding: 15px 0px 0px 15px;*/
+    font-size: 30px;
+}
+
+form{
+    position: absolute;
+    top: 40%;
+    left: 0%;
+
+    width: 100%;
+    height: 60%;
+
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    padding: 50px 12px 10px 12px;
+    gap: 2px;
+}
+
+
+input{
+    
+    width: 100%;
+    height: 30px;
+
+    margin: 0px 0px;
+    padding: 5px 10px;
+
+    border-radius: 5px;
+    border: none;
+
+    font-size: 15px;
+}
+
+form > div{
+    width: 100%;
+}
+
+
+form > button{
+    width: 100%;
+    height: 30px;
+
+    border-radius: 5px;
+    border: none;
+
+    background-color: var(--color-sky);
+    color: var(--color-white);
+
+    font-size: 17px;
+
+    cursor: pointer;
+}
+
+.form-text{
+    display: inline-block;
+}
+
+
+

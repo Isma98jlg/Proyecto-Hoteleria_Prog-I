@@ -1,0 +1,48 @@
+@page
+@model Hoteleria_App.Pages.Reservas.IndexModel
+@{
+    ViewData["Title"] = "Gestión de Reservas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📅 Gestión de Reservas</h1>
+    <a asp-page="Crear" class="btn btn-primary">➕ Nueva Reserva</a>
+</div>
+
+<div class="alert alert-info">
+    <h5>🚧 En construcción</h5>
+    <p class="mb-0">Esta sección estará disponible próximamente. Incluirá:</p>
+    <ul class="mb-0">
+        <li>Listado de reservas con filtros por estado, fecha, cliente</li>
+        <li>Creación de nuevas reservas con selección de habitaciones</li>
+        <li>Check-in / Check-out</li>
+        <li>Historial de reservas por cliente</li>
+    </ul>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-warning">@Model.ReservasPendientes</h3>
+                <small class="text-muted">Pendientes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-info">@Model.ReservasConfirmadas</h3>
+                <small class="text-muted">Confirmadas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">@Model.ReservasFinalizadas</h3>
+                <small class="text-muted">Finalizadas</small>
+            </div>
+        </div>
+    </div>
+</div>

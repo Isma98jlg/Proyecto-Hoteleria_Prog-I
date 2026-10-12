@@ -1,0 +1,82 @@
+@page
+@model Hoteleria_App.Pages.Chat.IndexModel
+@{
+    ViewData["Title"] = "Chat - Soporte";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>💬 Chat de Soporte</h1>
+</div>
+
+<div class="alert alert-info">
+    <h5>🚧 En construcción</h5>
+    <p class="mb-0">Esta sección estará disponible próximamente. Incluirá:</p>
+    <ul class="mb-0">
+        <li>Chat en tiempo real entre administrador y clientes (SignalR)</li>
+        <li>Historial de conversaciones</li>
+        <li>Notificaciones push</li>
+        <li>Estados: en línea, ocupado, fuera de línea</li>
+        <li>Transferencia de chat entre agentes</li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">👨‍💼 Vista Administrador</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Panel para que el administrador gestione todas las conversaciones activas.</p>
+                <ul>
+                    <li>Lista de chats activos</li>
+                    <li>Asignación de agentes</li>
+                    <li>Respuestas rápidas / plantillas</li>
+                    <li>Métricas de tiempo de respuesta</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">👤 Vista Cliente</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Widget de chat embebido para que los clientes contacten al hotel.</p>
+                <ul>
+                    <li>Botón flotante en la web</li>
+                    <li>Envío de mensajes offline</li>
+                    <li>Adjuntar archivos/fotos</li>
+                    <li>Calificación de atención</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">🛠️ Tecnologías previstas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Backend</h6>
+                <ul>
+                    <li>ASP.NET Core SignalR</li>
+                    <li>Entity Framework Core para persistencia</li>
+                    <li>Redis para backplane (escalabilidad)</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Frontend</h6>
+                <ul>
+                    <li>SignalR JavaScript Client</li>
+                    <li>Razor Components / Blazor (opcional)</li>
+                    <li>PWA para notificaciones push</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

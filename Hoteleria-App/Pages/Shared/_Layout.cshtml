@@ -1,19 +1,18 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Hoteleria_App</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Hoteleria</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Hoteleria_App.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Hoteleria_App</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">🏨 Hoteleria</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,12 +20,50 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link text-white" asp-area="" asp-page="/Index">🏠 Inicio</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                🛏️ Habitaciones
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index">📋 Ver todas</a></li>
+                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index" asp-route-estado="LIBRE">✅ Disponibles</a></li>
+                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index" asp-route-estado="OCUPADO">🔴 Ocupadas</a></li>
+                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index" asp-route-estado="MANTENIMIENTO">🔧 Mantenimiento</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-page="/Habitaciones/PorPiso">🏢 Por piso</a></li>
+                                <li><a class="dropdown-item" asp-page="/Habitaciones/PorTipoVip">⭐ Por tipo VIP</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                📅 Reservas
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" asp-page="/Reservas/Index">📋 Ver todas</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reservas/Crear">➕ Nueva reserva</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-page="/Reservas/Index" asp-route-estado="PENDIENTE">⏳ Pendientes</a></li>
+                                <li><a class="dropdown-item" asp-page="/Reservas/Index" asp-route-estado="CONFIRMADA">✅ Confirmadas</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👥 Clientes
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" asp-page="/Usuarios/Index">📋 Ver todos</a></li>
+                                <li><a class="dropdown-item" asp-page="/Usuarios/Crear">➕ Nuevo cliente</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link text-white" asp-area="" asp-page="/Chat/Index">💬 Chat</a>
                         </li>
                     </ul>
+                    <div class="navbar-nav">
+                        <span class="nav-link text-white-50">👤 Admin</span>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -37,9 +74,9 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Hoteleria_App - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="border-top footer text-muted py-3">
+        <div class="container text-center">
+            &copy; 2026 - Hoteleria - Sistema de Gestión Hotelera
         </div>
     </footer>
 

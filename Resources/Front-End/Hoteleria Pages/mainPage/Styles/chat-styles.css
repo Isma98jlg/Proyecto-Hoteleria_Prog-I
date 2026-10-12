@@ -1,0 +1,61 @@
+:root {
+    --color-blue: #4343FF;
+    --color-white: #FFFFFF;
+    --color-white-slightly-gray: #F9F9FB;
+    --color-black: black;
+    --color-purple-sky: #AEAEFF;
+}
+
+.chat-container{
+    width: 50%;
+    height: 100vh;
+    max-width: 70%;
+
+
+    margin-left: 60px;
+
+    /*overflow: hidden;*/
+
+    position: fixed;
+    right: 0px;
+    top: 0px;
+
+    background-color: var(--color-white-slightly-gray);
+    z-index: 25;
+    transition: background-color 0.011s linear, width 0.1s ease-out;
+
+}
+
+.toggle-chat{
+    transform: rotate(-0.25turn) ;
+
+    width: 60px;
+    height: 19px;
+    padding: 0;
+
+    position: absolute;
+    top: 20%;
+    left: -39.8px;
+
+    font-size: 14px;
+
+    z-index: 50;
+
+    
+    cursor: pointer;
+
+}
+
+/*el tirador transparente*/
+.tirador-derecho{
+    position: absolute;
+    top: 0px;    
+    left: -10px;
+
+    width: 10px;
+    height: 100%;
+    background-color: #efeff200;
+
+    cursor:ew-resize;
+    
+}

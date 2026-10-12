@@ -1,0 +1,80 @@
+@page
+@model Hoteleria_App.Pages.Habitaciones.PorPisoModel
+@{
+    ViewData["Title"] = "Habitaciones por Piso";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>🏢 Habitaciones por Piso</h1>
+    <a asp-page="Index" class="btn btn-secondary">← Volver al listado</a>
+</div>
+
+@if (Model.PisosConHabitaciones.Any())
+{
+    @foreach (var grupo in Model.PisosConHabitaciones)
+    {
+        var habitaciones = grupo.Value;
+        var libres = habitaciones.Count(h => h.Estado == "LIBRE");
+        var ocupadas = habitaciones.Count(h => h.Estado == "OCUPADO");
+        var mantenimiento = habitaciones.Count(h => h.Estado == "MANTENIMIENTO");
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">🏢 Piso @grupo.Key @(grupo.Value.FirstOrDefault()?.Piso?.RefPiso != null ? $"({grupo.Value.First().Piso.RefPiso})" : "")</h5>
+                <div class="btn-group btn-group-sm">
+                    <span class="badge bg-success me-1">✅ @libres</span>
+                    <span class="badge bg-danger me-1">🔴 @ocupadas</span>
+                    <span class="badge bg-warning text-dark">🔧 @mantenimiento</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Camas</th>
+                                <th>Tipo VIP</th>
+                                <th>Precio/Noche</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var h in habitaciones)
+                            {
+                                var badgeClass = h.Estado switch
+                                {
+                                    "LIBRE" => "bg-success",
+                                    "OCUPADO" => "bg-danger",
+                                    "MANTENIMIENTO" => "bg-warning text-dark",
+                                    _ => "bg-secondary"
+                                };
+                                var precioTotal = h.NroCamas * (h.TipoVip?.PrecioCama ?? 0);
+                                <tr>
+                                    <td>@h.HabitacionId</td>
+                                    <td><span class="badge bg-secondary">@($"{h.NroPiso:D4}{h.TipoVip?.Sigla}")</span></td>
+                                    <td>@h.NroCamas</td>
+                                    <td>@(h.TipoVip?.TipoVipNombre ?? "-")</td>
+                                    <td>@precioTotal.ToString("C")</td>
+                                    <td><span class="badge @badgeClass">@h.Estado</span></td>
+                                    <td>
+                                        <a asp-page="Detalles" asp-route-id="@h.HabitacionId" class="btn btn-sm btn-outline-primary">👁️</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="text-muted">No hay habitaciones registradas.</div>
+        <a asp-page="Index" class="btn btn-primary mt-2">Ver todas las habitaciones</a>
+    </div>
+}

@@ -1,0 +1,60 @@
+@page "{id:long}"
+@model Hoteleria_App.Pages.Habitaciones.EditarModel
+@{
+    ViewData["Title"] = "Editar Habitación";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>✏️ Editar Habitación @Model.Habitacion?.HabitacionId</h1>
+    <a asp-page="Detalles" asp-route-id="@Model.Habitacion?.HabitacionId" class="btn btn-secondary">← Volver</a>
+</div>
+
+@if (Model.Habitacion == null)
+{
+    <div class="alert alert-danger">Habitación no encontrada.</div>
+}
+else
+{
+    <form method="post" class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Datos de la Habitación</h5>
+        </div>
+        <div class="card-body">
+            <input type="hidden" asp-for="Habitacion.HabitacionId" />
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Habitacion.NroPiso" class="form-label">Piso *</label>
+                    <select asp-for="Habitacion.NroPiso" class="form-select" asp-items="@Model.PisosDisponibles">
+                        <option value="">Seleccionar piso...</option>
+                    </select>
+                    <span asp-validation-for="Habitacion.NroPiso" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Habitacion.NroCamas" class="form-label">N° Camas *</label>
+                    <input asp-for="Habitacion.NroCamas" class="form-control" min="1" />
+                    <span asp-validation-for="Habitacion.NroCamas" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Habitacion.TipoVipNombre" class="form-label">Tipo VIP *</label>
+                    <select asp-for="Habitacion.TipoVipNombre" class="form-select" asp-items="@Model.TiposVipDisponibles">
+                        <option value="">Seleccionar tipo VIP...</option>
+                    </select>
+                    <span asp-validation-for="Habitacion.TipoVipNombre" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Habitacion.Estado" class="form-label">Estado *</label>
+                    <select asp-for="Habitacion.Estado" class="form-select" asp-items="@Model.EstadosDisponibles">
+                        <option value="">Seleccionar estado...</option>
+                    </select>
+                    <span asp-validation-for="Habitacion.Estado" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">💾 Guardar cambios</button>
+                <a asp-page="Detalles" asp-route-id="@Model.Habitacion.HabitacionId" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </div>
+    </form>
+}

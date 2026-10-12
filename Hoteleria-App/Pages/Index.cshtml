@@ -1,10 +1,181 @@
 ﻿@page
-@model IndexModel
+@model Hoteleria_App.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-6 fw-bold">🏨 Hoteleria - Dashboard</h1>
+        <p class="text-muted">Sistema de gestión hotelera - Panel de control</p>
+    </div>
 </div>
+
+<!-- KPIs -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-primary">
+            <div class="card-body">
+                <h2 class="text-primary">@Model.TotalHabitaciones</h2>
+                <small class="text-muted">Total Habitaciones</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-success">
+            <div class="card-body">
+                <h2 class="text-success">@Model.HabitacionesLibres</h2>
+                <small class="text-muted">Disponibles (LIBRE)</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-danger">
+            <div class="card-body">
+                <h2 class="text-danger">@Model.HabitacionesOcupadas</h2>
+                <small class="text-muted">Ocupadas (OCUPADO)</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-warning">
+            <div class="card-body">
+                <h2 class="text-warning">@Model.HabitacionesMantenimiento</h2>
+                <small class="text-muted">Mantenimiento</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda fila de KPIs -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <h2 class="text-info">@Model.TotalReservas</h2>
+                <small class="text-muted">Total Reservas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <h2 class="text-info">@Model.ReservasPendientes</h2>
+                <small class="text-muted">Pendientes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <h2 class="text-info">@Model.ReservasConfirmadas</h2>
+                <small class="text-muted">Confirmadas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <h2 class="text-info">@Model.TotalClientes</h2>
+                <small class="text-muted">Clientes registrados</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos rápidos -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4>⚡ Accesos Rápidos</h4>
+    </div>
+    <div class="col-md-3">
+        <a asp-page="/Habitaciones/Index" class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow">
+            <div class="card-body text-center p-4">
+                <div class="display-4 mb-2">🛏️</div>
+                <h5>Explorar Habitaciones</h5>
+                <p class="text-muted small">Ver, filtrar y gestionar habitaciones</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a asp-page="/Reservas/Index" class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow">
+            <div class="card-body text-center p-4">
+                <div class="display-4 mb-2">📅</div>
+                <h5>Gestionar Reservas</h5>
+                <p class="text-muted small">Crear, ver y modificar reservas</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a asp-page="/Usuarios/Index" class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow">
+            <div class="card-body text-center p-4">
+                <div class="display-4 mb-2">👥</div>
+                <h5>Clientes</h5>
+                <p class="text-muted small">Gestionar huéspedes y usuarios</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a asp-page="/Chat/Index" class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow">
+            <div class="card-body text-center p-4">
+                <div class="display-4 mb-2">💬</div>
+                <h5>Chat</h5>
+                <p class="text-muted small">Comunicación admin ↔ clientes</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Estado de habitaciones por piso -->
+@if (Model.HabitacionesPorPiso.Any())
+{
+    <div class="row">
+        <div class="col-12">
+            <h4>🏢 Ocupación por Piso</h4>
+        </div>
+        @foreach (var kvp in Model.HabitacionesPorPiso)
+        {
+            var piso = kvp.Key;
+            var habitaciones = kvp.Value;
+            var libres = habitaciones.Count(h => h.Estado == "LIBRE");
+            var ocupadas = habitaciones.Count(h => h.Estado == "OCUPADO");
+            var mantenimiento = habitaciones.Count(h => h.Estado == "MANTENIMIENTO");
+            var total = habitaciones.Count;
+            var ocupacionPct = total > 0 ? (double)ocupadas / total * 100 : 0;
+
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-header bg-light d-flex justify-content-between">
+                        <h6 class="mb-0">Piso @piso</h6>
+                        <small class="text-muted">@total habitaciones</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-success">✅ @libres libres</span>
+                            <span class="text-danger">🔴 @ocupadas ocupadas</span>
+                        </div>
+                        @if (mantenimiento > 0)
+                        {
+                            <div class="text-warning small mb-2">🔧 @mantenimiento en mantenimiento</div>
+                        }
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: @ocupacionPct%" 
+                                 aria-valuenow="@ocupacionPct" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">Ocupación: @ocupacionPct.ToString("F1")%</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15) !important;
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+    }
+</style>
