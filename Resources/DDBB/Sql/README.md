@@ -1,0 +1,1 @@
+Este archivo contine la estrutura actual de la bbdd.
