@@ -7,18 +7,33 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-// DbContext - Connection string from env vars with fallback to appsettings
-var connectionString = BuildConnectionString(builder.Configuration);
-builder.Services.AddDbContext<HoteleriaDbContext>(options =>
-    options.UseSqlServer(connectionString, sqlOptions =>
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
-            errorNumbersToAdd: null
-        )));
+// =============================================
+// CONFIGURACIÓN DE BASE DE DATOS (OPCIONAL)
+// =============================================
+// Variable de entorno: DB_ENABLED=false  →  NO registra DbContext, usa servicio mock
+// Por defecto: true (intenta conectar a SQL Server)
+var useDatabase = GetUseDatabaseSetting(builder.Configuration);
 
-// Services
-builder.Services.AddScoped<IHabitacionService, HabitacionService>();
+if (useDatabase)
+{
+    var connectionString = BuildConnectionString(builder.Configuration);
+    builder.Services.AddDbContext<HoteleriaDbContext>(options =>
+        options.UseSqlServer(connectionString, sqlOptions =>
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null
+            )));
+
+    builder.Services.AddScoped<IHabitacionService, HabitacionService>();
+}
+else
+{
+    // Modo "sin BD" - usa implementación en memoria para desarrollo frontend
+    builder.Services.AddScoped<IHabitacionService, MockHabitacionService>();
+}
+
+// =============================================
 
 var app = builder.Build();
 
@@ -39,12 +54,30 @@ app.MapRazorPages();
 app.Run();
 
 /// <summary>
+/// Determina si se debe usar base de datos real.
+/// Variable de entorno: DB_ENABLED (true/false, default: true)
+/// appsettings.json: UseDatabase (true/false)
+/// </summary>
+static bool GetUseDatabaseSetting(IConfiguration config)
+{
+    var env = Environment.GetEnvironmentVariable("DB_ENABLED");
+    if (!string.IsNullOrWhiteSpace(env))
+        return bool.TryParse(env, out var b) && b;
+
+    var cfg = config["UseDatabase"];
+    if (!string.IsNullOrWhiteSpace(cfg))
+        return bool.TryParse(cfg, out var b) && b;
+
+    return true; // default: usar BD
+}
+
+/// <summary>
 /// Construye la connection string priorizando variables de entorno.
 /// Variables esperadas:
 ///   - DB_SERVER (default: localhost,1433)
 ///   - DB_NAME   (default: HOTEL)
 ///   - DB_USER   (default: sa)
-///   - DB_PASSWORD (requerido, sin default por seguridad)
+///   - DB_PASSWORD (requerido si DB_ENABLED=true)
 ///   - DB_TRUST_CERT (default: true)
 ///   - DB_CONNECTION_STRING (override total: si existe, ignora las demás)
 /// </summary>
