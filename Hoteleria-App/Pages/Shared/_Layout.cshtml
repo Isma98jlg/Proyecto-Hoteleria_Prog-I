@@ -3,85 +3,371 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Hoteleria</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <meta name="shell-type" content="web_dashboard" />
+    <title>@ViewData["Title"] - GrandStay HMS</title>
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#bec6e0",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#7c839b",
+                        "primary": "#000000",
+                        "on-primary-fixed": "#131b2e",
+                        "on-secondary-container": "#663500",
+                        "outline-variant": "#c6c6cd",
+                        "secondary": "#904d00",
+                        "background": "#faf9f7",
+                        "surface-variant": "#e3e2e0",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#68dba9",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-tertiary-container": "#069669",
+                        "surface-container-high": "#e9e8e6",
+                        "on-surface": "#1a1c1b",
+                        "outline": "#76777d",
+                        "tertiary-container": "#002114",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary-fixed-variant": "#005137",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "surface": "#faf9f7",
+                        "surface-tint": "#565e74",
+                        "surface-bright": "#faf9f7",
+                        "tertiary-fixed": "#85f8c4",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f4f3f1",
+                        "secondary-fixed": "#ffdcc3",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#000000",
+                        "primary-container": "#131b2e",
+                        "surface-container": "#efeeec",
+                        "on-background": "#1a1c1b",
+                        "secondary-container": "#fe932c",
+                        "on-secondary-fixed": "#2f1500",
+                        "inverse-on-surface": "#f1f1ef",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#002114",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "inverse-surface": "#2f3130",
+                        "surface-dim": "#dadad8",
+                        "surface-container-highest": "#e3e2e0",
+                        "on-error-container": "#93000a"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        "gutter": "1.25rem",
+                        "space-md": "0.75rem",
+                        "space-lg": "1.25rem",
+                        "space-xl": "2rem",
+                        "space-xs": "0.25rem",
+                        "gutter-desktop": "1.5rem",
+                        "margin-desktop": "2rem",
+                        "space-sm": "0.5rem",
+                        "margin": "1rem"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-xl-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "numeric-table": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "headline-md": ["1.25rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+                        "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-sm": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.06em", "fontWeight": "700" }],
+                        "numeric-table": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0.005em", "fontWeight": "400" }],
+                        "body-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["1.375rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        };
+    </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Hoteleria_App.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">🏨 Hoteleria</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-page="/Index">🏠 Inicio</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                🛏️ Habitaciones
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index">📋 Ver todas</a></li>
-                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index" asp-route-estado="LIBRE">✅ Disponibles</a></li>
-                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index" asp-route-estado="OCUPADO">🔴 Ocupadas</a></li>
-                                <li><a class="dropdown-item" asp-page="/Habitaciones/Index" asp-route-estado="MANTENIMIENTO">🔧 Mantenimiento</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-page="/Habitaciones/PorPiso">🏢 Por piso</a></li>
-                                <li><a class="dropdown-item" asp-page="/Habitaciones/PorTipoVip">⭐ Por tipo VIP</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                📅 Reservas
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" asp-page="/Reservas/Index">📋 Ver todas</a></li>
-                                <li><a class="dropdown-item" asp-page="/Reservas/Crear">➕ Nueva reserva</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-page="/Reservas/Index" asp-route-estado="PENDIENTE">⏳ Pendientes</a></li>
-                                <li><a class="dropdown-item" asp-page="/Reservas/Index" asp-route-estado="CONFIRMADA">✅ Confirmadas</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                👥 Clientes
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" asp-page="/Usuarios/Index">📋 Ver todos</a></li>
-                                <li><a class="dropdown-item" asp-page="/Usuarios/Crear">➕ Nuevo cliente</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-page="/Chat/Index">💬 Chat</a>
-                        </li>
-                    </ul>
-                    <div class="navbar-nav">
-                        <span class="nav-link text-white-50">👤 Admin</span>
-                    </div>
+<body class="bg-background font-body-md text-on-surface antialiased min-h-screen">
+@{
+    var currentPath = (Context.Request.Path.Value ?? "/").ToLowerInvariant();
+    System.Func<string, bool> IsActive = (page) =>
+        page == "/"
+            ? (currentPath == "/" || currentPath == "/index")
+            : currentPath.StartsWith(page);
+}
+
+    <!-- HEADER PRINCIPAL GLOBAL -->
+    <header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest border-b border-surface-container-high/80 z-40 flex items-center justify-between px-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <!-- Botón Módulos HMS -->
+            <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all shadow-sm" id="btn-toggle-drawer" onclick="toggleDrawer(true)" type="button">
+                <span class="material-symbols-outlined text-[20px] text-on-surface">menu</span>
+                <span class="font-label-md text-label-md font-bold text-on-surface">Módulos HMS</span>
+                <span class="font-label-sm text-[10px] bg-primary text-on-primary px-1.5 py-0.5 rounded font-bold tracking-wider">v3.2</span>
+            </button>
+            <div class="h-5 w-px bg-outline-variant/50 hidden sm:block"></div>
+            <!-- Logo GrandStay HMS -->
+            <div class="flex items-center gap-2.5">
+                <img alt="GrandStay Hotels Logo" class="h-8 w-auto object-contain" src="~/images/grandstay-logo.png" />
+            </div>
+        </div>
+        <!-- Buscador global unificado -->
+        <div class="flex-1 max-w-md mx-4 hidden md:block">
+            <button class="flex items-center justify-between bg-surface-container-low hover:bg-surface-container px-3.5 py-1.5 rounded-lg w-full border border-outline-variant/30 text-left transition-colors group" onclick="toggleBento(true)" type="button">
+                <div class="flex items-center gap-2 text-outline group-hover:text-on-surface">
+                    <span class="material-symbols-outlined text-[18px]">search</span>
+                    <span class="font-body-sm text-body-sm">Buscar en el sistema...</span>
+                </div>
+                <kbd class="font-label-sm text-label-sm bg-surface-container-lowest px-1.5 py-0.5 rounded text-on-surface-variant font-mono shadow-sm">⌘K</kbd>
+            </button>
+        </div>
+        <!-- Acciones y Perfil de Usuario -->
+        <div class="flex items-center gap-3">
+            <button class="md:hidden w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface" onclick="toggleBento(true)" title="Buscar" type="button">
+                <span class="material-symbols-outlined text-[20px]">search</span>
+            </button>
+            <button class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative" title="Notificaciones" type="button">
+                <span class="material-symbols-outlined text-[20px]">notifications</span>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+            </button>
+            <div class="h-6 w-px bg-outline-variant/50 hidden sm:block"></div>
+            <div class="flex items-center gap-3 pl-1">
+                <div class="flex flex-col text-right hidden sm:flex">
+                    <span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Elena Rostova</span>
+                    <span class="font-label-sm text-label-sm text-outline leading-tight">Admin General</span>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-2 ring-primary/10">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
                 </div>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <!-- FLYOUT DRAWER LATERAL IZQUIERDO -->
+    <div class="fixed inset-0 z-50 pointer-events-none transition-all duration-300" id="flyout-drawer-container">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+        <aside class="absolute top-0 left-0 bottom-0 w-80 bg-surface-container-lowest shadow-2xl flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto border-r border-surface-container-high" id="drawer-panel">
+            <div class="flex flex-col">
+                <div class="h-16 flex items-center justify-between px-6 border-b border-surface-container-high bg-surface-container-low/50">
+                    <div class="flex items-center gap-2.5">
+                        <img alt="GrandStay HMS Logo" class="h-7 w-auto object-contain" src="~/images/grandstay-logo.png" />
+                        <div class="flex flex-col">
+                            <span class="font-headline-sm text-body-lg font-bold text-on-surface leading-tight">GrandStay HMS</span>
+                            <span class="font-label-sm text-[10px] text-outline uppercase tracking-wider">Consola Unificada</span>
+                        </div>
+                    </div>
+                    <button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface transition-colors" onclick="toggleDrawer(false)" title="Cerrar menú" type="button">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+                <div class="px-5 pt-4 pb-2">
+                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
+                </div>
+                <nav class="flex flex-col gap-1 px-3">
+                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Index">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px]">grid_view</span>
+                            <span>1. Dashboard General</span>
+                        </div>
+                        @if (IsActive("/"))
+                        {
+                            <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+                        }
+                    </a>
+                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Habitaciones/Index">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px]">meeting_room</span>
+                            <span>2. Habitaciones y Pisos</span>
+                        </div>
+                        @if (IsActive("/Habitaciones"))
+                        {
+                            <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="font-label-sm text-label-sm text-outline">280 habs</span>
+                        }
+                    </a>
+                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Reservas") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Reservas/Index">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                            <span>3. Reservas</span>
+                        </div>
+                        @if (IsActive("/Reservas"))
+                        {
+                            <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">En vivo</span>
+                        }
+                    </a>
+                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Usuarios/Index">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px]">group</span>
+                            <span>4. Huéspedes / Directorio</span>
+                        </div>
+                        @if (IsActive("/Usuarios"))
+                        {
+                            <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="font-label-sm text-label-sm text-outline">496 activos</span>
+                        }
+                    </a>
+                </nav>
+                <div class="px-5 pt-6 pb-2">
+                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
+                </div>
+                <div class="px-3 flex flex-col gap-1.5">
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors" onclick="toggleDrawer(false); toggleBento(true);" type="button">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px] text-outline">terminal</span>
+                            <span>Comandos Bento ⌘K</span>
+                        </div>
+                        <span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
+                    </button>
+                    <a class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors" asp-page="/Chat/Index">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px] text-outline">forum</span>
+                            <span>Chat operativo</span>
+                        </div>
+                        <span class="font-label-sm text-[10px] text-outline">BETA</span>
+                    </a>
+                </div>
+            </div>
+            <div class="p-4 border-t border-surface-container-high bg-surface-container-low/40">
+                <div class="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between shadow-sm border border-surface-container-high/60">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined text-[16px]">hotel_class</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-on-surface font-bold">Auditoría Nocturna</span>
+                            <span class="font-label-sm text-[10px] text-outline">02:00 AM Programada</span>
+                        </div>
+                    </div>
+                    <span class="font-label-sm text-[10px] text-secondary font-bold bg-secondary-fixed/70 px-2 py-0.5 rounded">Auto</span>
+                </div>
+            </div>
+        </aside>
     </div>
 
-    <footer class="border-top footer text-muted py-3">
-        <div class="container text-center">
-            &copy; 2026 - Hoteleria - Sistema de Gestión Hotelera
+    <!-- COMMAND BENTO MODAL (⌘K) -->
+    <div class="fixed inset-0 z-50 pointer-events-none hidden items-center justify-center p-4" id="bento-modal-container">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-200 pointer-events-auto" id="bento-backdrop" onclick="toggleBento(false)"></div>
+        <div class="relative bg-surface-container-lowest rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-200 pointer-events-auto border border-surface-container-high flex flex-col" id="bento-panel">
+            <div class="flex items-center px-4 py-3 border-b border-surface-container-high gap-3">
+                <span class="material-symbols-outlined text-outline text-[22px]">search</span>
+                <input class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-on-surface placeholder:text-outline font-body-md text-body-md" id="bento-search-input" placeholder="Buscar reservas, huéspedes, módulos o escribir una orden..." type="text" />
+                <kbd class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline font-mono cursor-pointer" onclick="toggleBento(false)">ESC</kbd>
+            </div>
+            <div class="p-4 flex flex-col gap-3">
+                <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Navegación Rápida</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Index">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined @(IsActive("/") ? "text-on-primary" : "text-on-tertiary-container") text-[20px]">grid_view</span>
+                            <span class="font-body-sm text-body-sm font-semibold @(IsActive("/") ? "text-on-primary" : "text-on-surface")">Dashboard</span>
+                        </div>
+                        <span class="font-label-sm text-[10px] @(IsActive("/") ? "text-on-primary" : "text-outline") font-mono">^1</span>
+                    </a>
+                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Habitaciones/Index">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined @(IsActive("/Habitaciones") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">meeting_room</span>
+                            <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Habitaciones") ? "text-on-primary" : "text-on-surface")">Habitaciones</span>
+                        </div>
+                        <span class="font-label-sm text-[10px] @(IsActive("/Habitaciones") ? "text-on-primary" : "text-outline") font-mono">^2</span>
+                    </a>
+                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Reservas") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Reservas/Index">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined @(IsActive("/Reservas") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">calendar_month</span>
+                            <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Reservas") ? "text-on-primary" : "text-on-surface")">Reservas</span>
+                        </div>
+                        <span class="font-label-sm text-[10px] @(IsActive("/Reservas") ? "text-on-primary" : "text-outline") font-mono">^3</span>
+                    </a>
+                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Usuarios/Index">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined @(IsActive("/Usuarios") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">group</span>
+                            <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Usuarios") ? "text-on-primary" : "text-on-surface")">Huéspedes</span>
+                        </div>
+                        <span class="font-label-sm text-[10px] @(IsActive("/Usuarios") ? "text-on-primary" : "text-outline") font-mono">^4</span>
+                    </a>
+                </div>
+                <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold mt-2">Acciones de Mostrador</span>
+                <div class="flex flex-col gap-1.5">
+                    <a class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" asp-page="/Reservas/Index">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container">
+                                <span class="material-symbols-outlined text-[16px]">add_task</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-body-sm text-body-sm font-semibold text-on-surface">Nueva Reserva</span>
+                                <span class="font-label-sm text-[11px] text-outline">Abrir el libro de reservas</span>
+                            </div>
+                        </div>
+                        <span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">IR</span>
+                    </a>
+                    <a class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" asp-page="/Habitaciones/Crear">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded bg-primary-container/10 flex items-center justify-center text-primary-container">
+                                <span class="material-symbols-outlined text-[16px]">meeting_room</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-body-sm text-body-sm font-semibold text-on-surface">Nueva Habitación</span>
+                                <span class="font-label-sm text-[11px] text-outline">Registrar habitación nueva en la torre</span>
+                            </div>
+                        </div>
+                        <span class="font-label-sm text-label-sm text-on-surface font-semibold">Folio Nuevo</span>
+                    </a>
+                </div>
+            </div>
+            <div class="px-4 py-2.5 bg-surface-container-low flex items-center justify-between text-outline font-label-sm text-label-sm border-t border-surface-container-high">
+                <span>Navegar con teclas ↑ ↓ · Enter para seleccionar</span>
+                <span>Esc para salir</span>
+            </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="w-full pt-16 bg-surface min-h-screen">
+        <div class="px-6 md:px-8 py-8 flex flex-col gap-8 max-w-[1720px] mx-auto w-full">
+            @RenderBody()
+        </div>
+    </main>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

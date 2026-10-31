@@ -1,0 +1,880 @@
+<!DOCTYPE html><html lang="es" style=""><head></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen"><svg class="inline-defs-container" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"></svg><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-secondary":"#ffffff","inverse-primary":"#bec6e0","error-container":"#ffdad6","on-primary-container":"#7c839b","primary":"#000000","on-primary-fixed":"#131b2e","on-secondary-container":"#663500","outline-variant":"#c6c6cd","secondary":"#904d00","background":"#faf9f7","surface-variant":"#e3e2e0","on-error":"#ffffff","tertiary-fixed-dim":"#68dba9","primary-fixed-dim":"#bec6e0","on-tertiary-container":"#069669","surface-container-high":"#e9e8e6","on-surface":"#1a1c1b","outline":"#76777d","tertiary-container":"#002114","secondary-fixed-dim":"#ffb77d","on-surface-variant":"#45464d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#6e3900","surface":"#faf9f7","surface-tint":"#565e74","surface-bright":"#faf9f7","tertiary-fixed":"#85f8c4","on-tertiary":"#ffffff","surface-container-low":"#f4f3f1","secondary-fixed":"#ffdcc3","primary-fixed":"#dae2fd","surface-container-lowest":"#ffffff","tertiary":"#000000","primary-container":"#131b2e","surface-container":"#efeeec","on-background":"#1a1c1b","secondary-container":"#fe932c","on-secondary-fixed":"#2f1500","inverse-on-surface":"#f1f1ef","error":"#ba1a1a","on-primary":"#ffffff","on-tertiary-fixed":"#002114","on-primary-fixed-variant":"#3f465c","inverse-surface":"#2f3130","surface-dim":"#dadad8","surface-container-highest":"#e3e2e0","on-error-container":"#93000a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.25rem","space-md":"0.75rem","space-lg":"1.25rem","space-xl":"2rem","space-xs":"0.25rem","gutter-desktop":"1.5rem","margin-desktop":"2rem","space-sm":"0.5rem","margin":"1rem"},"fontFamily":{"headline-md":["Plus Jakarta Sans"],"headline-xl":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"numeric-table":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"headline-md":["1.25rem",{"lineHeight":"1.625rem","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-xl-mobile":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"label-md":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.04em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["1.125rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["0.6875rem",{"lineHeight":"0.875rem","letterSpacing":"0.06em","fontWeight":"700"}],"numeric-table":["0.875rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"body-sm":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"0.005em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.5rem","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["3rem",{"lineHeight":"3.5rem","letterSpacing":"-0.03em","fontWeight":"700"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}]}}}}</script>
+<!-- HEADER PRINCIPAL GLOBAL (Estático, ancho completo, sin sidebar permanente) -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest border-b border-surface-container-high/80 z-40 flex items-center justify-between px-6 shadow-sm">
+<div class="flex items-center gap-4">
+<!-- Botón interactivo Módulos HMS a la izquierda del logo con badge -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all shadow-sm" id="btn-toggle-drawer" onclick="toggleDrawer(true)" type="button">
+<span class="material-symbols-outlined text-[20px] text-on-surface">menu</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Módulos HMS</span>
+<span class="font-label-sm text-[10px] bg-primary text-on-primary px-1.5 py-0.5 rounded font-bold tracking-wider">v3.2</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/50 hidden sm:block"></div>
+<!-- Logo GrandStay HMS -->
+<div class="flex items-center gap-2.5"><img alt="GrandStay Hotels Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X7YyQRhDQRFZLuh0OL6o3M6Z2gMvsfJoEDf2Dh8gvXMvoCzyV1pGEKCSXHnhBX_mUCBqh7xhh953_ALzXFV7WL_8NRLEQILPOXNdwhQuAO6x3biezyottgZMPkpvwyDmFpfOYbs4RMGil_mgCQQhFNZLutSYJxWxBGToq7GCJtzXLxMH75feFPD6CRjbaowq1Qpz6qfG1106IHmdX4a_BQb7rQuFli4MM8H7teOtca"></div>
+<!-- Sede Hotelera Selector -->
+
+</div>
+<!-- Buscador global unificado -->
+<div class="flex-1 max-w-md mx-4 hidden md:block">
+<button class="flex items-center justify-between bg-surface-container-low hover:bg-surface-container px-3.5 py-1.5 rounded-lg w-full border border-outline-variant/30 text-left transition-colors group" onclick="toggleBento(true)" type="button">
+<div class="flex items-center gap-2 text-outline group-hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span class="font-body-sm text-body-sm">Buscar en el sistema...</span>
+</div>
+<kbd class="font-label-sm text-label-sm bg-surface-container-lowest px-1.5 py-0.5 rounded text-on-surface-variant font-mono shadow-sm">⌘K</kbd>
+</button>
+</div>
+<!-- Acciones y Perfil de Usuario -->
+<div class="flex items-center gap-3">
+<button class="md:hidden w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface" onclick="toggleBento(true)" title="Buscar" type="button">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<button class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative" title="Notificaciones" type="button">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+</button>
+<div class="h-6 w-px bg-outline-variant/50 hidden sm:block"></div>
+<div class="flex items-center gap-3 pl-1">
+<div class="flex flex-col text-right hidden sm:flex">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Elena Rostova</span>
+<span class="font-label-sm text-label-sm text-outline leading-tight">Admin General</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-2 ring-primary/10">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- FLYOUT DRAWER LATERAL IZQUIERDO -->
+<div class="fixed inset-0 z-50 pointer-events-none transition-all duration-300" id="flyout-drawer-container">
+<!-- Backdrop Overlay -->
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+<!-- Drawer Menu Panel -->
+<aside class="absolute top-0 left-0 bottom-0 w-80 bg-surface-container-lowest shadow-2xl flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto border-r border-surface-container-high" id="drawer-panel">
+<div class="flex flex-col">
+<!-- Drawer Header -->
+<div class="h-16 flex items-center justify-between px-6 border-b border-surface-container-high bg-surface-container-low/50">
+<div class="flex items-center gap-2.5">
+<img alt="GrandStay HMS Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF7v83ZsmNx50096-Lz_N34-IPz8mYAQDDVMf99b53JPw8rMkecPjPcckRTsPn6j6TGnJGVrtQqRXDHKJNXYqtBfqz4p6FcWJuNi7uoxORgQZuCaGOmOtVLfUeBKRPXs1VhXfwbYdQsV-1PSoWutnQU-fkx6ZNbN30zvbukSewSg4qZSs9aVdnYBD_XXx7eu2LyDhrZdtEwl9B-2jDsJR4agDSr2UqF3b6WZb6FfM">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-lg font-bold text-on-surface leading-tight">GrandStay HMS</span>
+<span class="font-label-sm text-[10px] text-outline uppercase tracking-wider">Consola Unificada</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface transition-colors" onclick="toggleDrawer(false)" title="Cerrar menú" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Navigation to the 4 Canonical Modules Only (NO 'Tarifas y VIP') -->
+<div class="px-5 pt-4 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
+</div>
+<nav class="flex flex-col gap-1 px-3">
+<!-- 1. Dashboard (Activo) -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-primary-container text-on-primary font-semibold shadow-sm transition-all" data-path="dashboard" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="font-body-md text-body-md">1. Dashboard General</span>
+</div>
+<span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+</a>
+<!-- 2. Habitaciones y Pisos -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="habitaciones-y-pisos" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+<span class="">2. Habitaciones y Pisos</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">280 habs</span>
+</a>
+<!-- 3. Reservas -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="reservas" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span class="">3. Reservas</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">En vivo</span>
+</a>
+<!-- 4. Huéspedes / Directorio -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="huespedes-y-usuarios" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="">4. Huéspedes / Directorio</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">496 activos</span>
+</a>
+</nav>
+<!-- Quick Action Inside Drawer -->
+<div class="px-5 pt-6 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
+</div>
+<div class="px-3 flex flex-col gap-1.5">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors" onclick="toggleDrawer(false); toggleBento(true);" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">terminal</span>
+<span class="">Comandos Bento ⌘K</span>
+</div>
+<span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
+</button>
+</div>
+</div>
+<!-- Drawer Footer Card -->
+<div class="p-4 border-t border-surface-container-high bg-surface-container-low/40">
+<div class="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between shadow-sm border border-surface-container-high/60">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">hotel_class</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Auditoría Nocturna</span>
+<span class="font-label-sm text-[10px] text-outline">02:00 AM Programada</span>
+</div>
+</div>
+<span class="font-label-sm text-[10px] text-secondary font-bold bg-secondary-fixed/70 px-2 py-0.5 rounded">Auto</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- COMMAND BENTO MODAL (⌘K) INTERACTIVO -->
+<div class="fixed inset-0 z-50 pointer-events-none hidden items-center justify-center p-4" id="bento-modal-container">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-200 pointer-events-auto" id="bento-backdrop" onclick="toggleBento(false)"></div>
+<!-- Bento Modal Card -->
+<div class="relative bg-surface-container-lowest rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-200 pointer-events-auto border border-surface-container-high flex flex-col" id="bento-panel">
+<!-- Top Search Input -->
+<div class="flex items-center px-4 py-3 border-b border-surface-container-high gap-3">
+<span class="material-symbols-outlined text-outline text-[22px]">search</span>
+<input class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-on-surface placeholder:text-outline font-body-md text-body-md" id="bento-search-input" placeholder="Buscar reservas, huéspedes, módulos o escribir una orden..." type="text">
+<kbd class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline font-mono cursor-pointer" onclick="toggleBento(false)">ESC</kbd>
+</div>
+<!-- Quick Module Jump (Only 4 Canonical Modules) -->
+<div class="p-4 flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Navegación Rápida</span>
+<div class="grid grid-cols-2 gap-2">
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px]">grid_view</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Dashboard</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^1</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">meeting_room</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Habitaciones</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^2</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">calendar_month</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Reservas</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^3</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">group</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Huéspedes</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^4</span>
+</a>
+</div>
+<!-- Quick Actions Bento Section -->
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold mt-2">Acciones de Mostrador</span>
+<div class="flex flex-col gap-1.5">
+<button class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined text-[16px]">add_task</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">+ Ingreso Exprés</span>
+<span class="font-label-sm text-[11px] text-outline">Asignar llave magnética de inmediato</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">IN Rápido</span>
+</button>
+<button class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" type="button">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[16px]">bookmark_add</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">+ Ingreso Exprés</span>
+<span class="font-label-sm text-[11px] text-outline">Bloquear habitación con regla 1 cama = 1 persona</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Folio Nuevo</span>
+</button>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-4 py-2.5 bg-surface-container-low flex items-center justify-between text-outline font-label-sm text-label-sm border-t border-surface-container-high">
+<span class="">Navegar con teclas ↑ ↓ · Enter para seleccionar</span>
+<span class="">Esc para salir</span>
+</div>
+</div>
+</div>
+<!-- CONTENIDO PRINCIPAL FULL-WIDTH (pt-16) -->
+<main class="w-full pt-16 bg-surface min-h-screen">
+<div class="px-6 md:px-8 py-8 flex flex-col gap-8 max-w-[1720px] mx-auto w-full">
+<!-- Top Action Bar & Executive Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container animate-ping"></span>
+            Métricas de Turno en Vivo
+          </span>
+<span class="text-outline font-label-sm text-label-sm">· Corte 14:35 hrs</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight mt-1 font-bold">Dashboard General &amp; Analítica Histórica</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Monitoreo holístico de inventario (280 habs), rendimiento financiero por camas y ciclo canónico de reservas.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-container-lowest p-1 rounded-xl shadow-sm border border-surface-container-high">
+<button class="px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+            Consola Ejecutiva
+          </button>
+
+</div>
+<button class="h-10 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity" type="button">
+<span class="material-symbols-outlined text-[18px]">file_download</span>
+          Exportar Informe BI
+        </button>
+</div>
+</div>
+<!-- CINTA COLAPSABLE DE MÉTRICAS / KPIS DEL DASHBOARD CON BOTÓN CHEVRON (▲ / ▼) -->
+<section class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container-high flex flex-col gap-5 transition-all duration-300" id="kpi-panel">
+<div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleKPIPanel()">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[22px]">equalizer</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Rendimiento Operativo y Tarifa Viva</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full">Actualizado hace 3 min</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline">Índices primarios de ocupación, tarifas medias ponderadas y proyección de caja en tiempo real.</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider hidden sm:inline" id="kpi-toggle-text">Mostrar Métricas</span>
+<button aria-label="Colapsar métricas" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px] transition-transform duration-300" id="kpi-chevron" style="transform: rotate(180deg);">expand_more</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 transition-all duration-300 hidden" id="kpi-grid">
+<!-- KPI 1: Ocupación Actual -->
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:bg-surface-container-low transition-colors border border-surface-container">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Ocupación Actual</span>
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px]">door_front</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">86.4%</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">242 de 280 Habitaciones</span>
+</div>
+<div class="mt-3 flex items-center justify-between text-label-sm font-label-sm">
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden mr-2">
+<div class="bg-on-tertiary-container h-full rounded-full" style="width: 86.4%"></div>
+</div>
+<span class="text-on-tertiary-container font-bold whitespace-nowrap">+4.1% vs ayer</span>
+</div>
+</div>
+<!-- KPI 2: ADR -->
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:bg-surface-container-low transition-colors border border-surface-container">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">ADR (Tarifa Prom.)</span>
+<span class="material-symbols-outlined text-secondary-container text-[20px]">price_change</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">$142.50</span>
+<span class="font-label-sm text-label-sm text-outline">USD</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Por noche ocupada</span>
+</div>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="font-semibold">+$12.30</span>
+<span class="text-outline font-normal">vs plan base</span>
+</div>
+</div>
+<!-- KPI 3: RevPAR Global -->
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:bg-surface-container-low transition-colors border border-surface-container">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">RevPAR Global</span>
+<span class="material-symbols-outlined text-outline text-[20px]">analytics</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">$123.12</span>
+<span class="font-label-sm text-label-sm text-outline">USD</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Sobre total 280 habs</span>
+</div>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+<span class="font-semibold">+8.7%</span>
+<span class="text-outline font-normal">rendimiento global</span>
+</div>
+</div>
+<!-- KPI 4: Ingresos MTD -->
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:bg-surface-container-low transition-colors border border-surface-container">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Ingresos MTD</span>
+<span class="material-symbols-outlined text-on-surface text-[20px]">account_balance_wallet</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">$148,650</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">A la fecha del mes</span>
+</div>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[14px]">auto_graph</span>
+<span class="font-semibold">+14.2%</span>
+<span class="text-outline font-normal">vs mes pasado</span>
+</div>
+</div>
+<!-- KPI 5: Huéspedes In-House -->
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:bg-surface-container-low transition-colors border border-surface-container">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Huéspedes In-House</span>
+<span class="material-symbols-outlined text-outline text-[20px]">badge</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">496</span>
+<span class="font-label-sm text-label-sm text-outline">pers.</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Capacidad activa estricta</span>
+</div>
+<div class="mt-3 flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-secondary font-bold">14 VIP Activos</span>
+<span class="text-outline">62 salidas hoy</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ANALYTICS ROW: GRÁFICA DE EVOLUCIÓN HISTÓRICA & COMPOSICIÓN DE INGRESOS -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Historical Graph 1: Ocupación vs Capacidad (8 Cols) -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container-high flex flex-col justify-between">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-on-tertiary-container"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Operaciones de Recepción: Inicios &amp; Fin de Estancia</h2>
+</div>
+<p class="font-body-sm text-body-sm text-outline">Desempeño mensual de plazas ocupadas con benchmark de meta hotelera (80%).</p>
+</div>
+<!-- Time Range Selector -->
+<div class="flex items-center bg-surface-container p-1 rounded-lg">
+<button class="px-2.5 py-1 text-label-sm font-label-sm rounded text-on-surface-variant hover:text-on-surface" type="button">7D</button>
+<button class="px-2.5 py-1 text-label-sm font-label-sm rounded text-on-surface-variant hover:text-on-surface" type="button">Inicios de reserva (5)</button>
+<button class="px-2.5 py-1 text-label-sm font-label-sm rounded text-on-surface-variant hover:text-on-surface" type="button">Fin de reserva (3)</button>
+<button class="px-3 py-1 text-label-sm font-label-sm rounded-md bg-surface-container-lowest font-bold text-on-surface shadow-sm" type="button">12M</button>
+</div>
+</div>
+<!-- SVG Line/Area Chart -->
+<div class="relative w-full h-72 my-2 flex items-center justify-center">
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 760 220">
+<defs>
+<linearGradient id="occupancyFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#069669" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#069669" stop-opacity="0.0"></stop>
+</linearGradient>
+</defs>
+<line stroke="#efeeec" stroke-width="1" x1="0" x2="760" y1="20" y2="20"></line>
+<line stroke="#efeeec" stroke-width="1" x1="0" x2="760" y1="70" y2="70"></line>
+<line stroke="#efeeec" stroke-width="1" x1="0" x2="760" y1="120" y2="120"></line>
+<line stroke="#efeeec" stroke-width="1" x1="0" x2="760" y1="170" y2="170"></line>
+<!-- Target 80% Benchmark Line -->
+<line stroke="#fe932c" stroke-dasharray="4 4" stroke-width="1.5" x1="0" x2="760" y1="62" y2="62"></line>
+<text fill="#904d00" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" x="700" y="56">Meta: 80%</text>
+<!-- Area polygon (12 months) -->
+<polygon fill="url(#occupancyFill)" points="0,170 0,140 68,132 136,115 204,95 272,88 340,55 408,48 476,60 544,52 612,42 680,38 748,32 760,32 760,200 0,200"></polygon>
+<!-- Trend Line -->
+<polyline fill="none" points="0,140 68,132 136,115 204,95 272,88 340,55 408,48 476,60 544,52 612,42 680,38 748,32 760,32" stroke="#069669" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>
+<circle cx="68" cy="132" fill="#ffffff" r="4" stroke="#069669" stroke-width="2.5"></circle>
+<circle cx="204" cy="95" fill="#ffffff" r="4" stroke="#069669" stroke-width="2.5"></circle>
+<circle cx="340" cy="55" fill="#ffffff" r="4" stroke="#069669" stroke-width="2.5"></circle>
+<circle cx="476" cy="60" fill="#ffffff" r="4" stroke="#069669" stroke-width="2.5"></circle>
+<circle cx="612" cy="42" fill="#ffffff" r="4" stroke="#069669" stroke-width="2.5"></circle>
+<circle cx="748" cy="32" fill="#069669" r="6" stroke="#ffffff" stroke-width="2"></circle>
+</svg>
+</div>
+<!-- Axis Labels -->
+<div class="grid grid-cols-12 text-center text-outline font-label-sm text-label-sm pt-2">
+<span class="">May</span><span class="">Jun</span><span class="">Jul</span><span class="">Ago</span><span class="">Sep</span><span class="">Oct</span><span class="">Nov</span><span class="">Dic</span><span class="">Ene</span><span class="">Feb</span><span class="">Mar</span><span class="text-on-tertiary-container font-bold">Abr (86.4%)</span>
+</div>
+<div class="mt-4 pt-4 flex flex-wrap items-center justify-between gap-4 bg-surface-container-low rounded-xl px-4 py-3">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-on-tertiary-container"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Ocupación Registrada (Promedio 12M: 78.2%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-0.5 bg-secondary-container"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Límite Rentabilidad Óptima (80%)</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-lowest px-2.5 py-1 rounded shadow-sm font-semibold">
+            Tendencia Anual: +11.8% Crecimiento
+          </span>
+</div>
+</div>
+<!-- Graph 2: Revenue Composition - Respetando categorías Estándar ($45/cama) y VIP ($95/cama) (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container-high flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Composición de Ingresos</h2>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Por Categoría</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline">Aporte tarifario canónico: Estándar ($45/cama) vs VIP ($95/cama).</p>
+<!-- Donut Graphic Representation -->
+<div class="flex items-center justify-center my-6 relative">
+<svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="38" stroke="#f4f3f1" stroke-width="12"></circle>
+<!-- VIP Segment (62%) -->
+<circle cx="50" cy="50" fill="transparent" r="38" stroke="#131b2e" stroke-dasharray="238.76" stroke-dashoffset="90.72" stroke-linecap="round" stroke-width="12"></circle>
+<!-- Standard Segment (38%) -->
+<circle cx="50" cy="50" fill="transparent" r="38" stroke="#fe932c" stroke-dasharray="238.76" stroke-dashoffset="148.03" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center text-center">
+<span class="font-label-sm text-label-sm text-outline uppercase">Ingreso Mes</span>
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">$148.6K</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">En Meta</span>
+</div>
+</div>
+<!-- Breakdown Cards -->
+<div class="flex flex-col gap-3">
+<div class="p-3 rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-3.5 h-3.5 rounded bg-primary-container"></span>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Categoría VIP</span>
+<span class="font-label-sm text-label-sm text-outline">$95 / cama · 104 suites asignables</span>
+</div>
+</div>
+<div class="flex flex-col text-right">
+<span class="font-numeric-table text-numeric-table font-bold text-on-surface">$92,160</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">62.0% del total</span>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-3.5 h-3.5 rounded bg-secondary-container"></span>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Categoría Estándar</span>
+<span class="font-label-sm text-label-sm text-outline">$45 / cama · 176 habitaciones base</span>
+</div>
+</div>
+<div class="flex flex-col text-right">
+<span class="font-numeric-table text-numeric-table font-bold text-on-surface">$56,490</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">38.0% del total</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span class="">Multiplicador VIP: 2.11x vs base</span>
+<span class="text-secondary font-semibold">Camas Activas: 512 / 560</span>
+</div>
+</div>
+</div>
+<!-- MIDDLE ROW: RESERVATION FUNNEL & STRICT CANONICAL BED CAPACITY (# CAMAS = # PERSONAS) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Visualizador Embudo Ciclo de Vida (7 Cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container-high flex flex-col justify-between"><div><div class="flex items-center justify-between pb-2"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-outline text-[20px]">filter_alt</span><h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Ciclo Canónico de Reservas (2 Estados)</h2></div><span class="font-label-sm text-label-sm px-2.5 py-1 rounded bg-surface-container text-on-surface-variant font-semibold">2 Estados Canónicos</span></div><p class="font-body-sm text-body-sm text-outline mb-6">Trazabilidad estricta del ciclo de vida de la entidad: exclusivamente 'Reservado' y 'Liberado'.</p><div class="flex flex-col gap-4"><!-- Estado 1: Reservado --><div class="flex flex-col gap-1.5 p-3.5 rounded-xl bg-surface-container-low border border-surface-container"><div class="flex items-center justify-between text-body-sm font-body-sm"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-sm text-label-sm font-bold">1</span><span class="font-bold text-on-surface text-[15px]">Reservado</span><span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-lowest px-2 py-0.5 rounded font-semibold border border-surface-container-high">Pago y registro completados</span></div><div class="flex items-center gap-2 font-numeric-table text-numeric-table"><span class="font-bold text-on-surface text-[16px]">242 folios</span><span class="text-outline text-label-sm">(86.4% inventario retenido)</span></div></div><div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden mt-1.5"><div class="bg-on-tertiary-container h-full rounded-full" style="width: 86.4%"></div></div><div class="flex items-center justify-between text-label-sm font-label-sm text-outline pt-1"><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-on-tertiary-container">event_available</span> Inicio de reserva activo · Plazas asignadas</span><span class="font-semibold text-on-surface">242 de 280 habs ocupadas</span></div></div><!-- Estado 2: Liberado --><div class="flex flex-col gap-1.5 p-3.5 rounded-xl bg-surface-container-low border border-surface-container"><div class="flex items-center justify-between text-body-sm font-body-sm"><div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-sm text-label-sm font-bold">2</span><span class="font-bold text-on-surface text-[15px]">Liberado</span><span class="font-label-sm text-label-sm text-outline bg-surface-container-lowest px-2 py-0.5 rounded font-semibold border border-surface-container-high">Término de reserva y entrega</span></div><div class="flex items-center gap-2 font-numeric-table text-numeric-table"><span class="font-bold text-on-surface text-[16px]">38 folios</span><span class="text-outline text-label-sm">(13.6% inventario disponible)</span></div></div><div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden mt-1.5"><div class="bg-secondary-container h-full rounded-full" style="width: 13.6%"></div></div><div class="flex items-center justify-between text-label-sm font-label-sm text-outline pt-1"><span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-secondary">meeting_room</span> Fin de reserva procesado · Habitaciones liberadas</span><span class="font-semibold text-on-surface">Devueltas a disponibilidad</span></div></div></div></div><div class="mt-6 pt-4 flex items-center justify-between text-body-sm font-body-sm bg-surface-container-low p-3.5 rounded-xl"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-on-tertiary-container text-[18px]">verified</span><span class="text-on-surface">Tasa Canónica de Conversión: <strong>100%</strong> (Folios registrados pasan a Reservado y concluyen en Liberado)</span></div><span class="text-outline text-label-sm font-label-sm">Total Inventario: 280 habitaciones</span></div></div>
+<!-- Distribución por Número de Camas (5 Cols) - STRICT RULE: # Camas = # Personas -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container-high flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[20px]">single_bed</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Inventario por Configuración de Camas</h2>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-semibold">Total 280</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline mb-5">Regla canónica estricta: <strong>1 Cama = 1 Persona</strong>, 2 Camas = 2 Personas, etc. Sin rangos ambiguos.</p>
+<div class="grid grid-cols-2 gap-3.5">
+<!-- 1 Cama = Capacidad 1 Persona -->
+<div class="bg-surface-container-low p-4 rounded-xl flex flex-col justify-between shadow-sm border border-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">1 Cama</span>
+<span class="font-label-sm text-label-sm text-outline font-medium">Capacidad: 1 Persona</span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest px-2 py-0.5 rounded text-on-surface-variant font-semibold">84 habs</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline justify-between">
+<span class="font-numeric-table text-numeric-table text-outline">Ocupadas:</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">76 habs</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden mt-2">
+<div class="bg-on-tertiary-container h-full rounded-full" style="width: 90.4%"></div>
+</div>
+<div class="flex items-center justify-between mt-1.5 text-label-sm font-label-sm">
+<span class="text-outline">Tasa de uso</span>
+<span class="text-on-tertiary-container font-bold">90.4%</span>
+</div>
+</div>
+</div>
+<!-- 2 Camas = Capacidad 2 Personas -->
+<div class="bg-surface-container-low p-4 rounded-xl flex flex-col justify-between shadow-sm border border-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">2 Camas</span>
+<span class="font-label-sm text-label-sm text-outline font-medium">Capacidad: 2 Personas</span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest px-2 py-0.5 rounded text-on-surface-variant font-semibold">136 habs</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline justify-between">
+<span class="font-numeric-table text-numeric-table text-outline">Ocupadas:</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">118 habs</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden mt-2">
+<div class="bg-on-tertiary-container h-full rounded-full" style="width: 86.7%"></div>
+</div>
+<div class="flex items-center justify-between mt-1.5 text-label-sm font-label-sm">
+<span class="text-outline">Tasa de uso</span>
+<span class="text-on-tertiary-container font-bold">86.7%</span>
+</div>
+</div>
+</div>
+<!-- 3 Camas = Capacidad 3 Personas -->
+<div class="bg-surface-container-low p-4 rounded-xl flex flex-col justify-between shadow-sm border border-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">3 Camas</span>
+<span class="font-label-sm text-label-sm text-outline font-medium">Capacidad: 3 Personas</span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest px-2 py-0.5 rounded text-on-surface-variant font-semibold">40 habs</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline justify-between">
+<span class="font-numeric-table text-numeric-table text-outline">Ocupadas:</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">33 habs</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden mt-2">
+<div class="bg-on-tertiary-container h-full rounded-full" style="width: 82.5%"></div>
+</div>
+<div class="flex items-center justify-between mt-1.5 text-label-sm font-label-sm">
+<span class="text-outline">Tasa de uso</span>
+<span class="text-on-tertiary-container font-bold">82.5%</span>
+</div>
+</div>
+</div>
+<!-- 4 Camas = Capacidad 4 Personas -->
+<div class="bg-surface-container-low p-4 rounded-xl flex flex-col justify-between shadow-sm border border-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">4 Camas</span>
+<span class="font-label-sm text-label-sm text-outline font-medium">Capacidad: 4 Personas</span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest px-2 py-0.5 rounded text-on-surface-variant font-semibold">20 habs</span>
+</div>
+<div class="mt-4 flex flex-col">
+<div class="flex items-baseline justify-between">
+<span class="font-numeric-table text-numeric-table text-outline">Ocupadas:</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">15 habs</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden mt-2">
+<div class="bg-on-tertiary-container h-full rounded-full" style="width: 75.0%"></div>
+</div>
+<div class="flex items-center justify-between mt-1.5 text-label-sm font-label-sm">
+<span class="text-outline">Tasa de uso</span>
+<span class="text-on-tertiary-container font-bold">75.0%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span class="">Capacidad física máxima: 560 personas</span>
+<span class="text-on-surface font-semibold">Disponibilidad remanente: 38 habs</span>
+</div>
+</div>
+</div>
+<!-- BOTTOM ROW: OPERATIONAL MOVEMENTS & NIGHT AUDIT STATUS -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-4">
+<!-- Tabla Próximos Check-ins y Check-outs (8 Cols) -->
+
+<!-- Tarjeta y Módulo de Auditoría Nocturna (4 Cols) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+
+<!-- Housekeeping Status Mini Widget -->
+
+</div>
+</div>
+</div>
+</main>
+<!-- JAVASCRIPT INTERACTIVO: DRAWER, BENTO MODAL & COLLAPSIBLE KPIS -->
+<script>
+  // 1. Toggle KPI Panel
+  function toggleKPIPanel() {
+    const kpiGrid = document.getElementById('kpi-grid');
+    const chevron = document.getElementById('kpi-chevron');
+    const toggleText = document.getElementById('kpi-toggle-text');
+
+    if (!kpiGrid || !chevron) return;
+
+    if (kpiGrid.classList.contains('hidden')) {
+      kpiGrid.classList.remove('hidden');
+      chevron.style.transform = 'rotate(0deg)';
+      chevron.innerText = 'expand_less';
+      if (toggleText) toggleText.innerText = 'Ocultar Métricas';
+    } else {
+      kpiGrid.classList.add('hidden');
+      chevron.style.transform = 'rotate(180deg)';
+      chevron.innerText = 'expand_more';
+      if (toggleText) toggleText.innerText = 'Mostrar Métricas';
+    }
+  }
+
+  // 2. Flyout Drawer Interactions
+  function toggleDrawer(open) {
+    const container = document.getElementById('flyout-drawer-container');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const panel = document.getElementById('drawer-panel');
+
+    if (!container || !backdrop || !panel) return;
+
+    if (open) {
+      container.classList.remove('pointer-events-none');
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+      panel.classList.remove('-translate-x-full');
+      panel.classList.add('translate-x-0');
+    } else {
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+      panel.classList.remove('translate-x-0');
+      panel.classList.add('-translate-x-full');
+      setTimeout(() => {
+        container.classList.add('pointer-events-none');
+      }, 300);
+    }
+  }
+
+  // 3. Bento Modal (⌘K) Interactions
+  function toggleBento(open) {
+    const modalContainer = document.getElementById('bento-modal-container');
+    const backdrop = document.getElementById('bento-backdrop');
+    const panel = document.getElementById('bento-panel');
+    const input = document.getElementById('bento-search-input');
+
+    if (!modalContainer || !backdrop || !panel) return;
+
+    if (open) {
+      modalContainer.classList.remove('hidden', 'pointer-events-none');
+      modalContainer.classList.add('flex', 'pointer-events-auto');
+      setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        panel.classList.remove('scale-95', 'opacity-0');
+        panel.classList.add('scale-100', 'opacity-100');
+        if (input) input.focus();
+      }, 10);
+    } else {
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      panel.classList.remove('scale-100', 'opacity-100');
+      panel.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modalContainer.classList.remove('flex', 'pointer-events-auto');
+        modalContainer.classList.add('hidden', 'pointer-events-none');
+      }, 200);
+    }
+  }
+
+  // Keyboard Shortcuts (Cmd+K / Ctrl+K and ESC)
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      const modalContainer = document.getElementById('bento-modal-container');
+      const isVisible = modalContainer && !modalContainer.classList.contains('hidden');
+      toggleBento(!isVisible);
+    }
+
+    if (e.key === 'Escape') {
+      toggleBento(false);
+      toggleDrawer(false);
+    }
+  });
+</script>
+
+
+<!-- WIDGET FLOTANTE: GRANDSTAY AI CONCIERGE / ASISTENTE OPERATIVO HMS -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end" id="hotel-ai-assistant">
+<div class="mb-4 w-[380px] max-w-[calc(100vw-2rem)] bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-2xl border border-surface-container-high/90 overflow-hidden transition-all duration-300 transform origin-bottom-right flex flex-col scale-100 opacity-100 pointer-events-auto" id="ai-chat-window" style="height: 530px;">
+<div class="px-4 py-3.5 bg-[#0f172a]/95 text-white backdrop-blur-md flex items-center justify-between border-b border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-center text-white shadow-inner">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed">auto_awesome</span>
+</div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-body-md font-bold leading-tight tracking-tight text-white">GrandStay AI Concierge</span>
+<span class="font-label-sm text-[9px] bg-secondary-container text-on-secondary-fixed px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">v3.2</span>
+</div>
+<span class="font-label-sm text-[11px] text-slate-300 flex items-center gap-1 leading-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Sistema en línea · Auditoría 24/7
+</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors" onclick="toggleChatWindow(false)" title="Minimizar ventana" type="button">
+<span class="material-symbols-outlined text-[18px]">minimize</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors" onclick="toggleChatWindow(false)" title="Cerrar chat" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-surface-container-low/40" id="ai-chat-messages">
+<div class="text-center my-1">
+<span class="font-label-sm text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-semibold uppercase tracking-wider border border-surface-container-high/60 shadow-xs">
+Turno Tarde · Conexión Segura Torre Principal
+</span>
+</div>
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl rounded-tl-xs border border-surface-container-high text-body-sm text-on-surface shadow-sm">
+<p class="leading-relaxed">Buenas tardes, <strong>Elena</strong>. Resumen instantáneo de consola:</p>
+<div class="mt-2 p-2.5 bg-surface-container-low rounded-xl border border-surface-container flex flex-col gap-1.5 text-[12px]">
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Ocupación Actual:</span>
+<span class="font-bold text-on-tertiary-container">86.4% (242 / 280)</span>
+</div>
+<div class="flex items-center justify-between"><span class="text-outline font-medium">Fin de reserva hoy:</span><span class="font-bold text-secondary">62 folios a liberar</span></div>
+</div>
+<p class="mt-2.5 text-on-surface-variant text-[12px] leading-relaxed">¿Deseas auditar cargos de minibar o validar ingresos prioritarios?</p>
+</div>
+<span class="text-[10px] text-outline font-label-sm pl-1">14:36 hrs · Copiloto Concierge</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5 pt-1">
+<span class="font-label-sm text-[11px] text-outline uppercase tracking-wider font-semibold pl-1">Consultas prioritarias</span>
+<div class="flex flex-wrap gap-1.5">
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95" onclick="sendQuickPrompt('Verificar folios con fin de reserva hoy')" type="button"><span class="material-symbols-outlined text-secondary-container text-[14px]">pending_actions</span>
+Verificar fin de reserva de hoy</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95" onclick="sendQuickPrompt('Disponibilidad de suites VIP piso 5 y 6')" type="button">
+<span class="material-symbols-outlined text-on-tertiary-container text-[14px]">hotel_class</span>
+Suites VIP disponibles
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95" onclick="sendQuickPrompt('Pre-validar balance auditoría nocturna')" type="button">
+<span class="material-symbols-outlined text-outline text-[14px]">rule</span>
+Pre-validar balance nocturno
+</button>
+</div>
+</div>
+</div>
+<div class="p-3 bg-surface-container-lowest border-t border-surface-container-high flex flex-col gap-2">
+<form class="flex items-center gap-2" onsubmit="handleAISubmit(event)">
+<button class="w-9 h-9 rounded-xl bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface flex items-center justify-center transition-colors flex-shrink-0" title="Adjuntar comprobante o folio" type="button">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+</button>
+<div class="flex-1 relative flex items-center">
+<input class="w-full bg-surface-container-low hover:bg-surface-container focus:bg-surface-container-lowest px-3 py-2 rounded-xl text-body-sm text-on-surface placeholder:text-outline border border-outline-variant/30 focus:outline-none focus:ring-1 focus:ring-[#0f172a] font-body-sm transition-all" id="ai-chat-input" placeholder="Pregunta al Concierge o escribe un comando..." type="text">
+</div>
+<button class="w-9 h-9 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-sm flex-shrink-0 active:scale-95" title="Enviar mensaje" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</form>
+<div class="flex items-center justify-between text-[10px] text-outline font-label-sm px-1">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-on-tertiary-container">verified_user</span> Privacidad HMS &amp; Registro auditado</span>
+<span class="">Presiona Enter ↵</span>
+</div>
+</div>
+</div>
+<div class="relative group">
+<button aria-label="Abrir asistente de hotel GrandStay AI" class="w-14 h-14 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 hover:ring-4 hover:ring-slate-900/15 active:scale-95 flex items-center justify-center relative cursor-pointer" id="ai-fab-launcher" onclick="toggleChatWindow()" type="button">
+<span class="material-symbols-outlined text-[26px] text-tertiary-fixed transition-transform duration-300 group-hover:rotate-12" id="ai-fab-icon">close</span>
+<span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]" id="ai-fab-badge"></span>
+</button>
+</div>
+</div>
+
+<script>
+  // Control interactivo para el Asistente AI Flotante
+  function toggleChatWindow(forceState) {
+    var chatWindow = document.getElementById('ai-chat-window');
+    var fabIcon = document.getElementById('ai-fab-icon');
+    var chatInput = document.getElementById('ai-chat-input');
+    if (!chatWindow) return;
+
+    var isCurrentlyOpen = chatWindow.classList.contains('scale-100');
+    var shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
+
+    if (shouldOpen) {
+      chatWindow.classList.remove('scale-95', 'opacity-0', 'pointer-events-none');
+      chatWindow.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
+      if (fabIcon) fabIcon.innerText = 'close';
+      if (chatInput) setTimeout(function() { chatInput.focus(); }, 150);
+    } else {
+      chatWindow.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
+      chatWindow.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
+      if (fabIcon) fabIcon.innerText = 'smart_toy';
+    }
+  }
+
+  function sendQuickPrompt(promptText) {
+    var input = document.getElementById('ai-chat-input');
+    if (input) {
+      input.value = promptText;
+      handleAISubmit();
+    }
+  }
+
+  function handleAISubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var input = document.getElementById('ai-chat-input');
+    var messagesContainer = document.getElementById('ai-chat-messages');
+    if (!input || !messagesContainer) return;
+
+    var userText = input.value.trim();
+    if (!userText) return;
+
+    // Render user message
+    var userMsgWrapper = document.createElement('div');
+    userMsgWrapper.className = 'flex items-start justify-end gap-2 text-right';
+    userMsgWrapper.innerHTML = '<div class="flex flex-col gap-1 max-w-[85%] items-end"><div class="bg-primary text-on-primary p-3 rounded-2xl rounded-tr-sm text-body-sm shadow-sm text-left">' + userText + '</div><span class="text-[10px] text-outline font-label-sm pr-1">Justo ahora</span></div>';
+    messagesContainer.appendChild(userMsgWrapper);
+    input.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Render simulated bot answer with hotel context
+    setTimeout(function() {
+      var botMsgWrapper = document.createElement('div');
+      botMsgWrapper.className = 'flex items-start gap-2.5';
+      botMsgWrapper.innerHTML = '<div class="w-7 h-7 rounded-lg bg-primary-container flex items-center justify-center text-on-primary flex-shrink-0 mt-0.5"><span class="material-symbols-outlined text-[16px] text-tertiary-fixed">auto_awesome</span></div><div class="flex flex-col gap-1 max-w-[82%]"><div class="bg-surface-container-lowest p-3 rounded-2xl rounded-tl-sm border border-surface-container-high text-body-sm text-on-surface shadow-sm"><p>Procesando registro en el HMS... He indexado tu consulta. Los 14 folios con saldo suman $925.50 USD y están listos para pre-validación en el módulo de Auditoría Nocturna.</p></div><span class="text-[10px] text-outline font-label-sm pl-1">En vivo · GrandStay AI</span></div>';
+      messagesContainer.appendChild(botMsgWrapper);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 600);
+  }
+</script>
+
+
+
+
+
+
+
+</body></html>

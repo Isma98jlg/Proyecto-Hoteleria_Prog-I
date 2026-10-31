@@ -1,0 +1,1393 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-secondary":"#ffffff","inverse-primary":"#bec6e0","error-container":"#ffdad6","on-primary-container":"#7c839b","primary":"#000000","on-primary-fixed":"#131b2e","on-secondary-container":"#663500","outline-variant":"#c6c6cd","secondary":"#904d00","background":"#faf9f7","surface-variant":"#e3e2e0","on-error":"#ffffff","tertiary-fixed-dim":"#68dba9","primary-fixed-dim":"#bec6e0","on-tertiary-container":"#069669","surface-container-high":"#e9e8e6","on-surface":"#1a1c1b","outline":"#76777d","tertiary-container":"#002114","secondary-fixed-dim":"#ffb77d","on-surface-variant":"#45464d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#6e3900","surface":"#faf9f7","surface-tint":"#565e74","surface-bright":"#faf9f7","tertiary-fixed":"#85f8c4","on-tertiary":"#ffffff","surface-container-low":"#f4f3f1","secondary-fixed":"#ffdcc3","primary-fixed":"#dae2fd","surface-container-lowest":"#ffffff","tertiary":"#000000","primary-container":"#131b2e","surface-container":"#efeeec","on-background":"#1a1c1b","secondary-container":"#fe932c","on-secondary-fixed":"#2f1500","inverse-on-surface":"#f1f1ef","error":"#ba1a1a","on-primary":"#ffffff","on-tertiary-fixed":"#002114","on-primary-fixed-variant":"#3f465c","inverse-surface":"#2f3130","surface-dim":"#dadad8","surface-container-highest":"#e3e2e0","on-error-container":"#93000a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.25rem","space-md":"0.75rem","space-lg":"1.25rem","space-xl":"2rem","space-xs":"0.25rem","gutter-desktop":"1.5rem","margin-desktop":"2rem","space-sm":"0.5rem","margin":"1rem"},"fontFamily":{"headline-md":["Plus Jakarta Sans"],"headline-xl":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"numeric-table":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"headline-md":["1.25rem",{"lineHeight":"1.625rem","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-xl-mobile":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"label-md":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.04em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["1.125rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["0.6875rem",{"lineHeight":"0.875rem","letterSpacing":"0.06em","fontWeight":"700"}],"numeric-table":["0.875rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"body-sm":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"0.005em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.5rem","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["3rem",{"lineHeight":"3.5rem","letterSpacing":"-0.03em","fontWeight":"700"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased overflow-hidden h-screen flex flex-col relative">
+<!-- ==================== BENTO COMMAND LAUNCHER MODAL (⌘K) ==================== -->
+<div class="fixed inset-0 bg-primary/50 backdrop-blur-md z-50 transition-opacity duration-300 items-center justify-center p-4 hidden" id="bento-command-modal" onclick="handleBentoBackdropClick(event)">
+<div class="w-full max-w-3xl bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container flex flex-col overflow-hidden max-h-[85vh]" onclick="event.stopPropagation()">
+<!-- Buscador del Bento -->
+<div class="p-4 border-b border-surface-container flex items-center gap-3 bg-surface-container-low">
+<span class="material-symbols-outlined text-[24px] text-primary">terminal</span>
+<div class="flex-1 flex items-center gap-2">
+<input autofocus="" class="w-full bg-transparent text-headline-sm text-on-surface focus:outline-none placeholder:text-outline font-medium" id="bento-search-input" placeholder="Escribe un comando o navega a un módulo..." type="text">
+<kbd class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-on-surface font-mono font-bold">ESC</kbd>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-outline hover:text-on-surface flex items-center justify-center transition-colors" onclick="toggleBentoCommand(false)" title="Cerrar Bento Command" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Matriz Bento de 4 Módulos Canónicos Oficiales -->
+<div class="p-5 overflow-y-auto flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<span class="text-label-sm uppercase tracking-wider font-bold text-outline">Módulos Canónicos HMS v3.2</span>
+<span class="text-body-sm text-outline">Atajos directos: [1] a [4]</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+<!-- 1. Dashboard -->
+<div class="p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container border border-surface-container flex flex-col justify-between cursor-pointer transition-all hover:border-primary/40 group" onclick="toggleBentoCommand(false); alert('Navegando a Dashboard General &amp; Analítica Histórica');">
+<div class="flex items-center justify-between">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</div>
+<span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-surface-container text-outline font-bold">[1]</span>
+</div>
+<div class="mt-3">
+<div class="font-headline-sm text-body-md font-bold text-on-surface">Dashboard General</div>
+<div class="text-[11px] text-outline mt-0.5">Analítica histórica &amp; KPIs</div>
+</div>
+</div>
+<!-- 2. Habitaciones y Pisos -->
+<div class="p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container border border-surface-container flex flex-col justify-between cursor-pointer transition-all hover:border-primary/40 group" onclick="toggleBentoCommand(false); alert('Navegando a Gestión de Habitaciones y Pisos');">
+<div class="flex items-center justify-between">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+</div>
+<span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-surface-container text-outline font-bold">[2]</span>
+</div>
+<div class="mt-3">
+<div class="font-headline-sm text-body-md font-bold text-on-surface">Habitaciones &amp; Pisos</div>
+<div class="text-[11px] text-outline mt-0.5">Inventario y housekeeping</div>
+</div>
+</div>
+<!-- 3. Gestión de Reservas (ACTIVO) -->
+<div class="p-3.5 rounded-xl bg-primary text-on-primary border border-primary flex flex-col justify-between cursor-pointer transition-all shadow-md group" onclick="toggleBentoCommand(false);">
+<div class="flex items-center justify-between">
+<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+</div>
+<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-container/20 text-on-primary font-bold">[3] ACTIVO</span>
+</div>
+<div class="mt-3">
+<div class="font-headline-sm text-body-md font-bold text-on-primary">Gestión de Reservas</div>
+<div class="text-[11px] opacity-80 mt-0.5">Libro relacional (142 activas)</div>
+</div>
+</div>
+<!-- 4. Directorio y CRUD de Huéspedes -->
+<div class="p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container border border-surface-container flex flex-col justify-between cursor-pointer transition-all hover:border-primary/40 group" onclick="toggleBentoCommand(false); alert('Navegando a Directorio y CRUD de Huéspedes / Usuarios');">
+<div class="flex items-center justify-between">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high group-hover:bg-primary group-hover:text-on-primary flex items-center justify-center text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">group</span>
+</div>
+<span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-surface-container text-outline font-bold">[4]</span>
+</div>
+<div class="mt-3">
+<div class="font-headline-sm text-body-md font-bold text-on-surface">Directorio Huéspedes</div>
+<div class="text-[11px] text-outline mt-0.5">CRUD perfiles DNI/PAS &amp; CRM</div>
+</div>
+</div>
+</div>
+<!-- Acciones Rápidas -->
+<div class="bg-surface-container-low p-3 rounded-xl border border-surface-container flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">bolt</span>
+<span class="text-body-sm font-semibold text-on-surface">Acciones Rápidas:</span>
+<span class="text-[12px] text-outline">+ Nueva Reserva • + Nuevo Huésped • Exportar Reporte</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-label-sm font-semibold transition-colors" onclick="toggleBentoCommand(false); alert('Exportando datos a formato XLS/PDF...');" type="button">Exportar XLS/PDF</button>
+<button class="px-3 py-1 rounded-lg bg-primary text-on-primary text-label-sm font-semibold hover:opacity-90 transition-opacity" onclick="toggleBentoCommand(false); openDrawer('new');" type="button">+ Nueva Reserva</button>
+</div>
+</div>
+</div>
+<!-- Footer modal -->
+<div class="p-3 border-t border-surface-container bg-surface-container-low/70 flex items-center justify-between text-[11px] text-outline font-mono">
+<span class="">Presiona ESC para salir • Flechas para navegar</span>
+<span class="text-secondary font-bold">GrandStay Command Launcher v3.2</span>
+</div>
+</div>
+</div>
+<!-- ==================== FLYOUT DRAWER OFICIAL (MÓDULOS HMS v3.2) ==================== -->
+<div class="fixed inset-0 z-50 transition-all duration-300 pointer-events-none" id="flyout-drawer">
+<!-- Backdrop Overlay -->
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 pointer-events-none opacity-0" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+<!-- Drawer Menu Panel -->
+<aside class="absolute top-0 left-0 bottom-0 w-80 bg-surface-container-lowest shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out pointer-events-auto border-r border-surface-container-high -translate-x-full" id="drawer-panel">
+<div class="flex flex-col">
+<!-- Drawer Header -->
+<div class="h-16 flex items-center justify-between px-6 border-b border-surface-container-high bg-surface-container-low/50">
+<div class="flex items-center gap-2.5">
+<img alt="GrandStay HMS Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X7YyQRhDQRFZLuh0OL6o3M6Z2gMvsfJoEDf2Dh8gvXMvoCzyV1pGEKCSXHnhBX_mUCBqh7xhh953_ALzXFV7WL_8NRLEQILPOXNdwhQuAO6x3biezyottgZMPkpvwyDmFpfOYbs4RMGil_mgCQQhFNZLutSYJxWxBGToq7GCJtzXLxMH75feFPD6CRjbaowq1Qpz6qfG1106IHmdX4a_BQb7rQuFli4MM8H7teOtca">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-lg font-bold text-on-surface leading-tight">GrandStay HMS</span>
+<span class="font-label-sm text-[10px] text-outline uppercase tracking-wider">Consola Unificada</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface transition-colors cursor-pointer" id="close-drawer-btn" onclick="toggleDrawer(false)" title="Cerrar menú" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Navigation to the 4 Canonical Modules Only -->
+<div class="px-5 pt-4 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
+</div>
+<nav class="flex flex-col gap-1 px-3">
+<!-- 1. Dashboard -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="dashboard" href="#" onclick="toggleDrawer(false); alert('Navegando a Dashboard General &amp; Analítica Histórica'); return false;">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="">1. Dashboard General</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Analítica</span>
+</a>
+<!-- 2. Habitaciones y Pisos -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="habitaciones-y-pisos" href="#" onclick="toggleDrawer(false); alert('Navegando a Gestión de Habitaciones y Pisos'); return false;">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+<span class="">2. Habitaciones y Pisos</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">280 habs</span>
+</a>
+<!-- 3. Reservas (Activo) -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-primary-container text-on-primary font-semibold shadow-sm transition-all" data-path="reservas" href="#" onclick="toggleDrawer(false); return false;">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span class="font-body-md text-body-md">3. Reservas y Estancias</span>
+</div>
+<span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+</a>
+<!-- 4. Huéspedes / Directorio -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="huespedes-y-usuarios" href="#" onclick="toggleDrawer(false); alert('Navegando a Directorio y CRUD de Huéspedes / Usuarios'); return false;">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="">4. Huéspedes / Directorio</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">496 activos</span>
+</a>
+</nav>
+<!-- Quick Action Inside Drawer -->
+<div class="px-5 pt-6 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
+</div>
+<div class="px-3 flex flex-col gap-1.5">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors cursor-pointer" onclick="toggleDrawer(false); toggleBentoCommand(true);" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">terminal</span>
+<span class="">Comandos Bento ⌘K</span>
+</div>
+<span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
+</button>
+</div>
+</div>
+<!-- Drawer Footer Card -->
+<div class="p-4 border-t border-surface-container-high bg-surface-container-low/40">
+<div class="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between shadow-sm border border-surface-container-high/60">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">hotel_class</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Auditoría Nocturna</span>
+<span class="font-label-sm text-[10px] text-outline">02:00 AM Programada</span>
+</div>
+</div>
+<span class="font-label-sm text-[10px] text-secondary font-bold bg-secondary-fixed/70 px-2 py-0.5 rounded">Auto</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- ==================== CABECERA OFICIAL ==================== -->
+<header class="h-16 shrink-0 bg-surface/90 backdrop-blur-xl border-b border-surface-container shadow-[0_1px_8px_rgba(0,0,0,0.03)] z-40 flex items-center justify-between px-6 lg:px-8 relative">
+<!-- Izquierda: Botón unificado "Módulos HMS v3.2" + Logo corporativo + Sede Hotelera -->
+<div class="flex items-center gap-5">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all shadow-sm cursor-pointer" id="btn-toggle-modules" onclick="toggleDrawer(true)" type="button">
+<span class="material-symbols-outlined text-[20px] text-on-surface">menu</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Módulos HMS</span>
+<span class="font-label-sm text-[10px] bg-primary text-on-primary px-1.5 py-0.5 rounded font-bold tracking-wider">v3.2</span>
+</button>
+<div class="flex items-center gap-2.5"></div>
+<div class="flex items-center gap-2.5"><img alt="GrandStay HOTELS" class="h-14 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X7YyQRhDQRFZLuh0OL6o3M6Z2gMvsfJoEDf2Dh8gvXMvoCzyV1pGEKCSXHnhBX_mUCBqh7xhh953_ALzXFV7WL_8NRLEQILPOXNdwhQuAO6x3biezyottgZMPkpvwyDmFpfOYbs4RMGil_mgCQQhFNZLutSYJxWxBGToq7GCJtzXLxMH75feFPD6CRjbaowq1Qpz6qfG1106IHmdX4a_BQb7rQuFli4MM8H7teOtca"></div>
+</div>
+<!-- Centro y Derecha: Buscador ⌘K + Notificaciones + Perfil Elena Rostova -->
+<div class="flex items-center gap-4">
+<!-- Buscador central con atajo de teclado ⌘K -->
+<div class="flex items-center bg-surface-container-lowest border border-surface-container px-3.5 py-1.5 rounded-lg w-64 md:w-80 shadow-[0_1px_6px_rgba(0,0,0,0.03)] cursor-pointer hover:border-primary/40 transition-all" onclick="toggleBentoCommand(true)">
+<span class="material-symbols-outlined text-outline text-[18px] mr-2">search</span>
+<span class="font-body-sm text-body-sm text-outline flex-1 select-none">Buscar reserva, huésped...</span>
+<kbd class="font-label-sm text-label-sm bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant font-mono">⌘K</kbd>
+</div>
+<!-- Notificaciones -->
+<button class="w-9 h-9 rounded-lg bg-surface-container-lowest border border-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative shadow-[0_1px_6px_rgba(0,0,0,0.03)]" onclick="alert('Notificaciones operativas al día');" title="Notificaciones" type="button">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+</button>
+<!-- Perfil Usuario Oficial -->
+<div class="flex items-center gap-3 pl-1">
+<div class="flex flex-col text-right hidden sm:flex">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Elena Rostova</span>
+<span class="font-label-sm text-label-sm text-outline leading-tight">Admin General</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+<main class="w-full flex-1 min-h-0 bg-surface flex flex-col overflow-hidden">
+<div class="px-6 lg:px-8 py-3.5 flex flex-col gap-3 max-w-[1780px] w-full mx-auto flex-1 min-h-0 overflow-hidden">
+<!-- Título de pantalla y botón de acción principal -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 pb-1">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+
+
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight mt-1 font-bold">Gestión de Reservas y Estancias</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Control unificado de ciclo canónico de reservas, asignación de inventario y folios financieros de mostrador.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-10 px-4 rounded-lg bg-surface-container-lowest border border-surface-container-high text-on-surface font-label-md text-label-md flex items-center gap-2 shadow-sm hover:bg-surface-container transition-colors" onclick="alert('Exportando listado de reservas a formato XLS/PDF...')" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">file_download</span>
+          Exportar XLS
+        </button>
+<button class="h-10 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity" onclick="openDrawer('new')" type="button">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+          + Nueva Reserva Manual
+        </button>
+</div>
+</div>
+<!-- Cinta de KPIs Colapsable (Métricas Operativas de Reservas) -->
+<section class="bg-surface-container-lowest rounded-2xl p-4 md:p-5 shadow-sm border border-surface-container-high flex flex-col gap-4 shrink-0 transition-all duration-300" id="kpi-ribbon-container">
+<div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleKpiRibbon()">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[20px]">equalizer</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Cinta de KPIs Operativos de Reservas</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full">Actualizado hace 3 min</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline">Snapshot en tiempo real del libro de reservas, ratio de expiración y proyección financiera.</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider hidden sm:inline" id="kpi-toggle-text">Ocultar Métricas</span>
+<button aria-label="Colapsar métricas" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px] transition-transform duration-300" id="kpi-ribbon-toggle-icon">expand_less</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-300" id="kpi-ribbon-cards">
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm border border-surface-container hover:bg-surface-container-low transition-colors group">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Reservas Activas</span>
+<span class="material-symbols-outlined text-outline text-[20px]">book_online</span>
+</div>
+<div class="mt-3 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-[2rem] leading-none text-on-surface tracking-tight font-bold">142</span>
+<span class="font-label-sm text-label-sm text-outline">en libro</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Ocupación proyectada: 86.4%</span>
+</div>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="font-semibold">+8.4%</span>
+<span class="text-outline font-normal">vs ayer</span>
+</div>
+</div>
+
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm border border-surface-container hover:bg-surface-container-low transition-colors group">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Reservas por Finalizar</span>
+<span class="material-symbols-outlined text-outline text-[20px]">logout</span>
+</div>
+<div class="mt-3 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-[2rem] leading-none text-on-surface tracking-tight font-bold">32</span>
+<span class="font-label-sm text-label-sm text-outline">habitaciones</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">85% liberadas y en limpieza</span>
+</div>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-outline">
+<span class="material-symbols-outlined text-[14px]">apartment</span>
+<span class="font-semibold text-on-surface">Pisos 1 al 4</span>
+<span class="text-outline font-normal">Torre Principal</span>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-4 flex flex-col justify-between shadow-sm border border-surface-container hover:bg-surface-container-low transition-colors group">
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Ingresos Pactados</span>
+<span class="material-symbols-outlined text-on-surface text-[20px]">payments</span>
+</div>
+<div class="mt-3 flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-[2rem] leading-none text-on-surface tracking-tight font-bold">$38,400</span>
+<span class="font-label-sm text-label-sm text-outline">USD</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Libro activo consolidado</span>
+</div>
+<div class="mt-3 flex items-center gap-1.5 text-label-sm font-label-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="font-semibold">+12.0%</span>
+<span class="text-outline font-normal">vs semana pasada</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Workspace: Tabla a la izquierda + Ficha a la derecha -->
+<div class="flex flex-col xl:flex-row gap-5 items-stretch flex-1 min-h-0 h-full overflow-hidden">
+<!-- Izquierda: Filtros y Tabla de Reservas -->
+<div class="flex-1 w-full bg-surface-container-lowest rounded-2xl shadow-sm border border-surface-container-high p-4 md:p-5 flex flex-col h-full min-h-0 overflow-hidden">
+<!-- Tabs de Estado Canónico -->
+<div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-surface-container shrink-0">
+<div class="flex items-center bg-surface-container p-1 rounded-xl shadow-sm gap-1 overflow-x-auto max-w-full" id="filter-tabs-group"><button class="status-tab-btn px-3.5 py-1.5 rounded-lg bg-primary text-on-primary font-numeric-table text-numeric-table shadow-sm transition-colors cursor-pointer flex items-center gap-1.5" data-filter="all" onclick="selectStatusTab('all')" type="button"><span class="">Todas</span><span class="font-numeric-table text-label-sm bg-surface-container-lowest/20 px-1.5 py-0.2 rounded font-bold">142</span></button><button class="status-tab-btn px-3.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-numeric-table text-numeric-table flex items-center gap-1.5 transition-colors cursor-pointer group" data-filter="reserved" onclick="selectStatusTab('reserved')" title="Pago y registro completados" type="button"><span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span><span class="font-semibold">Reservado</span><span class="font-numeric-table text-label-sm text-outline">126</span><span class="text-[10px] text-outline hidden md:inline ml-1 font-normal">(Pago y registro completados)</span></button><button class="status-tab-btn px-3.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-numeric-table text-numeric-table flex items-center gap-1.5 transition-colors cursor-pointer group" data-filter="liberated" onclick="selectStatusTab('liberated')" title="Término de la reserva, se liberaron las habitaciones" type="button"><span class="w-2 h-2 rounded-full bg-outline"></span><span class="font-semibold">Liberado</span><span class="font-numeric-table text-label-sm text-outline">16</span><span class="text-[10px] text-outline hidden md:inline ml-1 font-normal">(Término de la reserva, se liberaron habitaciones)</span></button></div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider font-semibold">Modo vista:</span>
+<div class="flex items-center bg-surface-container p-1 rounded-xl shadow-sm">
+<button class="px-3 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm font-semibold cursor-pointer transition-all" id="btn-view-cru" onclick="setViewMode('cru')">Detalle CRU</button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md cursor-pointer transition-all" id="btn-view-audit" onclick="setViewMode('audit')">Auditoría</button>
+</div>
+</div>
+</div>
+<!-- Filtros secundarios -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 bg-surface-container-low/70 border border-surface-container p-2.5 rounded-xl shrink-0 mt-3">
+<div class="md:col-span-5 relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">search</span>
+<input class="w-full pl-9 pr-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-outline border border-surface-container-high hover:border-outline-variant/60 transition-colors" id="table-search-input" oninput="filterTableRows()" placeholder="Buscar por código RES-XXXX, huésped, DNI o hab..." type="text">
+</div>
+<div class="md:col-span-3 flex items-center gap-2">
+<div class="w-full flex items-center bg-surface-container-lowest px-3 py-2 rounded-lg shadow-sm border border-surface-container-high hover:border-outline-variant/60 transition-colors">
+<span class="material-symbols-outlined text-outline text-[18px] mr-2">date_range</span>
+<input class="w-full bg-transparent font-numeric-table text-body-sm text-on-surface focus:outline-none" type="text" value="24 Oct 2023 - 31 Oct 2023">
+</div>
+</div>
+<div class="md:col-span-2">
+<select class="w-full bg-surface-container-lowest px-3 py-2 rounded-lg text-on-surface font-body-sm text-body-sm shadow-sm focus:outline-none cursor-pointer border border-surface-container-high hover:border-outline-variant/60 transition-colors">
+<option>Todos los Pisos</option>
+<option>Piso 1 - Lobby Suites</option>
+<option>Piso 2 - Deluxe Garden</option>
+<option>Piso 3 - Premium Ocean</option>
+<option>Piso 4 - Penthouse VIP</option>
+</select>
+</div>
+<div class="md:col-span-2">
+<select class="w-full bg-surface-container-lowest px-3 py-2 rounded-lg text-on-surface font-body-sm text-body-sm shadow-sm focus:outline-none cursor-pointer border border-surface-container-high hover:border-outline-variant/60 transition-colors">
+<option>Categoría VIP</option>
+<option>Solo VIP Presidencial</option>
+<option>VIP Gold &amp; Executive</option>
+<option>Estándar</option>
+</select>
+</div>
+</div>
+<!-- Tabla Relacional de Reservas -->
+<div class="flex-1 min-h-0 overflow-y-auto overflow-x-auto w-full border border-surface-container-high rounded-xl my-3">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider sticky top-0 z-10 border-b border-surface-container-high">
+<th class="py-3 px-4 rounded-l-lg">Reserva ID &amp; Registro</th>
+<th class="py-3 px-4">Huésped Titular (Usuario)</th>
+<th class="py-3 px-4">Habitación &amp; Piso</th>
+<th class="py-3 px-4">Periodo (Estancia)</th>
+<th class="py-3 px-4">Estado Operativo</th>
+<th class="py-3 px-4 text-right rounded-r-lg">Acciones CRU</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container font-body-md text-body-md text-on-surface" id="reservations-table-body"><!-- FILA 1: Reservado -->
+<tr class="reservation-row cursor-pointer transition-colors border-l-4 border-on-tertiary-container bg-surface-container-low/50 shadow-sm" data-category="reserved" data-res-id="RES-8942" onclick="selectReservationRow(this, 'RES-8942')">
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-bold text-on-surface flex items-center gap-1.5">#RES-8942</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">24 Oct 2023, 14:32</span>
+<span class="font-label-sm text-[11px] text-on-tertiary-container font-medium mt-1">Pago verificado</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-sm text-body-md font-bold shrink-0">CM</div>
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface">Carlos Mendoza Silva</span>
+<span class="font-label-sm text-label-sm text-outline">DNI: 45892011</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">carlos.m@example.com</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-1">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold">P-401 · Suite VIP</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Pactado: $450.00 / noche</span>
+<span class="font-label-sm text-[11px] text-outline">precio_noche_pactado</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface" id="row-range-RES-8942">25 Oct - 28 Oct 2023</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-label-sm text-label-sm text-on-surface font-semibold" id="row-nights-RES-8942">3 noches</span>
+<div class="inline-flex items-center gap-1" onclick="event.stopPropagation()">
+<button class="px-1.5 py-0.5 rounded border border-surface-container-high bg-surface-container-lowest hover:bg-surface-container text-outline hover:text-on-surface text-[11px] font-bold transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8942', -1)" title="Reducir estadía (-1 noche)" type="button">- Noche</button>
+<button class="px-1.5 py-0.5 rounded border border-surface-container-high bg-surface-container-lowest hover:bg-surface-container text-outline hover:text-on-surface text-[11px] font-bold transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8942', 1)" title="Aumentar estadía (+1 noche)" type="button">+ Noche</button>
+</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-0.5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-tertiary-container font-label-sm text-label-sm font-bold"><span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>Reservado</span>
+<span class="text-[11px] text-outline">Pago y registro completados</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right" onclick="event.stopPropagation()">
+<div class="flex items-center justify-end gap-1.5">
+<button class="px-2.5 py-1 rounded border border-outline-variant/60 hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8942', -1)" title="Reducir estadía" type="button">- Estadía</button>
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-opacity cursor-pointer" onclick="adjustStayQuick('RES-8942', 1)" title="Aumentar estadía" type="button">+ Estadía</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" onclick="openDrawer('RES-8942')" title="Gestionar Ficha" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</td>
+</tr>
+
+<!-- FILA 2: Reservado -->
+<tr class="reservation-row cursor-pointer transition-colors border-l-4 border-transparent hover:bg-surface-container-low/60" data-category="reserved" data-res-id="RES-8939" onclick="selectReservationRow(this, 'RES-8939')">
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-bold text-on-surface">#RES-8939</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">23 Oct 2023, 10:15</span>
+<span class="font-label-sm text-[11px] text-on-tertiary-container font-medium mt-1">Garantía activa</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container text-on-surface flex items-center justify-center font-headline-sm text-body-md font-bold shrink-0">VR</div>
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface">Valeria Rios Montiel</span>
+<span class="font-label-sm text-label-sm text-outline">PAS: AB9940124</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">v.rios@globaltech.com</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-1">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container text-on-surface font-label-sm text-label-sm font-semibold">D-305 · Estándar</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Pactado: $280.00 / noche</span>
+<span class="font-label-sm text-[11px] text-outline">precio_noche_pactado</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface" id="row-range-RES-8939">24 Oct - 29 Oct 2023</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-label-sm text-label-sm text-on-surface font-semibold" id="row-nights-RES-8939">5 noches</span>
+<div class="inline-flex items-center gap-1" onclick="event.stopPropagation()">
+<button class="px-1.5 py-0.5 rounded border border-surface-container-high bg-surface-container-lowest hover:bg-surface-container text-outline hover:text-on-surface text-[11px] font-bold transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8939', -1)" title="Reducir estadía (-1 noche)" type="button">- Noche</button>
+<button class="px-1.5 py-0.5 rounded border border-surface-container-high bg-surface-container-lowest hover:bg-surface-container text-outline hover:text-on-surface text-[11px] font-bold transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8939', 1)" title="Aumentar estadía (+1 noche)" type="button">+ Noche</button>
+</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-0.5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-tertiary-container font-label-sm text-label-sm font-bold"><span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>Reservado</span>
+<span class="text-[11px] text-outline">Pago y registro completados</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right" onclick="event.stopPropagation()">
+<div class="flex items-center justify-end gap-1.5">
+<button class="px-2.5 py-1 rounded border border-outline-variant/60 hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8939', -1)" title="Reducir estadía" type="button">- Estadía</button>
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-opacity cursor-pointer" onclick="adjustStayQuick('RES-8939', 1)" title="Aumentar estadía" type="button">+ Estadía</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" onclick="openDrawer('RES-8939')" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</td>
+</tr>
+
+<!-- FILA 3: Reservado -->
+<tr class="reservation-row cursor-pointer transition-colors border-l-4 border-transparent hover:bg-surface-container-low/60 bg-surface-container-low/30" data-category="reserved" data-res-id="RES-8911" onclick="selectReservationRow(this, 'RES-8911')">
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-bold text-on-surface">#RES-8911</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">20 Oct 2023, 18:20</span>
+<span class="font-label-sm text-[11px] text-outline mt-1">inicio_reserva: 21 Oct 15:00</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline-sm text-body-md font-bold shrink-0">FA</div>
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface">Fernando Alarcón</span>
+<span class="font-label-sm text-label-sm text-outline">DNI: 09823145</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">fernando.a@lima.pe</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-start flex-col gap-1">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold">S-102 · Suite Jardín</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Pactado: $320.00 / noche</span>
+<span class="font-label-sm text-[11px] text-outline">precio_noche_pactado</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface" id="row-range-RES-8911">21 Oct - 26 Oct 2023</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-label-sm text-label-sm text-on-surface font-semibold" id="row-nights-RES-8911">5 noches</span>
+<div class="inline-flex items-center gap-1" onclick="event.stopPropagation()">
+<button class="px-1.5 py-0.5 rounded border border-surface-container-high bg-surface-container-lowest hover:bg-surface-container text-outline hover:text-on-surface text-[11px] font-bold transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8911', -1)" title="Reducir estadía (-1 noche)" type="button">- Noche</button>
+<button class="px-1.5 py-0.5 rounded border border-surface-container-high bg-surface-container-lowest hover:bg-surface-container text-outline hover:text-on-surface text-[11px] font-bold transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8911', 1)" title="Aumentar estadía (+1 noche)" type="button">+ Noche</button>
+</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-0.5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-tertiary-container font-label-sm text-label-sm font-bold"><span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>Reservado</span>
+<span class="text-[11px] text-outline">Pago y registro completados</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right" onclick="event.stopPropagation()">
+<div class="flex items-center justify-end gap-1.5">
+<button class="px-2.5 py-1 rounded border border-outline-variant/60 hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors cursor-pointer" onclick="adjustStayQuick('RES-8911', -1)" title="Reducir estadía" type="button">- Estadía</button>
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-opacity cursor-pointer" onclick="adjustStayQuick('RES-8911', 1)" title="Aumentar estadía" type="button">+ Estadía</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" onclick="openDrawer('RES-8911')" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</td>
+</tr>
+
+<!-- FILA 4: Liberado -->
+<tr class="reservation-row cursor-pointer transition-colors border-l-4 border-transparent hover:bg-surface-container-low/60 opacity-80" data-category="liberated" data-res-id="RES-8890" onclick="selectReservationRow(this, 'RES-8890')">
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-bold text-on-surface">#RES-8890</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">18 Oct 2023, 09:00</span>
+<span class="font-label-sm text-[11px] text-outline mt-1">fin_reserva: 23 Oct 12:00</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-headline-sm text-body-md font-bold shrink-0">MK</div>
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface">Mariko Kobayashi</span>
+<span class="font-label-sm text-label-sm text-outline">PAS: TZ840199</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">m.koba@tokyo-arch.jp</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-1">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container text-outline font-label-sm text-label-sm font-semibold">P-404 · Penthouse VIP</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Pactado: $460.00 / noche</span>
+<span class="font-label-sm text-[11px] text-outline">precio_noche_pactado</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface" id="row-range-RES-8890">19 Oct - 23 Oct 2023</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-label-sm text-label-sm text-on-surface" id="row-nights-RES-8890">4 noches</span>
+<span class="text-[11px] text-outline">Estancia completada</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-0.5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-outline"></span>Liberado</span>
+<span class="text-[11px] text-outline">Término de la reserva, se liberaron las habitaciones</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right" onclick="event.stopPropagation()">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" onclick="openDrawer('RES-8890')" title="Ver Ficha" type="button"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+</div>
+</td>
+</tr>
+
+<!-- FILA 5: Liberado -->
+<tr class="reservation-row cursor-pointer transition-colors border-l-4 border-transparent hover:bg-surface-container-low/60 opacity-80" data-category="liberated" data-res-id="RES-8874" onclick="selectReservationRow(this, 'RES-8874')">
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-outline">#RES-8874</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">17 Oct 2023, 12:44</span>
+<span class="font-label-sm text-[11px] text-outline mt-1">fin_reserva: 28 Oct 12:00</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container text-outline flex items-center justify-center font-headline-sm text-body-md font-bold shrink-0">DG</div>
+<div class="flex flex-col">
+<span class="font-numeric-table font-semibold text-on-surface">Daniel Gómez Paz</span>
+<span class="font-label-sm text-label-sm text-outline">DNI: 71290344</span>
+<span class="font-label-sm text-[11px] text-outline">daniel.g@outlook.com</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-1">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container text-outline font-label-sm text-label-sm font-semibold">D-210 · Estándar</span>
+<span class="font-label-sm text-label-sm text-outline">Habitaciones devueltas</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-numeric-table text-outline" id="row-range-RES-8874">26 Oct - 28 Oct 2023</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-outline" id="row-nights-RES-8874">2 noches</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col items-start gap-0.5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-outline"></span>Liberado</span>
+<span class="text-[11px] text-outline">Término de la reserva, se liberaron las habitaciones</span>
+</div>
+</td>
+<td class="py-3.5 px-4 align-top text-right" onclick="event.stopPropagation()">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all cursor-pointer" onclick="openDrawer('RES-8874')" title="Ver Ficha" type="button"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+</div>
+</td>
+</tr></tbody>
+</table>
+</div>
+<!-- Paginación estilo SCREEN_10 -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-surface-container-high shrink-0 mt-auto">
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-outline">
+<span class="">Mostrando <strong class="text-on-surface font-semibold" id="pagination-info">1 - 5</strong> de <strong class="text-on-surface font-semibold">142</strong> reservas</span>
+<span class="mx-1">·</span>
+<a class="text-on-surface font-semibold hover:underline flex items-center gap-1" href="#" onclick="alert('Abriendo auditoría completa de libro de reservas...'); return false;">
+            Ver Libro Completo
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-lg bg-surface-container text-outline hover:text-on-surface flex items-center justify-center disabled:opacity-50 transition-colors" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary-container text-on-primary font-numeric-table text-numeric-table font-semibold shadow-sm">1</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-numeric-table text-numeric-table transition-colors">2</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-numeric-table text-numeric-table transition-colors">3</button>
+<span class="text-outline text-label-sm px-1">...</span>
+<button class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-numeric-table text-numeric-table transition-colors">29</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container text-outline hover:text-on-surface flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Derecha: Ficha Detallada de Reserva (Limpia y estructurada) -->
+<div class="w-full xl:w-[480px] bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col border border-surface-container-high shrink-0 overflow-hidden max-h-full transition-all duration-300" id="cru-drawer">
+<!-- Header de la Ficha estilo Consola Canónica SCREEN_10 -->
+<div class="flex items-center justify-between p-4 md:p-5 border-b border-surface-container-high shrink-0 bg-surface-container-low/40"><div class="flex flex-col gap-1"><div class="flex items-center gap-2"><span class="px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-surface-container text-on-tertiary-container" id="drawer-badge">Reservado</span><span class="font-numeric-table font-bold text-on-surface text-body-sm" id="drawer-res-code">#RES-8942</span><span class="text-[11px] text-outline">· Folio PMS</span></div><h2 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight mt-0.5" id="drawer-title">Ficha Detallada de Reserva</h2></div><button class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-outline hover:text-on-surface transition-colors cursor-pointer" onclick="closeDrawer()" title="Cerrar ficha" type="button"><span class="material-symbols-outlined text-[18px]">close</span></button></div>
+<!-- Estado Vacío informativo (oculto por defecto) -->
+<div class="hidden flex-1 min-h-0 p-8 flex-col items-center justify-center text-center gap-3" id="cru-drawer-empty">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[28px]">folder_off</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-sm text-body-md font-bold text-on-surface">Ninguna reserva seleccionada</h3>
+<p class="text-body-sm text-outline max-w-xs">Selecciona cualquier fila del listado para inspeccionar o gestionar su ficha operativa.</p>
+</div>
+<button class="mt-2 px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold hover:opacity-90 transition-opacity cursor-pointer" onclick="openDrawer('RES-8942')" type="button">Ver Reserva #RES-8942</button>
+</div>
+<!-- Cuerpo de la Ficha (Scrollable) -->
+<div class="flex-1 min-h-0 overflow-y-auto p-4 md:p-5 flex flex-col gap-4" id="cru-drawer-content">
+<!-- 1. Huésped Titular -->
+<div class="bg-surface-container-low/70 p-3.5 rounded-xl flex flex-col gap-2.5 border border-surface-container">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">person</span>1. Huésped Titular
+              </span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container-lowest font-numeric-table font-semibold text-on-surface border border-surface-container" id="drawer-guest-doc">DNI: 45892011</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container-high/60 shadow-xs">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-container flex items-center justify-center font-bold text-body-md shrink-0" id="drawer-guest-avatar">CM</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-body-md font-bold text-on-surface truncate" id="drawer-guest-name">Carlos Mendoza Silva</span>
+<span class="text-label-sm text-outline" id="drawer-guest-type">Huésped Recurrente (2da estancia)</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 text-label-sm font-body-sm">
+<div class="flex items-center gap-2 bg-surface-container-lowest px-2.5 py-1.5 rounded-lg border border-surface-container-high/60">
+<span class="material-symbols-outlined text-outline text-[16px]">call</span>
+<span class="font-numeric-table text-on-surface" id="drawer-guest-phone">+51 984 219 042</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-2.5 py-1.5 rounded-lg border border-surface-container-high/60 overflow-hidden">
+<span class="material-symbols-outlined text-outline text-[16px]">mail</span>
+<span class="truncate text-on-surface" id="drawer-guest-email">carlos.m@example.com</span>
+</div>
+</div>
+</div>
+<!-- 2. Estancia y Calendario -->
+<div class="bg-surface-container-low/70 p-3.5 rounded-xl flex flex-col gap-2.5 border border-surface-container"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">date_range</span>2. Estancia &amp; Calendario (total_noches)</span><div class="flex items-center gap-1.5"><span class="font-numeric-table font-bold text-on-surface text-body-sm bg-surface-container-lowest px-2.5 py-0.5 rounded border border-surface-container" id="drawer-nights-badge">3 Noches</span></div></div><div class="grid grid-cols-2 gap-2 text-body-sm"><div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container-high/60 flex flex-col"><span class="text-outline text-[11px] font-medium">Inicio de Reserva (inicio_reserva)</span><span class="font-numeric-table font-bold text-on-surface text-body-md mt-0.5" id="drawer-checkin">25 Oct 2023</span><span class="text-label-sm text-outline">Desde las 15:00 hrs</span></div><div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container-high/60 flex flex-col"><span class="text-outline text-[11px] font-medium">Fin de Reserva (fin_reserva)</span><span class="font-numeric-table font-bold text-on-surface text-body-md mt-0.5" id="drawer-checkout">28 Oct 2023</span><span class="text-label-sm text-outline">Hasta las 12:00 hrs (autocalculado)</span></div></div><div class="p-2.5 rounded-lg bg-surface-container-lowest border border-surface-container-high/60 flex flex-col gap-2"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">tune</span>Ajuste Operativo de Estadía</span><span class="text-[10px] text-outline font-mono">inicio_reserva + total_noches = fin_reserva</span></div><div class="grid grid-cols-2 gap-2"><button class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg border border-outline-variant/60 hover:border-outline bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-all shadow-xs cursor-pointer active:scale-95" onclick="adjustStayInDrawer(-1)" title="Reducir una noche (total_noches - 1)" type="button"><span class="material-symbols-outlined text-[18px] text-error">remove_circle</span><span class="">Reducir estadía</span></button><button class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-primary hover:opacity-90 text-on-primary font-label-md text-label-md font-semibold transition-all shadow-xs cursor-pointer active:scale-95" onclick="adjustStayInDrawer(1)" title="Aumentar una noche (total_noches + 1)" type="button"><span class="material-symbols-outlined text-[18px] text-tertiary-fixed">add_circle</span><span class="">Aumentar estadía</span></button></div><p class="text-[11px] text-outline leading-tight">Recalcula automáticamente total_noches, fin_reserva y el folio liquidado con precio_noche_pactado.</p></div></div>
+<!-- 3. Habitación Asignada (Regla canónica 1 Cama = 1 Persona) -->
+<div class="bg-surface-container-low/70 p-3.5 rounded-xl flex flex-col gap-2.5 border border-surface-container"><div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">meeting_room</span>3. Habitación &amp; RESERVA_HABITACIONES
+</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed px-2 py-0.5 rounded font-bold" id="drawer-room-badge">Piso 4 VIP</span>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-surface-container-high/60 flex items-center justify-between shadow-xs">
+<div class="flex items-center gap-3">
+<span class="px-2.5 py-1 rounded bg-secondary-fixed text-on-secondary-container font-numeric-table font-bold text-body-md" id="drawer-room-num">P-401</span>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface text-body-sm" id="drawer-room-type">Suite Presidencial Marina</span>
+<span class="text-label-sm text-outline" id="drawer-room-desc">Cama King • Vista al Mar • Balcón</span>
+</div>
+</div>
+<div class="text-right flex flex-col items-end">
+<div class="flex items-baseline gap-1">
+<span class="font-numeric-table font-bold text-on-surface text-body-md" id="drawer-room-rate">$450.00</span>
+<span class="text-[11px] text-outline">USD</span>
+</div>
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded font-semibold font-mono tracking-tight">precio_noche_pactado</span>
+<span class="text-[10px] text-on-tertiary-container font-medium">Tarifa congelada E/R</span>
+</div>
+</div></div>
+<!-- 4. Estado Canónico de la Reserva (Reglas de Negocio) -->
+<div class="p-3.5 rounded-xl bg-surface-container-low/80 border border-surface-container flex flex-col gap-2" id="drawer-status-card"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">rule</span>4. Estado Canónico E/R</span><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-tertiary-container font-label-sm font-bold" id="drawer-status-pill"><span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>Reservado</span></div><p class="text-body-sm text-on-surface leading-tight" id="drawer-status-desc">Estado canónico: <strong class="font-semibold text-on-tertiary-container">Reservado</strong> (Pago y registro completados). Si ocurre el término o anulación, pasa al estado <strong class="font-semibold text-outline">Liberado</strong> (Término de la reserva, se liberaron las habitaciones).</p><div class="mt-1 pt-1.5 border-t border-surface-container flex items-center justify-between text-[11px] text-outline font-medium"><span class="">Únicos 2 estados E/R: Reservado · Liberado</span><span class="text-on-tertiary-container font-semibold">Inventario sincronizado</span></div></div>
+<!-- 5. Folio Financiero & Liquidación -->
+<div class="p-4 rounded-xl bg-surface-container-low/70 border border-surface-container flex flex-col gap-2.5 shadow-sm">
+<div class="flex items-center justify-between pb-1.5 border-b border-surface-container-high">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface">receipt_long</span>5. Folio Financiero &amp; Saldo
+              </span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-error-container text-on-error-container font-semibold" id="drawer-balance-badge">Saldo Deudor</span>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant" id="drawer-calc-nights">Estancia (3 noches x $450.00):</span>
+<span class="font-numeric-table font-semibold text-on-surface" id="drawer-subtotal">$1,350.00 USD</span>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant">Abonos registrados:</span>
+<span class="font-numeric-table font-semibold text-on-surface" id="drawer-payments">$0.00 USD</span>
+</div>
+<div class="h-px bg-surface-container-high my-0.5"></div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface font-bold text-body-md leading-tight">Monto por Cobrar al Huésped:</span>
+<span class="font-numeric-table font-bold text-secondary tabular-nums text-headline-md" id="total-display">$1,350.00 USD</span>
+</div>
+</div>
+</div>
+<!-- Footer de la Ficha -->
+<div class="p-4 bg-surface-container-lowest border-t border-surface-container-high flex flex-col gap-2 shrink-0 mt-auto shadow-sm" id="cru-drawer-footer"><div class="flex items-center justify-between gap-2"><button class="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg border border-outline-variant/60 hover:bg-surface-container text-on-surface text-label-md font-semibold transition-colors cursor-pointer" onclick="adjustStayInDrawer(-1)" title="Disminuir total_noches y adelantar fin_reserva" type="button"><span class="material-symbols-outlined text-[18px] text-error">remove_circle</span><span class="">- Reducir Estadía</span></button><button class="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg bg-primary hover:opacity-90 text-on-primary text-label-md font-semibold transition-opacity cursor-pointer" onclick="adjustStayInDrawer(1)" title="Incrementar total_noches y extender fin_reserva" type="button"><span class="material-symbols-outlined text-[18px] text-tertiary-fixed">add_circle</span><span class="">+ Aumentar Estadía</span></button></div><div class="flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm border border-surface-container mt-1"><span class="material-symbols-outlined text-[16px] text-on-tertiary-container">verified</span><span class="">E/R Canónico: Únicos estados [Reservado · Liberado] · Tarifa pactada congelada</span></div></div>
+</div>
+</div>
+</div>
+</main>
+<!-- ==================== SCRIPT DE INTERACTIVIDAD ==================== -->
+<script>
+  // Diccionario canónico de datos de reservas
+  const reservationsData = {
+    'RES-8942': {
+      code: '#RES-8942',
+      badge: 'Pendiente de Pago',
+      badgeClass: 'px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-secondary-fixed text-on-secondary-container',
+      title: 'Ficha Detallada de Reserva',
+      doc: 'DNI: 45892011',
+      initials: 'CM',
+      avatarBg: 'bg-secondary-fixed text-on-secondary-container',
+      name: 'Carlos Mendoza Silva',
+      type: 'Huésped Recurrente (2da estancia)',
+      phone: '+51 984 219 042',
+      email: 'carlos.m@example.com',
+      nights: '3 Noches',
+      checkin: '25 Oct 2023',
+      checkout: '28 Oct 2023',
+      roomBadge: 'Piso 4 VIP',
+      roomBadgeClass: 'font-label-sm text-label-sm text-secondary bg-secondary-fixed px-2 py-0.5 rounded font-bold',
+      roomNum: 'P-401',
+      roomNumClass: 'px-2.5 py-1 rounded bg-secondary-fixed text-on-secondary-container font-numeric-table font-bold text-body-md',
+      roomType: 'Suite Presidencial Marina',
+      roomDesc: 'Cama King • Vista al Mar • Balcón',
+      roomRate: '$450.00',
+      statusCardClass: 'p-3.5 rounded-xl bg-secondary-fixed/50 border border-secondary flex flex-col gap-2',
+      statusPill: '<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>Pendiente de Cobro',
+      statusPillClass: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-container font-label-sm font-bold',
+      statusDesc: 'La habitación se encuentra bloqueada temporalmente en inventario. El plazo de expiración vence en <strong class="text-secondary font-semibold">2h 45m</strong> si no se registra el cobro inicial o garantía correspondiente.',
+      balanceBadge: 'Saldo Deudor',
+      balanceBadgeClass: 'font-label-sm text-label-sm px-2 py-0.5 rounded bg-error-container text-on-error-container font-semibold',
+      calcText: 'Estancia (3 noches x $450.00):',
+      subtotal: '$1,350.00 USD',
+      payments: '$0.00 USD',
+      total: '$1,350.00 USD',
+      totalColor: 'text-secondary'
+    },
+    'RES-8939': {
+      code: '#RES-8939',
+      badge: 'Confirmada / Garantizada',
+      badgeClass: 'px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-surface-container text-on-tertiary-container',
+      title: 'Ficha Detallada de Reserva',
+      doc: 'PAS: AB9940124',
+      initials: 'VR',
+      avatarBg: 'bg-surface-container text-on-surface',
+      name: 'Valeria Rios Montiel',
+      type: 'Cliente Corporativo (GlobalTech)',
+      phone: '+34 612 984 011',
+      email: 'v.rios@globaltech.com',
+      nights: '5 Noches',
+      checkin: '24 Oct 2023',
+      checkout: '29 Oct 2023',
+      roomBadge: 'Piso 3 Ejecutivo',
+      roomBadgeClass: 'font-label-sm text-label-sm text-on-surface bg-surface-container-high px-2 py-0.5 rounded font-bold',
+      roomNum: 'D-305',
+      roomNumClass: 'px-2.5 py-1 rounded bg-surface-container font-numeric-table font-bold text-body-md text-on-surface',
+      roomType: 'Doble Suite Ejecutiva',
+      roomDesc: 'Piso 3 • 2 Camas Queen • Escritorio Ergonomico',
+      roomRate: '$280.00',
+      statusCardClass: 'p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2',
+      statusPill: '<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>Reserva Confirmada',
+      statusPillClass: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-tertiary-container font-label-sm font-bold',
+      statusDesc: 'Garantía con tarjeta de crédito autorizada y verificada por pasarela segura Stripe. Lista para Check-in.',
+      balanceBadge: 'Garantizado 100%',
+      balanceBadgeClass: 'font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-tertiary-container font-semibold',
+      calcText: 'Estancia (5 noches x $280.00):',
+      subtotal: '$1,400.00 USD',
+      payments: '$1,400.00 USD (Retención)',
+      total: '$0.00 USD',
+      totalColor: 'text-on-tertiary-container'
+    },
+    'RES-8911': {
+      code: '#RES-8911',
+      badge: 'En Estancia Activa',
+      badgeClass: 'px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-primary-container text-on-primary',
+      title: 'Ficha Detallada de Reserva',
+      doc: 'DNI: 09823145',
+      initials: 'FA',
+      avatarBg: 'bg-primary-container text-on-primary-container',
+      name: 'Fernando Alarcón',
+      type: 'Huésped en Casa • Día 3 de 5',
+      phone: '+51 914 883 201',
+      email: 'fernando.a@lima.pe',
+      nights: '5 Noches',
+      checkin: '21 Oct 2023 (15:04)',
+      checkout: '26 Oct 2023 (12:00)',
+      roomBadge: 'Piso 1 Jardín',
+      roomBadgeClass: 'font-label-sm text-label-sm text-on-primary bg-primary-container px-2 py-0.5 rounded font-bold',
+      roomNum: 'S-102',
+      roomNumClass: 'px-2.5 py-1 rounded bg-primary-container text-on-primary font-numeric-table font-bold text-body-md',
+      roomType: 'Suite Jardín Interior',
+      roomDesc: 'Cama King • Acceso a Terraza Privada',
+      roomRate: '$320.00',
+      statusCardClass: 'p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2',
+      statusPill: '<span class="material-symbols-outlined text-[14px]">hotel</span>Habitación Ocupada',
+      statusPillClass: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary font-label-sm font-semibold',
+      statusDesc: 'El huésped completó el check-in presencial en torre principal. Llave digital emitida en app móvil.',
+      balanceBadge: 'Folio Abierto',
+      balanceBadgeClass: 'font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-semibold',
+      calcText: 'Estancia + Consumos Restaurante:',
+      subtotal: '$1,720.00 USD',
+      payments: '$1,600.00 USD',
+      total: '$120.00 USD',
+      totalColor: 'text-secondary'
+    },
+    'RES-8890': {
+      code: '#RES-8890',
+      badge: 'Estancia Finalizada',
+      badgeClass: 'px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-surface-container-high text-on-surface-variant',
+      title: 'Ficha de Reserva Cerrada',
+      doc: 'PAS: TZ840199',
+      initials: 'MK',
+      avatarBg: 'bg-surface-container-high text-on-surface-variant',
+      name: 'Mariko Kobayashi',
+      type: 'Huésped Saliente (Check-out completado)',
+      phone: '+81 90 4410 2231',
+      email: 'm.koba@tokyo-arch.jp',
+      nights: '4 Noches',
+      checkin: '19 Oct 2023',
+      checkout: '23 Oct 2023 (11:30)',
+      roomBadge: 'Piso 4 VIP',
+      roomBadgeClass: 'font-label-sm text-label-sm text-secondary bg-secondary-fixed px-2 py-0.5 rounded font-bold',
+      roomNum: 'P-404',
+      roomNumClass: 'px-2.5 py-1 rounded bg-surface-container text-on-surface font-numeric-table font-bold text-body-md',
+      roomType: 'VIP Presidencial',
+      roomDesc: 'Piso 4 • Terraza Panorámica',
+      roomRate: '$460.00',
+      statusCardClass: 'p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2',
+      statusPill: '<span class="material-symbols-outlined text-[14px]">done_all</span>Check-out Liquidado',
+      statusPillClass: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm font-semibold',
+      statusDesc: 'La estancia concluyó con éxito, habitación enviada a inspección de Housekeeping.',
+      balanceBadge: 'Saldado 100%',
+      balanceBadgeClass: 'font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-semibold',
+      calcText: 'Estancia (4 noches x $460.00):',
+      subtotal: '$1,840.00 USD',
+      payments: '$1,840.00 USD',
+      total: '$0.00 USD',
+      totalColor: 'text-outline'
+    },
+    'RES-8874': {
+      code: '#RES-8874',
+      badge: 'Cancelada',
+      badgeClass: 'px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-error-container text-on-error-container',
+      title: 'Ficha de Reserva Cancelada',
+      doc: 'DNI: 71290344',
+      initials: 'DG',
+      avatarBg: 'bg-error-container text-on-error-container',
+      name: 'Daniel Gómez Paz',
+      type: 'Cancelación sin penalidad vía portal web',
+      phone: '+51 955 120 442',
+      email: 'daniel.g@outlook.com',
+      nights: '2 Noches',
+      checkin: '26 Oct 2023',
+      checkout: '28 Oct 2023',
+      roomBadge: 'Liberado',
+      roomBadgeClass: 'font-label-sm text-label-sm text-error bg-error-container px-2 py-0.5 rounded font-bold',
+      roomNum: 'D-210',
+      roomNumClass: 'px-2.5 py-1 rounded bg-surface-container text-outline line-through font-numeric-table font-bold text-body-md',
+      roomType: 'Doble Estándar',
+      roomDesc: 'Inventario devuelto al pool público',
+      roomRate: '$190.00',
+      statusCardClass: 'p-3.5 rounded-xl bg-error-container/20 border border-error/30 flex flex-col gap-2',
+      statusPill: '<span class="material-symbols-outlined text-[14px]">cancel</span>Anulada',
+      statusPillClass: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm font-semibold',
+      statusDesc: 'El cliente canceló con más de 48 horas de antelación. Política flexible aplicada sin recargo.',
+      balanceBadge: 'Sin Cargos',
+      balanceBadgeClass: 'font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-outline font-semibold',
+      calcText: 'Cargo por cancelación:',
+      subtotal: '$0.00 USD',
+      payments: '$0.00 USD',
+      total: '$0.00 USD',
+      totalColor: 'text-outline'
+    }
+  };
+
+  // 1. Control del Flyout Drawer de Módulos HMS v3.2
+  function toggleDrawer(show) {
+    const container = document.getElementById('flyout-drawer');
+    const panel = document.getElementById('drawer-panel');
+    const backdrop = document.getElementById('drawer-backdrop');
+
+    if (!container || !panel || !backdrop) return;
+
+    const isCurrentlyOpen = panel.classList.contains('translate-x-0');
+    const willOpen = show !== undefined ? Boolean(show) : !isCurrentlyOpen;
+
+    if (willOpen) {
+      toggleBentoCommand(false);
+      container.classList.remove('pointer-events-none');
+      container.classList.add('pointer-events-auto');
+      backdrop.classList.remove('pointer-events-none', 'opacity-0');
+      backdrop.classList.add('pointer-events-auto', 'opacity-100');
+      panel.classList.remove('-translate-x-full');
+      panel.classList.add('translate-x-0');
+    } else {
+      panel.classList.remove('translate-x-0');
+      panel.classList.add('-translate-x-full');
+      backdrop.classList.remove('pointer-events-auto', 'opacity-100');
+      backdrop.classList.add('pointer-events-none', 'opacity-0');
+      container.classList.remove('pointer-events-auto');
+      container.classList.add('pointer-events-none');
+    }
+  }
+
+  // 2. Control de Bento Command Launcher Modal (⌘K)
+  function toggleBentoCommand(forceState) {
+    const modal = document.getElementById('bento-command-modal');
+    const input = document.getElementById('bento-search-input');
+    if (!modal) return;
+    const isCurrentlyOpen = !modal.classList.contains('hidden');
+    const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
+
+    if (shouldOpen) {
+      toggleDrawer(false);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => {
+        if (input) input.focus();
+      }, 50);
+    } else {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function handleBentoBackdropClick(event) {
+    if (event.target === document.getElementById('bento-command-modal')) {
+      toggleBentoCommand(false);
+    }
+  }
+
+  // Atajos de teclado: ESC para cerrar overlays, Cmd+K / Ctrl+K para Bento Modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      toggleBentoCommand(false);
+      toggleDrawer(false);
+    }
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      toggleBentoCommand();
+    }
+  });
+
+  // Configuración de listeners adicionales tras carga del DOM
+  document.addEventListener('DOMContentLoaded', function() {
+    const btnToggle = document.getElementById('btn-toggle-modules');
+    if (btnToggle) {
+      btnToggle.addEventListener('click', function() {
+        toggleDrawer(true);
+      });
+    }
+    const closeBtn = document.getElementById('close-drawer-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        toggleDrawer(false);
+      });
+    }
+    const backdrop = document.getElementById('drawer-backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', function() {
+        toggleDrawer(false);
+      });
+    }
+  });
+
+  // 3. Cinta Colapsable de KPIs
+  function toggleKpiRibbon() {
+    const cards = document.getElementById('kpi-ribbon-cards');
+    const icon = document.getElementById('kpi-ribbon-toggle-icon');
+    const text = document.getElementById('kpi-toggle-text');
+    if (cards.classList.contains('hidden')) {
+      cards.classList.remove('hidden');
+      icon.textContent = 'expand_less';
+      text.textContent = 'Ocultar Métricas';
+    } else {
+      cards.classList.add('hidden');
+      icon.textContent = 'expand_more';
+      text.textContent = 'Mostrar Métricas';
+    }
+  }
+
+  // 4. Tabs de Filtro de Estado
+  function selectStatusTab(filter) {
+    const tabButtons = document.querySelectorAll('.status-tab-btn');
+    tabButtons.forEach(btn => {
+      const isCurrent = btn.getAttribute('data-filter') === filter;
+      if (isCurrent) {
+        btn.className = 'status-tab-btn px-3.5 py-1.5 rounded-lg bg-primary text-on-primary font-numeric-table text-numeric-table shadow-sm transition-colors cursor-pointer flex items-center gap-1.5';
+      } else {
+        btn.className = 'status-tab-btn px-3.5 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-numeric-table text-numeric-table flex items-center gap-1.5 transition-colors cursor-pointer';
+      }
+    });
+
+    const rows = document.querySelectorAll('.reservation-row');
+    let visibleCount = 0;
+    rows.forEach(row => {
+      const cat = row.getAttribute('data-category');
+      if (filter === 'all' || cat === filter) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    const paginationInfo = document.getElementById('pagination-info');
+    if (paginationInfo) {
+      paginationInfo.textContent = visibleCount > 0 ? `1 - ${visibleCount}` : '0';
+    }
+  }
+
+  // Búsqueda en vivo en la tabla
+  function filterTableRows() {
+    const query = (document.getElementById('table-search-input').value || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('.reservation-row');
+    let visibleCount = 0;
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      if (query === '' || text.includes(query)) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    const paginationInfo = document.getElementById('pagination-info');
+    if (paginationInfo) {
+      paginationInfo.textContent = visibleCount > 0 ? `1 - ${visibleCount}` : '0';
+    }
+  }
+
+  // Modos de visualización
+  function setViewMode(mode) {
+    const btnCru = document.getElementById('btn-view-cru');
+    const btnAudit = document.getElementById('btn-view-audit');
+    if (mode === 'cru') {
+      btnCru.className = 'px-3 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm font-semibold cursor-pointer transition-all';
+      btnAudit.className = 'px-3 py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md cursor-pointer transition-all';
+    } else {
+      btnAudit.className = 'px-3 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm font-semibold cursor-pointer transition-all';
+      btnCru.className = 'px-3 py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md cursor-pointer transition-all';
+    }
+  }
+
+  // Selección de filas y sincronización con el panel lateral
+  function selectReservationRow(rowElem, resId) {
+    const allRows = document.querySelectorAll('.reservation-row');
+    allRows.forEach(r => {
+      r.classList.remove('bg-secondary-fixed/50', 'border-secondary', 'shadow-sm');
+      r.classList.add('border-transparent');
+    });
+
+    if (rowElem) {
+      rowElem.classList.remove('border-transparent');
+      rowElem.classList.add('bg-secondary-fixed/50', 'border-secondary', 'shadow-sm');
+    }
+
+    openDrawer(resId);
+  }
+
+  // Abrir y cargar datos en la ficha lateral
+  function openDrawer(mode) {
+    const drawer = document.getElementById('cru-drawer');
+    const drawerContent = document.getElementById('cru-drawer-content');
+    const drawerEmpty = document.getElementById('cru-drawer-empty');
+    const drawerFooter = document.getElementById('cru-drawer-footer');
+
+    drawer.classList.remove('hidden');
+    drawerContent.classList.remove('hidden');
+    drawerEmpty.classList.add('hidden');
+    drawerFooter.classList.remove('hidden');
+
+    if (mode === 'new') {
+      document.getElementById('drawer-res-code').textContent = '#RES-NUEVA';
+      document.getElementById('drawer-badge').textContent = 'Borrador Walk-in';
+      document.getElementById('drawer-badge').className = 'px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-secondary-fixed text-on-secondary-container';
+      document.getElementById('drawer-title').textContent = 'Crear Nueva Reserva';
+      document.getElementById('drawer-guest-doc').textContent = 'DNI / PAS';
+      document.getElementById('drawer-guest-avatar').textContent = '+';
+      document.getElementById('drawer-guest-avatar').className = 'w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-body-md shrink-0';
+      document.getElementById('drawer-guest-name').textContent = 'Nuevo Huésped en Mostrador';
+      document.getElementById('drawer-guest-type').textContent = 'Registro Presencial / Walk-in';
+      document.getElementById('drawer-guest-phone').textContent = 'Pendiente de registrar';
+      document.getElementById('drawer-guest-email').textContent = 'pendiente@email.com';
+      document.getElementById('drawer-nights-badge').textContent = '1 Noche (Estándar)';
+      document.getElementById('drawer-checkin').textContent = 'Hoy (Inmediato)';
+      document.getElementById('drawer-checkout').textContent = 'Mañana (12:00)';
+      document.getElementById('drawer-room-badge').textContent = 'Por Asignar';
+      document.getElementById('drawer-room-num').textContent = 'DISP';
+      document.getElementById('drawer-room-type').textContent = 'Habitación Estándar Disponible';
+      document.getElementById('drawer-room-desc').textContent = 'Asignación automática por inventario';
+      document.getElementById('drawer-room-rate').textContent = '$150.00';
+      document.getElementById('drawer-status-pill').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Borrador sin Confirmar';
+      document.getElementById('drawer-status-desc').textContent = 'Completa los datos del huésped y método de pago en recepción para asentar la estancia en el libro.';
+      document.getElementById('drawer-balance-badge').textContent = 'Borrador';
+      document.getElementById('drawer-calc-nights').textContent = 'Tarifa base:';
+      document.getElementById('drawer-subtotal').textContent = '$150.00 USD';
+      document.getElementById('drawer-payments').textContent = '$0.00 USD';
+      document.getElementById('total-display').textContent = '$150.00 USD';
+      document.getElementById('total-display').className = 'font-numeric-table font-bold text-secondary tabular-nums text-headline-md';
+    } else if (reservationsData[mode]) {
+      const d = reservationsData[mode];
+      document.getElementById('drawer-res-code').textContent = d.code;
+      document.getElementById('drawer-badge').textContent = d.badge;
+      document.getElementById('drawer-badge').className = d.badgeClass;
+      document.getElementById('drawer-title').textContent = d.title;
+      document.getElementById('drawer-guest-doc').textContent = d.doc;
+      document.getElementById('drawer-guest-avatar').textContent = d.initials;
+      document.getElementById('drawer-guest-avatar').className = 'w-10 h-10 rounded-full ' + d.avatarBg + ' flex items-center justify-center font-bold text-body-md shrink-0';
+      document.getElementById('drawer-guest-name').textContent = d.name;
+      document.getElementById('drawer-guest-type').textContent = d.type;
+      document.getElementById('drawer-guest-phone').textContent = d.phone;
+      document.getElementById('drawer-guest-email').textContent = d.email;
+      document.getElementById('drawer-nights-badge').textContent = d.nights;
+      document.getElementById('drawer-checkin').textContent = d.checkin;
+      document.getElementById('drawer-checkout').textContent = d.checkout;
+      document.getElementById('drawer-room-badge').textContent = d.roomBadge;
+      document.getElementById('drawer-room-badge').className = d.roomBadgeClass;
+      document.getElementById('drawer-room-num').textContent = d.roomNum;
+      document.getElementById('drawer-room-num').className = d.roomNumClass;
+      document.getElementById('drawer-room-type').textContent = d.roomType;
+      document.getElementById('drawer-room-desc').textContent = d.roomDesc;
+      document.getElementById('drawer-room-rate').textContent = d.roomRate;
+      document.getElementById('drawer-status-card').className = d.statusCardClass;
+      document.getElementById('drawer-status-pill').innerHTML = d.statusPill;
+      document.getElementById('drawer-status-pill').className = d.statusPillClass;
+      document.getElementById('drawer-status-desc').innerHTML = d.statusDesc;
+      document.getElementById('drawer-balance-badge').textContent = d.balanceBadge;
+      document.getElementById('drawer-balance-badge').className = d.balanceBadgeClass;
+      document.getElementById('drawer-calc-nights').textContent = d.calcText;
+      document.getElementById('drawer-subtotal').textContent = d.subtotal;
+      document.getElementById('drawer-payments').textContent = d.payments;
+      document.getElementById('total-display').textContent = d.total;
+      document.getElementById('total-display').className = 'font-numeric-table font-bold ' + d.totalColor + ' tabular-nums text-headline-md';
+    }
+  }
+
+  function closeDrawer() {
+    const drawerContent = document.getElementById('cru-drawer-content');
+    const drawerEmpty = document.getElementById('cru-drawer-empty');
+    const drawerFooter = document.getElementById('cru-drawer-footer');
+    const drawerBadge = document.getElementById('drawer-badge');
+    const drawerCode = document.getElementById('drawer-res-code');
+
+    drawerContent.classList.add('hidden');
+    drawerFooter.classList.add('hidden');
+    drawerEmpty.classList.remove('hidden');
+    drawerEmpty.classList.add('flex');
+    drawerBadge.textContent = 'Sin Selección';
+    drawerBadge.className = 'px-2 py-0.5 rounded text-label-sm font-semibold bg-surface-container text-outline';
+    drawerCode.textContent = '#--';
+
+    const allRows = document.querySelectorAll('.reservation-row');
+    allRows.forEach(r => {
+      r.classList.remove('bg-secondary-fixed/50', 'border-secondary', 'shadow-sm');
+      r.classList.add('border-transparent');
+    });
+  }
+</script>
+
+
+<!-- ESTILO 1: BURBUJA FLOTANTE MINIMALISTA CIRCULAR (MODERN MICRO-FAB) -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end" id="hotel-ai-assistant">
+<!-- Ventana de Chatbot (380px x 530px, glassmorphism suave) -->
+<div class="mb-4 w-[380px] max-w-[calc(100vw-2rem)] bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-2xl border border-surface-container-high/90 overflow-hidden transition-all duration-300 transform origin-bottom-right flex flex-col scale-95 opacity-0 pointer-events-none" id="ai-chat-window" style="height: 530px;">
+<!-- Cabecera Traslúcida Glassmorphism con Avatar y Controles -->
+<div class="px-4 py-3.5 bg-[#0f172a]/95 text-white backdrop-blur-md flex items-center justify-between border-b border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-center text-white shadow-inner">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed">auto_awesome</span>
+</div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-body-md font-bold leading-tight tracking-tight text-white">GrandStay AI Concierge</span>
+<span class="font-label-sm text-[9px] bg-secondary-container text-on-secondary-fixed px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">v3.2</span>
+</div>
+<span class="font-label-sm text-[11px] text-slate-300 flex items-center gap-1 leading-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Sistema en línea · Auditoría 24/7
+</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer" onclick="toggleChatWindow(false)" title="Minimizar ventana" type="button">
+<span class="material-symbols-outlined text-[18px]">minimize</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer" onclick="toggleChatWindow(false)" title="Cerrar chat" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- Historial de Conversación Hotelera Ejecutiva -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-surface-container-low/40" id="ai-chat-messages">
+<!-- Badge de sincronización de turno -->
+<div class="text-center my-1">
+<span class="font-label-sm text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-semibold uppercase tracking-wider border border-surface-container-high/60 shadow-xs">
+Turno Tarde · Conexión Segura Torre Principal
+</span>
+</div>
+<!-- Burbuja del Asistente -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl rounded-tl-xs border border-surface-container-high text-body-sm text-on-surface shadow-sm">
+<p class="leading-relaxed">Buenas tardes, <strong>Elena</strong>. Resumen instantáneo de consola:</p>
+<div class="mt-2 p-2.5 bg-surface-container-low rounded-xl border border-surface-container flex flex-col gap-1.5 text-[12px]">
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Ocupación Actual:</span>
+<span class="font-bold text-on-tertiary-container">86.4% (242 / 280)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Pre-auditoría 02:00 AM:</span>
+<span class="font-bold text-secondary">14 folios con saldo</span>
+</div>
+</div>
+<p class="mt-2.5 text-on-surface-variant text-[12px] leading-relaxed">¿Deseas auditar cargos de minibar o validar llegadas prioritarias?</p>
+</div>
+<span class="text-[10px] text-outline font-label-sm pl-1">14:36 hrs · Copiloto Concierge</span>
+</div>
+</div>
+<!-- Sugerencias / Chips Rápidos de Operación -->
+<div class="flex flex-col gap-1.5 pt-1">
+<span class="font-label-sm text-[11px] text-outline uppercase tracking-wider font-semibold pl-1">Consultas prioritarias</span>
+<div class="flex flex-wrap gap-1.5">
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95" onclick="sendQuickPrompt('Verificar 14 folios con saldo pendiente')" type="button">
+<span class="material-symbols-outlined text-secondary-container text-[14px]">pending_actions</span>
+Verificar 14 folios pendientes
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95" onclick="sendQuickPrompt('Disponibilidad de suites VIP piso 5 y 6')" type="button">
+<span class="material-symbols-outlined text-on-tertiary-container text-[14px]">hotel_class</span>
+Suites VIP disponibles
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95" onclick="sendQuickPrompt('Pre-validar balance auditoría nocturna')" type="button">
+<span class="material-symbols-outlined text-outline text-[14px]">rule</span>
+Pre-validar balance nocturno
+</button>
+</div>
+</div>
+</div>
+<!-- Campo Input Inferior Minimalista con Selector de Adjuntos y Enviar -->
+<div class="p-3 bg-surface-container-lowest border-t border-surface-container-high flex flex-col gap-2">
+<form class="flex items-center gap-2" onsubmit="handleAISubmit(event)">
+<button class="w-9 h-9 rounded-xl bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer" title="Adjuntar comprobante o folio" type="button">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+</button>
+<div class="flex-1 relative flex items-center">
+<input class="w-full bg-surface-container-low hover:bg-surface-container focus:bg-surface-container-lowest px-3 py-2 rounded-xl text-body-sm text-on-surface placeholder:text-outline border border-outline-variant/30 focus:outline-none focus:ring-1 focus:ring-[#0f172a] font-body-sm transition-all" id="ai-chat-input" placeholder="Pregunta al Concierge o escribe un comando..." type="text">
+</div>
+<button class="w-9 h-9 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-sm flex-shrink-0 active:scale-95 cursor-pointer" title="Enviar mensaje" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</form>
+<div class="flex items-center justify-between text-[10px] text-outline font-label-sm px-1">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-on-tertiary-container">verified_user</span> Privacidad HMS &amp; Registro auditado</span>
+<span class="">Presiona Enter ↵</span>
+</div>
+</div>
+</div>
+<!-- Botón Activador Circular Minimalista: Modern Micro-FAB (56x56px, #0f172a) -->
+<div class="relative group">
+<button aria-label="Abrir asistente de hotel GrandStay AI" class="w-14 h-14 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 hover:ring-4 hover:ring-slate-900/15 active:scale-95 flex items-center justify-center relative cursor-pointer" id="ai-fab-launcher" onclick="toggleChatWindow()" type="button">
+<span class="material-symbols-outlined text-[26px] text-tertiary-fixed transition-transform duration-300 group-hover:rotate-12" id="ai-fab-icon">spark</span>
+<span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]" id="ai-fab-badge"></span>
+</button>
+</div>
+</div>
+<script>
+  function toggleChatWindow(forceState) {
+    var chatWindow = document.getElementById('ai-chat-window');
+    var fabIcon = document.getElementById('ai-fab-icon');
+    var chatInput = document.getElementById('ai-chat-input');
+    if (!chatWindow) return;
+    var isCurrentlyOpen = chatWindow.classList.contains('scale-100') && !chatWindow.classList.contains('pointer-events-none');
+    var shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
+    if (shouldOpen) {
+      chatWindow.classList.remove('scale-95', 'opacity-0', 'pointer-events-none', 'hidden');
+      chatWindow.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
+      if (fabIcon) fabIcon.innerText = 'close';
+      if (chatInput) setTimeout(function() { chatInput.focus(); }, 150);
+    } else {
+      chatWindow.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
+      chatWindow.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
+      if (fabIcon) fabIcon.innerText = 'spark';
+    }
+  }
+  function sendQuickPrompt(promptText) {
+    var input = document.getElementById('ai-chat-input');
+    if (input) {
+      input.value = promptText;
+      handleAISubmit();
+    }
+  }
+  function handleAISubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var input = document.getElementById('ai-chat-input');
+    var messagesContainer = document.getElementById('ai-chat-messages');
+    if (!input || !messagesContainer) return;
+    var userText = input.value.trim();
+    if (!userText) return;
+    var userMsgWrapper = document.createElement('div');
+    userMsgWrapper.className = 'flex items-start justify-end gap-2 text-right';
+    userMsgWrapper.innerHTML = '<div class="flex flex-col gap-1 max-w-[85%] items-end"><div class="bg-[#0f172a] text-white p-3 rounded-2xl rounded-tr-xs text-body-sm shadow-sm text-left">' + userText + '</div><span class="text-[10px] text-outline font-label-sm pr-1">Justo ahora</span></div>';
+    messagesContainer.appendChild(userMsgWrapper);
+    input.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    setTimeout(function() {
+      var botMsgWrapper = document.createElement('div');
+      botMsgWrapper.className = 'flex items-start gap-2.5';
+      botMsgWrapper.innerHTML = '<div class="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm"><span class="material-symbols-outlined text-[16px] text-tertiary-fixed">smart_toy</span></div><div class="flex flex-col gap-1 max-w-[85%]"><div class="bg-surface-container-lowest p-3.5 rounded-2xl rounded-tl-xs border border-surface-container-high text-body-sm text-on-surface shadow-sm"><p>Verificación HMS completada: los 14 folios con saldo suman $925.50 USD. Todos cuentan con tarjeta de garantía registrada previa a la auditoría nocturna de las 02:00 AM.</p></div><span class="text-[10px] text-outline font-label-sm pl-1">En vivo · GrandStay Concierge</span></div>';
+      messagesContainer.appendChild(botMsgWrapper);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 550);
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,1147 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-secondary":"#ffffff","inverse-primary":"#bec6e0","error-container":"#ffdad6","on-primary-container":"#7c839b","primary":"#000000","on-primary-fixed":"#131b2e","on-secondary-container":"#663500","outline-variant":"#c6c6cd","secondary":"#904d00","background":"#faf9f7","surface-variant":"#e3e2e0","on-error":"#ffffff","tertiary-fixed-dim":"#68dba9","primary-fixed-dim":"#bec6e0","on-tertiary-container":"#069669","surface-container-high":"#e9e8e6","on-surface":"#1a1c1b","outline":"#76777d","tertiary-container":"#002114","secondary-fixed-dim":"#ffb77d","on-surface-variant":"#45464d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#6e3900","surface":"#faf9f7","surface-tint":"#565e74","surface-bright":"#faf9f7","tertiary-fixed":"#85f8c4","on-tertiary":"#ffffff","surface-container-low":"#f4f3f1","secondary-fixed":"#ffdcc3","primary-fixed":"#dae2fd","surface-container-lowest":"#ffffff","tertiary":"#000000","primary-container":"#131b2e","surface-container":"#efeeec","on-background":"#1a1c1b","secondary-container":"#fe932c","on-secondary-fixed":"#2f1500","inverse-on-surface":"#f1f1ef","error":"#ba1a1a","on-primary":"#ffffff","on-tertiary-fixed":"#002114","on-primary-fixed-variant":"#3f465c","inverse-surface":"#2f3130","surface-dim":"#dadad8","surface-container-highest":"#e3e2e0","on-error-container":"#93000a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.25rem","space-md":"0.75rem","space-lg":"1.25rem","space-xl":"2rem","space-xs":"0.25rem","gutter-desktop":"1.5rem","margin-desktop":"2rem","space-sm":"0.5rem","margin":"1rem"},"fontFamily":{"headline-md":["Plus Jakarta Sans"],"headline-xl":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"numeric-table":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"headline-md":["1.25rem",{"lineHeight":"1.625rem","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-xl-mobile":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"label-md":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.04em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["1.125rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["0.6875rem",{"lineHeight":"0.875rem","letterSpacing":"0.06em","fontWeight":"700"}],"numeric-table":["0.875rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"body-sm":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"0.005em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.5rem","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["3rem",{"lineHeight":"3.5rem","letterSpacing":"-0.03em","fontWeight":"700"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased min-h-screen">
+<!-- HEADER PRINCIPAL GLOBAL (Estático, ancho completo, sin sidebar permanente) -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest border-b border-surface-container-high/80 z-40 flex items-center justify-between px-6 shadow-sm">
+<div class="flex items-center gap-4">
+<!-- Botón interactivo Módulos HMS a la izquierda del logo con badge -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all shadow-sm cursor-pointer" id="btn-toggle-drawer" onclick="toggleDrawer(true)" type="button">
+<span class="material-symbols-outlined text-[20px] text-on-surface">menu</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Módulos HMS</span>
+<span class="font-label-sm text-[10px] bg-primary text-on-primary px-1.5 py-0.5 rounded font-bold tracking-wider">v3.2</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/50 hidden sm:block"></div>
+<!-- Logo GrandStay HMS -->
+<div class="flex items-center gap-2.5"><img alt="GrandStay HOTELS" class="h-14 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X7YyQRhDQRFZLuh0OL6o3M6Z2gMvsfJoEDf2Dh8gvXMvoCzyV1pGEKCSXHnhBX_mUCBqh7xhh953_ALzXFV7WL_8NRLEQILPOXNdwhQuAO6x3biezyottgZMPkpvwyDmFpfOYbs4RMGil_mgCQQhFNZLutSYJxWxBGToq7GCJtzXLxMH75feFPD6CRjbaowq1Qpz6qfG1106IHmdX4a_BQb7rQuFli4MM8H7teOtca"></div>
+<!-- Sede Hotelera Selector -->
+
+</div>
+<!-- Buscador global unificado -->
+<div class="flex-1 max-w-md mx-4 hidden md:block">
+<button class="flex items-center justify-between bg-surface-container-low hover:bg-surface-container px-3.5 py-1.5 rounded-lg w-full border border-outline-variant/30 text-left transition-colors group cursor-pointer" onclick="toggleBento(true)" type="button">
+<div class="flex items-center gap-2 text-outline group-hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span class="font-body-sm text-body-sm">Buscar en el sistema...</span>
+</div>
+<kbd class="font-label-sm text-label-sm bg-surface-container-lowest px-1.5 py-0.5 rounded text-on-surface-variant font-mono shadow-sm">⌘K</kbd>
+</button>
+</div>
+<!-- Acciones y Perfil de Usuario -->
+<div class="flex items-center gap-3">
+<button class="md:hidden w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface cursor-pointer" onclick="toggleBento(true)" title="Buscar" type="button">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<button class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative cursor-pointer" title="Notificaciones" type="button">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+</button>
+<div class="h-6 w-px bg-outline-variant/50 hidden sm:block"></div>
+<div class="flex items-center gap-3 pl-1">
+<div class="flex flex-col text-right hidden sm:flex">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Elena Rostova</span>
+<span class="font-label-sm text-label-sm text-outline leading-tight">Admin General</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-2 ring-primary/10">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- FLYOUT DRAWER LATERAL IZQUIERDO -->
+<div class="fixed inset-0 z-50 pointer-events-none transition-all duration-300" id="flyout-drawer-container">
+<!-- Backdrop Overlay -->
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+<!-- Drawer Menu Panel -->
+<aside class="absolute top-0 left-0 bottom-0 w-80 bg-surface-container-lowest shadow-2xl flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto border-r border-surface-container-high" id="drawer-panel">
+<div class="flex flex-col">
+<!-- Drawer Header -->
+<div class="h-16 flex items-center justify-between px-6 border-b border-surface-container-high bg-surface-container-low/50">
+<div class="flex items-center gap-2.5">
+<img alt="GrandStay HMS Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF7v83ZsmNx50096-Lz_N34-IPz8mYAQDDVMf99b53JPw8rMkecPjPcckRTsPn6j6TGnJGVrtQqRXDHKJNXYqtBfqz4p6FcWJuNi7uoxORgQZuCaGOmOtVLfUeBKRPXs1VhXfwbYdQsV-1PSoWutnQU-fkx6ZNbN30zvbukSewSg4qZSs9aVdnYBD_XXx7eu2LyDhrZdtEwl9B-2jDsJR4agDSr2UqF3b6WZb6FfM">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-lg font-bold text-on-surface leading-tight">GrandStay HMS</span>
+<span class="font-label-sm text-[10px] text-outline uppercase tracking-wider">Consola Unificada</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface transition-colors cursor-pointer" onclick="toggleDrawer(false)" title="Cerrar menú" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Navigation to the 4 Canonical Modules Only (NO 'Tarifas y VIP') -->
+<div class="px-5 pt-4 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
+</div>
+<nav class="flex flex-col gap-1 px-3">
+<!-- 1. Dashboard -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="dashboard" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="">1. Dashboard General</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Analítica</span>
+</a>
+<!-- 2. Habitaciones y Pisos -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="habitaciones-y-pisos" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+<span class="">2. Habitaciones y Pisos</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">280 habs</span>
+</a>
+<!-- 3. Reservas -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="reservas" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span class="">3. Reservas</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">En vivo</span>
+</a>
+<!-- 4. Huéspedes / Directorio (Activo en esta pantalla) -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-primary-container text-on-primary font-semibold shadow-sm transition-all" data-path="huespedes-y-usuarios" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="">4. Huéspedes / Directorio</span>
+</div>
+<span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+</a>
+</nav>
+<!-- Quick Action Inside Drawer -->
+<div class="px-5 pt-6 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
+</div>
+<div class="px-3 flex flex-col gap-1.5">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors cursor-pointer" onclick="toggleDrawer(false); toggleBento(true);" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">terminal</span>
+<span class="">Comandos Bento ⌘K</span>
+</div>
+<span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
+</button>
+</div>
+</div>
+<!-- Drawer Footer Card -->
+<div class="p-4 border-t border-surface-container-high bg-surface-container-low/40">
+<div class="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between shadow-sm border border-surface-container-high/60">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">hotel_class</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Auditoría Nocturna</span>
+<span class="font-label-sm text-[10px] text-outline">02:00 AM Programada</span>
+</div>
+</div>
+<span class="font-label-sm text-[10px] text-secondary font-bold bg-secondary-fixed/70 px-2 py-0.5 rounded">Auto</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- COMMAND BENTO MODAL (⌘K) INTERACTIVO -->
+<div class="fixed inset-0 z-50 pointer-events-none hidden items-center justify-center p-4" id="bento-modal-container">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-200 pointer-events-auto" id="bento-backdrop" onclick="toggleBento(false)"></div>
+<!-- Bento Modal Card -->
+<div class="relative bg-surface-container-lowest rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-200 pointer-events-auto border border-surface-container-high flex flex-col" id="bento-panel">
+<!-- Top Search Input -->
+<div class="flex items-center px-4 py-3 border-b border-surface-container-high gap-3">
+<span class="material-symbols-outlined text-outline text-[22px]">search</span>
+<input class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-on-surface placeholder:text-outline font-body-md text-body-md" id="bento-search-input" placeholder="Buscar reservas, huéspedes, módulos o escribir una orden..." type="text">
+<kbd class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline font-mono cursor-pointer" onclick="toggleBento(false)">ESC</kbd>
+</div>
+<!-- Quick Module Jump (Only 4 Canonical Modules) -->
+<div class="p-4 flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Navegación Rápida</span>
+<div class="grid grid-cols-2 gap-2">
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">grid_view</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Dashboard</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^1</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">meeting_room</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Habitaciones</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^2</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">calendar_month</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Reservas</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^3</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px]">group</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Huéspedes</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^4</span>
+</a>
+</div>
+<!-- Quick Actions Bento Section -->
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold mt-2">Acciones de Mostrador</span>
+<div class="flex flex-col gap-1.5">
+<button class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left cursor-pointer" onclick="toggleBento(false); openDrawer('new');" type="button">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined text-[16px]">person_add</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">+ Nuevo Huésped</span>
+<span class="font-label-sm text-[11px] text-outline">Alta inmediata en el padrón de usuarios</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">Nuevo Registro</span>
+</button>
+<button class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left cursor-pointer" type="button">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[16px]">bookmark_add</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">+ Nueva Reserva Manual</span>
+<span class="font-label-sm text-[11px] text-outline">Bloquear habitación con regla 1 cama = 1 persona</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Folio Nuevo</span>
+</button>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-4 py-2.5 bg-surface-container-low flex items-center justify-between text-outline font-label-sm text-label-sm border-t border-surface-container-high">
+<span class="">Navegar con teclas ↑ ↓ · Enter para seleccionar</span>
+<span class="">Esc para salir</span>
+</div>
+</div>
+</div>
+<main class="w-full pt-16 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<div class="px-6 md:px-8 py-8 flex flex-col gap-8 max-w-[1720px] mx-auto w-full">
+<!-- Breadcrumb & Top Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-container-high pb-5">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2 text-outline font-label-sm text-label-sm">
+<span class="hover:text-on-surface cursor-pointer">GrandStay HMS</span>
+<span class="">/</span>
+<span class="hover:text-on-surface cursor-pointer">Directorio</span>
+<span class="">/</span>
+<span class="text-on-surface font-semibold">Huéspedes y Usuarios</span>
+</div>
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Directorio de Huéspedes&nbsp;</h1>
+<span class="font-label-sm text-[11px] bg-on-tertiary-container/10 text-on-tertiary-container px-2 py-0.5 rounded-full font-bold border border-on-tertiary-container/20">Módulo 4</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline max-w-3xl">Gestión de clientes, historial de estancias, categorización de fidelización VIP y sincronización fiscal de documentos de identidad con control de reservas.</p>
+</div>
+<div class="flex items-center gap-2.5 flex-wrap">
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant/50 hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors cursor-pointer shadow-sm" id="btn-export-csv" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">download</span>
+<span class="">Exportar CSV</span>
+</button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant/50 hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors cursor-pointer shadow-sm" id="btn-import-csv" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">upload_file</span>
+<span class="">Importar Padrones</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold transition-all shadow cursor-pointer" onclick="openDrawer('new')" type="button">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+<span class="">+ Nuevo Huésped</span>
+</button>
+</div>
+</div>
+<!-- Collapsible KPI Ribbon -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 transition-all duration-300 shadow-sm flex flex-col gap-5" id="kpi-panel">
+<div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleKpiRibbon()">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[22px]">query_stats</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Indicadores del Padrón Central</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full">Actualizado en tiempo real</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline">Métricas vivas de altas, segmentación VIP y huéspedes in-house activos.</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider hidden sm:inline" id="kpi-toggle-text">Ocultar Métricas</span>
+<button aria-label="Colapsar métricas" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px] transition-transform duration-300" id="kpi-chevron">expand_less</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-300" id="kpi-grid">
+<div class="bg-surface rounded-xl p-4 border border-surface-container flex items-center justify-between hover:bg-surface-container-low transition-colors shadow-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-outline font-semibold">Total Registrados</span>
+<span class="font-headline-lg text-display-lg text-on-surface font-bold mt-1">1,420</span>
+<span class="font-label-sm text-[10px] text-on-tertiary-container font-semibold mt-0.5">+18 este mes</span>
+</div>
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-4 border border-surface-container flex items-center justify-between hover:bg-surface-container-low transition-colors shadow-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-outline font-semibold">Huéspedes In-House</span>
+<span class="font-headline-lg text-display-lg text-on-tertiary-container font-bold mt-1">32</span>
+<span class="font-label-sm text-[10px] text-outline font-semibold mt-0.5">En 28 habitaciones</span>
+</div>
+<div class="w-10 h-10 rounded-xl bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined text-[20px]">luggage</span>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-4 border border-surface-container flex items-center justify-between hover:bg-surface-container-low transition-colors shadow-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-outline font-semibold">Extranjeros / Pasaporte</span>
+<span class="font-headline-lg text-display-lg text-on-surface font-bold mt-1">68.4%</span>
+<span class="font-label-sm text-[10px] text-outline font-semibold mt-0.5">Validación DNI/Extr.</span>
+</div>
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[20px]">public</span>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-4 border border-surface-container flex items-center justify-between hover:bg-surface-container-low transition-colors shadow-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-outline font-semibold">VIPs / Club GrandStay</span>
+<span class="font-headline-lg text-display-lg text-secondary font-bold mt-1">184</span>
+<span class="font-label-sm text-[10px] text-secondary font-semibold mt-0.5">Gold &amp; Black Tier</span>
+</div>
+<div class="w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">star</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter Toolbar -->
+<div class="flex flex-col md:flex-row items-center justify-between gap-3 bg-surface-container-lowest p-3.5 rounded-xl border border-surface-container-high shadow-sm">
+<div class="flex items-center gap-2.5 w-full md:w-auto flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full bg-surface-container-low/60 border border-outline-variant/40 rounded-lg pl-9 pr-3 py-1.5 font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary" id="guest-search-input" placeholder="Buscar por nombre, apellidos, folio o documento..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-2.5 w-full md:w-auto flex-wrap">
+<select class="bg-surface-container-low/60 border border-outline-variant/40 rounded-lg px-2.5 py-1.5 font-body-sm text-body-sm text-on-surface focus:outline-none" id="filter-tipo-doc">
+<option value="">Tipo Documento: Todos</option>
+<option value="DNI">DNI / Cédula</option>
+<option value="Pasaporte">Pasaporte</option>
+<option value="RFC">RFC / Tax ID</option>
+<option value="Extranjeria">Carné Extranjería</option>
+</select>
+<select class="bg-surface-container-low/60 border border-outline-variant/40 rounded-lg px-2.5 py-1.5 font-body-sm text-body-sm text-on-surface focus:outline-none" id="filter-vip">
+<option value="">Categoría: Todas</option>
+<option value="VIP Black">VIP Black (Elite)</option>
+<option value="VIP Gold">VIP Gold</option>
+<option value="Estandar">Estándar</option>
+</select>
+<select class="bg-surface-container-low/60 border border-outline-variant/40 rounded-lg px-2.5 py-1.5 font-body-sm text-body-sm text-on-surface focus:outline-none" id="filter-status">
+<option value="">Estado: Todos</option>
+<option value="In-House">In-House (Hospedado)</option>
+<option value="Reserva">Con Reserva Próxima</option>
+<option value="Historico">Histórico</option>
+</select>
+<button class="p-1.5 rounded-lg border border-outline-variant/40 hover:bg-surface-container text-outline hover:text-on-surface transition-colors cursor-pointer" onclick="document.getElementById('guest-search-input').value='';" title="Reiniciar filtros" type="button">
+<span class="material-symbols-outlined text-[18px]">filter_alt_off</span>
+</button>
+</div>
+</div>
+<!-- Two-Column Operational Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- Left Column: Guest Table (7 Cols) -->
+<div class="xl:col-span-7 bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-sm overflow-hidden flex flex-col">
+<div class="px-5 py-3.5 border-b border-surface-container-high flex items-center justify-between bg-surface-container-low/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">contacts</span>
+<span class="font-label-md text-label-md font-bold text-on-surface uppercase tracking-wider">Directorio de Registros (6 mostrados)</span>
+</div>
+<span class="font-label-sm text-[11px] text-outline">Haga clic en una fila para editar</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-container-high bg-surface-container-low/60 font-label-sm text-[11px] uppercase tracking-wider text-outline">
+<th class="py-3 px-4 font-semibold">Huésped / ID</th>
+<th class="py-3 px-4 font-semibold">Documento</th>
+<th class="py-3 px-4 font-semibold">Categoría</th>
+<th class="py-3 px-4 font-semibold">Estado</th>
+<th class="py-3 px-4 font-semibold text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high/60 font-body-sm text-body-sm">
+<!-- Row 1: Carlos Mendoza -->
+<tr class="hover:bg-surface-container-low/70 transition-colors cursor-pointer bg-surface-container-low/40" onclick="selectGuest('USR-1048')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-label-md ring-1 ring-secondary/20">
+                  CM
+                </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Carlos Mendoza Silva</span>
+<span class="font-label-sm text-[10px] text-outline font-mono">USR-1048 · España</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-[12px] text-on-surface-variant">
+<div class="">DNI: 44920183-K</div>
+<div class="text-[10px] text-outline">+34 914 283 921</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold bg-secondary-fixed text-secondary border border-secondary/20">VIP Gold</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-[10px] font-semibold bg-on-tertiary-container/10 text-on-tertiary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                In-House (402)
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded text-outline hover:text-on-surface cursor-pointer" onclick="event.stopPropagation(); selectGuest('USR-1048')" title="Editar" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Akira Yoshida -->
+<tr class="hover:bg-surface-container-low/70 transition-colors cursor-pointer" onclick="selectGuest('USR-1049')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-label-md">
+                  AY
+                </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Akira Yoshida</span>
+<span class="font-label-sm text-[10px] text-outline font-mono">USR-1049 · Japón</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-[12px] text-on-surface-variant">
+<div class="">Pas: TZ8829104</div>
+<div class="text-[10px] text-outline">+81 3 5550 1920</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold bg-primary text-on-primary">VIP Black</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-[10px] font-semibold bg-surface-container text-outline">
+                Próx. Arribo
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded text-outline hover:text-on-surface cursor-pointer" onclick="event.stopPropagation(); selectGuest('USR-1049')" title="Editar" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Sofía Valenzuela -->
+<tr class="hover:bg-surface-container-low/70 transition-colors cursor-pointer" onclick="selectGuest('USR-1050')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-label-md">
+                  SV
+                </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Sofía Valenzuela Rios</span>
+<span class="font-label-sm text-[10px] text-outline font-mono">USR-1050 · México</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-[12px] text-on-surface-variant">
+<div class="">RFC: VARS-891024</div>
+<div class="text-[10px] text-outline">+52 81 8290 3100</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-medium bg-surface-container text-on-surface-variant border border-surface-container-high">Estándar</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-[10px] font-semibold bg-on-tertiary-container/10 text-on-tertiary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                In-House (215)
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded text-outline hover:text-on-surface cursor-pointer" onclick="event.stopPropagation(); selectGuest('USR-1050')" title="Editar" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Marcus Vance -->
+<tr class="hover:bg-surface-container-low/70 transition-colors cursor-pointer" onclick="selectGuest('USR-1051')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-label-md">
+                  MV
+                </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Marcus Vance</span>
+<span class="font-label-sm text-[10px] text-outline font-mono">USR-1051 · EE.UU.</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-[12px] text-on-surface-variant">
+<div class="">Pas: US-55928190</div>
+<div class="text-[10px] text-outline">+1 212 890 4410</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold bg-secondary-fixed text-secondary border border-secondary/20">VIP Gold</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-[10px] font-semibold bg-surface-container text-outline">
+                Confirmada
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded text-outline hover:text-on-surface cursor-pointer" onclick="event.stopPropagation(); selectGuest('USR-1051')" title="Editar" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Camille Laurent -->
+<tr class="hover:bg-surface-container-low/70 transition-colors cursor-pointer" onclick="selectGuest('USR-1052')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-label-md">
+                  CL
+                </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Camille Laurent</span>
+<span class="font-label-sm text-[10px] text-outline font-mono">USR-1052 · Francia</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-[12px] text-on-surface-variant">
+<div class="">Pas: FR-9938102</div>
+<div class="text-[10px] text-outline">+33 1 40 50 60 70</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-medium bg-surface-container text-on-surface-variant border border-surface-container-high">Estándar</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-[10px] font-semibold bg-surface-container text-outline">
+                Histórico
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded text-outline hover:text-on-surface cursor-pointer" onclick="event.stopPropagation(); selectGuest('USR-1052')" title="Editar" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- Row 6: Gabriel Arana -->
+<tr class="hover:bg-surface-container-low/70 transition-colors cursor-pointer" onclick="selectGuest('USR-1053')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-label-md">
+                  GA
+                </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Gabriel Arana Huamán</span>
+<span class="font-label-sm text-[10px] text-outline font-mono">USR-1053 · Perú</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-[12px] text-on-surface-variant">
+<div class="">CE: 00984129</div>
+<div class="text-[10px] text-outline">+51 987 654 321</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-medium bg-surface-container text-on-surface-variant border border-surface-container-high">Estándar</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-[10px] font-semibold bg-surface-container text-outline">
+                Histórico
+              </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded text-outline hover:text-on-surface cursor-pointer" onclick="event.stopPropagation(); selectGuest('USR-1053')" title="Editar" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination footer -->
+<div class="p-3.5 bg-surface-container-low/50 border-t border-surface-container-high flex items-center justify-between font-label-sm text-label-sm text-outline">
+<span class="">Mostrando 1 - 6 de 1,420 huéspedes</span>
+<div class="flex items-center gap-1.5">
+<button class="px-2 py-1 rounded bg-surface-container-lowest border border-surface-container-high opacity-50 cursor-not-allowed" disabled="" type="button">Anterior</button>
+<span class="px-2 py-1 rounded bg-primary text-on-primary font-bold">1</span>
+<button class="px-2 py-1 rounded bg-surface-container-lowest border border-surface-container-high hover:bg-surface-container cursor-pointer" type="button">2</button>
+<button class="px-2 py-1 rounded bg-surface-container-lowest border border-surface-container-high hover:bg-surface-container cursor-pointer" type="button">3</button>
+<span class="px-1">...</span>
+<button class="px-2 py-1 rounded bg-surface-container-lowest border border-surface-container-high hover:bg-surface-container cursor-pointer" type="button">237</button>
+<button class="px-2 py-1 rounded bg-surface-container-lowest border border-surface-container-high hover:bg-surface-container cursor-pointer" type="button">Siguiente</button>
+</div>
+</div>
+</div>
+<!-- Right Column: Guest Detail / CRUD Form (5 Cols) -->
+<div class="xl:col-span-5 bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-md p-6 flex flex-col gap-6" id="guest-drawer">
+<!-- Form Header -->
+<div class="flex items-start justify-between border-b border-surface-container-high pb-4">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold text-headline-sm shadow-sm">
+<span class="material-symbols-outlined text-[24px]">person</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface" id="drawer-user-title">Carlos Mendoza Silva</h2>
+<span class="px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold bg-secondary-fixed text-secondary border border-secondary/20" id="drawer-vip-badge">VIP Gold</span>
+</div>
+<div class="flex items-center gap-2 text-outline font-label-sm text-label-sm font-mono">
+<span class="">ID: <strong class="text-on-surface" id="drawer-user-id">USR-1048</strong></span>
+<span class="">·</span>
+<span class="">Reg. 14/01/2023</span>
+</div>
+</div>
+</div>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface text-label-sm font-semibold transition-colors cursor-pointer flex items-center gap-1" onclick="openDrawer('new')" title="Limpiar formulario" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span class="">Nuevo</span>
+</button>
+</div>
+<!-- Tabbed Profile & Form -->
+<form class="flex flex-col gap-5" id="form-guest-crud" onsubmit="event.preventDefault(); saveGuestData();">
+<!-- Section 1: Identidad Legal -->
+<div class="flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">fingerprint</span>
+          Datos Personales y Documentación
+        </span>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Nombres *</label>
+<input class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" id="input-nombres" required="" type="text" value="Carlos">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Apellidos *</label>
+<input class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" id="input-apellidos" required="" type="text" value="Mendoza Silva">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Tipo de Documento</label>
+<select class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none" id="input-tipo-documento">
+<option value="DNI">DNI / Cédula</option>
+<option value="Pasaporte">Pasaporte</option>
+<option value="RFC / RUT">RFC / RUT</option>
+<option value="Carné de Extranjería">Carné Extranjería</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">N° Documento Identidad *</label>
+<input class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface font-mono focus:outline-none focus:ring-1 focus:ring-primary" id="input-numero-documento" required="" type="text" value="44920183-K">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Nacionalidad</label>
+<input class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none" id="input-nacionalidad" type="text" value="España">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Categoría Fidelización</label>
+<select class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none" id="input-vip">
+<option value="VIP Gold">VIP Gold</option>
+<option value="VIP Black">VIP Black (Top)</option>
+<option value="Estándar">Estándar</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Section 2: Contacto & Notificaciones -->
+<div class="flex flex-col gap-3 pt-2 border-t border-surface-container-high/60">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">contact_phone</span>
+          Contacto y Canales de Facturación
+        </span>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Teléfono Móvil</label>
+<input class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface font-mono focus:outline-none" id="input-telefono" type="text" value="+34 914 283 921">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold">Correo Electrónico</label>
+<input class="bg-surface-container-low/50 border border-outline-variant/40 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none" id="input-email" type="email" value="c.mendoza@mendozagroup.es">
+</div>
+</div>
+</div>
+<!-- Section 3: Historial de Estancias Vinculadas -->
+<div class="flex flex-col gap-2.5 pt-2 border-t border-surface-container-high/60">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">history_edu</span>
+            Historial de Estancias Relacionadas
+          </span>
+<span class="font-label-sm text-[11px] text-on-tertiary-container font-semibold">2 Reservas Totales</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-container-high flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-on-tertiary-container/10 text-on-tertiary-container flex items-center justify-center font-bold text-label-sm">
+<span class="material-symbols-outlined text-[16px]">key</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface font-mono">#RES-8942 · Suite Presidencial 402</span>
+<span class="font-label-sm text-[10px] text-outline">12 Mar - 18 Mar (6 noches) · In-House</span>
+</div>
+</div>
+<span class="font-label-sm text-[11px] font-bold text-on-surface font-mono">$3,240 USD</span>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low/40 border border-surface-container-high flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-surface-container-high text-outline flex items-center justify-center font-bold text-label-sm">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface font-mono">#RES-8120 · Suite Ejecutiva 310</span>
+<span class="font-label-sm text-[10px] text-outline">05 Nov - 08 Nov (3 noches) · Checkout</span>
+</div>
+</div>
+<span class="font-label-sm text-[11px] font-bold text-outline font-mono">$1,180 USD</span>
+</div>
+</div>
+</div>
+<!-- Form Action Buttons -->
+<div class="flex items-center justify-between pt-4 border-t border-surface-container-high mt-1">
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-error hover:bg-error-container/30 transition-colors font-label-md text-label-md font-semibold cursor-pointer" id="btn-delete-guest" onclick="confirmDeleteUser()" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span class="">Eliminar</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors cursor-pointer" onclick="selectGuest(currentSelectedId)" type="button">
+            Cancelar
+          </button>
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow transition-all cursor-pointer" id="btn-save-drawer" type="submit">
+<span class="material-symbols-outlined text-[18px]">check</span>
+<span class="">Guardar Cambios</span>
+</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- Toast Notification Feedback Container -->
+<div class="fixed bottom-6 right-6 z-50 bg-surface-container-lowest border border-surface-container-high rounded-xl p-4 shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 max-w-md" id="toast-notification">
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px]" id="toast-icon">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface" id="toast-title">Operación Exitosa</span>
+<span class="font-body-sm text-body-sm text-outline" id="toast-message">Datos actualizados en el sistema central.</span>
+</div>
+</div><!-- ASISTENTE IA FLOTANTE: MICRO-FAB & CHAT WINDOW (GrandStay AI Concierge) -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end" id="hotel-ai-assistant">
+<!-- Ventana de Chatbot desplegada -->
+<div class="mb-4 w-[380px] max-w-[calc(100vw-2rem)] bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-2xl border border-surface-container-high/90 overflow-hidden transition-all duration-300 transform origin-bottom-right scale-100 opacity-100 pointer-events-auto flex flex-col" id="ai-chat-window" style="height: 530px;">
+<!-- Cabecera Traslúcida con Avatar y Controles -->
+<div class="px-4 py-3.5 bg-[#0f172a]/95 text-white backdrop-blur-md flex items-center justify-between border-b border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-center text-white shadow-inner">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed">auto_awesome</span>
+</div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-body-md font-bold leading-tight tracking-tight text-white">GrandStay AI Concierge</span>
+<span class="font-label-sm text-[9px] bg-secondary-container text-on-secondary-fixed px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">v3.2</span>
+</div>
+<span class="font-label-sm text-[11px] text-slate-300 flex items-center gap-1 leading-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Sistema en línea · Auditoría 24/7
+</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer" onclick="toggleChatWindow(false)" title="Minimizar ventana" type="button">
+<span class="material-symbols-outlined text-[18px]">minimize</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer" onclick="toggleChatWindow(false)" title="Cerrar chat" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- Historial de Conversación -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-surface-container-low/40" id="ai-chat-messages">
+<!-- Badge de sincronización de turno -->
+<div class="text-center my-1">
+<span class="font-label-sm text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-semibold uppercase tracking-wider border border-surface-container-high/60 shadow-xs">
+Turno Tarde · Conexión Segura Torre Principal
+</span>
+</div>
+<!-- Burbuja del Asistente -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl rounded-tl-xs border border-surface-container-high text-body-sm text-on-surface shadow-sm">
+<p class="leading-relaxed">Buenas tardes, <strong>Elena</strong>. Resumen instantáneo de consola:</p>
+<div class="mt-2 p-2.5 bg-surface-container-low rounded-xl border border-surface-container flex flex-col gap-1.5 text-[12px]">
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Ocupación Actual:</span>
+<span class="font-bold text-on-tertiary-container">86.4% (242 / 280)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Pre-auditoría 02:00 AM:</span>
+<span class="font-bold text-secondary">14 folios con saldo</span>
+</div>
+</div>
+<p class="mt-2.5 text-on-surface-variant text-[12px] leading-relaxed">¿Deseas auditar cargos de minibar o validar check-ins prioritarios?</p>
+</div>
+<span class="text-[10px] text-outline font-label-sm pl-1">14:36 hrs · Copiloto Concierge</span>
+</div>
+</div>
+<!-- Sugerencias / Chips Rápidos -->
+<div class="flex flex-col gap-1.5 pt-1">
+<span class="font-label-sm text-[11px] text-outline uppercase tracking-wider font-semibold pl-1">Consultas prioritarias</span>
+<div class="flex flex-wrap gap-1.5">
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer" onclick="sendQuickPrompt('Verificar 14 folios con saldo pendiente')" type="button">
+<span class="material-symbols-outlined text-secondary-container text-[14px]">pending_actions</span>
+Verificar 14 folios pendientes
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer" onclick="sendQuickPrompt('Disponibilidad de suites VIP piso 5 y 6')" type="button">
+<span class="material-symbols-outlined text-on-tertiary-container text-[14px]">hotel_class</span>
+Suites VIP disponibles
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer" onclick="sendQuickPrompt('Pre-validar balance auditoría nocturna')" type="button">
+<span class="material-symbols-outlined text-outline text-[14px]">rule</span>
+Pre-validar balance nocturno
+</button>
+</div>
+</div>
+</div>
+<!-- Input Inferior con Acciones -->
+<div class="p-3 bg-surface-container-lowest border-t border-surface-container-high flex flex-col gap-2">
+<form class="flex items-center gap-2" onsubmit="handleAISubmit(event)">
+<button class="w-9 h-9 rounded-xl bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer" title="Adjuntar comprobante o folio" type="button">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+</button>
+<div class="flex-1 relative flex items-center">
+<input class="w-full bg-surface-container-low hover:bg-surface-container focus:bg-surface-container-lowest px-3 py-2 rounded-xl text-body-sm text-on-surface placeholder:text-outline border border-outline-variant/30 focus:outline-none focus:ring-1 focus:ring-[#0f172a] font-body-sm transition-all" id="ai-chat-input" placeholder="Pregunta al Concierge o escribe un comando..." type="text">
+</div>
+<button class="w-9 h-9 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-sm flex-shrink-0 active:scale-95 cursor-pointer" title="Enviar mensaje" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</form>
+<div class="flex items-center justify-between text-[10px] text-outline font-label-sm px-1">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-on-tertiary-container">verified_user</span> Privacidad HMS &amp; Registro auditado</span>
+<span class="">Presiona Enter ↵</span>
+</div>
+</div>
+</div>
+<!-- Botón Activador Circular Minimalista: Modern Micro-FAB (56x56px, #0f172a Slate Navy) -->
+<div class="relative group">
+<button aria-label="Abrir asistente de hotel GrandStay AI" class="w-14 h-14 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 hover:ring-4 hover:ring-slate-900/15 active:scale-95 flex items-center justify-center relative cursor-pointer" id="ai-fab-launcher" onclick="toggleChatWindow()" type="button">
+<span class="material-symbols-outlined text-[26px] text-tertiary-fixed transition-transform duration-300 group-hover:rotate-12" id="ai-fab-icon">close</span>
+<span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]" id="ai-fab-badge"></span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- JAVASCRIPT: DRAWER, BENTO MODAL, KPI RIBBON & CRUD LOGIC -->
+<script>
+  // 1. Toggle KPI Panel / Ribbon
+  function toggleKpiRibbon() {
+    const kpiGrid = document.getElementById('kpi-grid');
+    const chevron = document.getElementById('kpi-chevron');
+    const toggleText = document.getElementById('kpi-toggle-text');
+
+    if (!kpiGrid || !chevron) return;
+
+    if (kpiGrid.classList.contains('hidden')) {
+      kpiGrid.classList.remove('hidden');
+      chevron.style.transform = 'rotate(0deg)';
+      chevron.innerText = 'expand_less';
+      if (toggleText) toggleText.innerText = 'Ocultar Métricas';
+    } else {
+      kpiGrid.classList.add('hidden');
+      chevron.style.transform = 'rotate(180deg)';
+      chevron.innerText = 'expand_more';
+      if (toggleText) toggleText.innerText = 'Mostrar Métricas';
+    }
+  }
+
+  // 2. Flyout Drawer Interactions
+  function toggleDrawer(open) {
+    const container = document.getElementById('flyout-drawer-container');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const panel = document.getElementById('drawer-panel');
+
+    if (!container || !backdrop || !panel) return;
+
+    if (open) {
+      container.classList.remove('pointer-events-none');
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+      panel.classList.remove('-translate-x-full');
+      panel.classList.add('translate-x-0');
+    } else {
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+      panel.classList.remove('translate-x-0');
+      panel.classList.add('-translate-x-full');
+      setTimeout(() => {
+        container.classList.add('pointer-events-none');
+      }, 300);
+    }
+  }
+
+  // 3. Bento Modal (⌘K) Interactions
+  function toggleBento(open) {
+    const modalContainer = document.getElementById('bento-modal-container');
+    const backdrop = document.getElementById('bento-backdrop');
+    const panel = document.getElementById('bento-panel');
+    const input = document.getElementById('bento-search-input');
+
+    if (!modalContainer || !backdrop || !panel) return;
+
+    if (open) {
+      modalContainer.classList.remove('hidden', 'pointer-events-none');
+      modalContainer.classList.add('flex', 'pointer-events-auto');
+      setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        panel.classList.remove('scale-95', 'opacity-0');
+        panel.classList.add('scale-100', 'opacity-100');
+        if (input) input.focus();
+      }, 10);
+    } else {
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      panel.classList.remove('scale-100', 'opacity-100');
+      panel.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        modalContainer.classList.remove('flex', 'pointer-events-auto');
+        modalContainer.classList.add('hidden', 'pointer-events-none');
+      }, 200);
+    }
+  }
+
+  // Keyboard Shortcuts (Cmd+K / Ctrl+K and ESC)
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      const modalContainer = document.getElementById('bento-modal-container');
+      const isVisible = modalContainer && !modalContainer.classList.contains('hidden');
+      toggleBento(!isVisible);
+    }
+
+    if (e.key === 'Escape') {
+      toggleBento(false);
+      toggleDrawer(false);
+    }
+  });
+
+  // Guest Directory Mock Database
+  const guestDatabase = {
+    'USR-1048': {
+      id: 'USR-1048',
+      nombres: 'Carlos',
+      apellidos: 'Mendoza Silva',
+      vip: 'VIP Gold',
+      tipo_doc: 'DNI',
+      num_doc: '44920183-K',
+      nacionalidad: 'España',
+      telefono: '+34 914 283 921',
+      email: 'c.mendoza@mendozagroup.es',
+      inHouse: true,
+      room: 'Suite Presidencial 402'
+    },
+    'USR-1049': {
+      id: 'USR-1049',
+      nombres: 'Akira',
+      apellidos: 'Yoshida',
+      vip: 'VIP Black',
+      tipo_doc: 'Pasaporte',
+      num_doc: 'TZ8829104',
+      nacionalidad: 'Japón',
+      telefono: '+81 3 5550 1920',
+      email: 'a.yoshida@mitsui-corp.jp',
+      inHouse: false,
+      room: 'Sin asignar'
+    },
+    'USR-1050': {
+      id: 'USR-1050',
+      nombres: 'Sofía',
+      apellidos: 'Valenzuela Rios',
+      vip: 'Estándar',
+      tipo_doc: 'RFC / RUT',
+      num_doc: 'VARS-891024-KM9',
+      nacionalidad: 'México',
+      telefono: '+52 81 8290 3100',
+      email: 'sofia.valenzuela@innovatech.mx',
+      inHouse: true,
+      room: 'Habitación Doble 215'
+    },
+    'USR-1051': {
+      id: 'USR-1051',
+      nombres: 'Marcus',
+      apellidos: 'Vance',
+      vip: 'VIP Gold',
+      tipo_doc: 'Pasaporte',
+      num_doc: 'US-55928190',
+      nacionalidad: 'Estados Unidos',
+      telefono: '+1 212 890 4410',
+      email: 'mvance@vanceholdings.com',
+      inHouse: false,
+      room: 'Próximo arribo'
+    },
+    'USR-1052': {
+      id: 'USR-1052',
+      nombres: 'Camille',
+      apellidos: 'Laurent',
+      vip: 'Estándar',
+      tipo_doc: 'Pasaporte',
+      num_doc: 'FR-9938102',
+      nacionalidad: 'Francia',
+      telefono: '+33 1 40 50 60 70',
+      email: 'camille.laurent@artsparis.fr',
+      inHouse: false,
+      room: 'Histórico'
+    },
+    'USR-1053': {
+      id: 'USR-1053',
+      nombres: 'Gabriel',
+      apellidos: 'Arana Huamán',
+      vip: 'Estándar',
+      tipo_doc: 'Carné de Extranjería',
+      num_doc: 'CE-00984129',
+      nacionalidad: 'Perú',
+      telefono: '+51 987 654 321',
+      email: 'g.arana@mineria-andina.pe',
+      inHouse: false,
+      room: 'Histórico'
+    }
+  };
+
+  let currentSelectedId = 'USR-1048';
+
+  function selectGuest(userId) {
+    currentSelectedId = userId;
+    const guest = guestDatabase[userId];
+    if (!guest) return;
+
+    const drawer = document.getElementById('guest-drawer');
+    drawer.classList.remove('hidden');
+
+    document.getElementById('drawer-user-id').textContent = guest.id;
+    document.getElementById('drawer-vip-badge').textContent = guest.vip;
+    document.getElementById('drawer-user-title').textContent = `${guest.nombres} ${guest.apellidos}`;
+    document.getElementById('input-nombres').value = guest.nombres;
+    document.getElementById('input-apellidos').value = guest.apellidos;
+    document.getElementById('input-nacionalidad').value = guest.nacionalidad;
+    document.getElementById('input-tipo-documento').value = guest.tipo_doc;
+    document.getElementById('input-numero-documento').value = guest.num_doc;
+    document.getElementById('input-telefono').value = guest.telefono;
+    document.getElementById('input-email').value = guest.email;
+    document.getElementById('btn-delete-guest').classList.remove('hidden');
+    document.getElementById('btn-save-drawer').innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span> <span>Guardar Cambios</span>';
+  }
+
+  function openDrawer(mode, userId = null) {
+    const drawer = document.getElementById('guest-drawer');
+    drawer.classList.remove('hidden');
+
+    if (mode === 'new') {
+      currentSelectedId = 'USR-' + (1050 + Math.floor(Math.random() * 800));
+      document.getElementById('drawer-user-id').textContent = currentSelectedId;
+      document.getElementById('drawer-vip-badge').textContent = 'Nuevo';
+      document.getElementById('drawer-user-title').textContent = 'Registro de Huésped';
+      document.getElementById('input-nombres').value = '';
+      document.getElementById('input-apellidos').value = '';
+      document.getElementById('input-nacionalidad').value = 'España';
+      document.getElementById('input-tipo-documento').value = 'DNI';
+      document.getElementById('input-numero-documento').value = '';
+      document.getElementById('input-telefono').value = '';
+      document.getElementById('input-email').value = '';
+      document.getElementById('btn-delete-guest').classList.add('hidden');
+      document.getElementById('btn-save-drawer').innerHTML = '<span class="material-symbols-outlined text-[18px]">person_add</span> <span>Crear Huésped</span>';
+      document.getElementById('input-nombres').focus();
+    } else if (userId) {
+      selectGuest(userId);
+    }
+  }
+
+  function closeDrawer() {
+    const drawer = document.getElementById('guest-drawer');
+    drawer.classList.add('hidden');
+  }
+
+  function showToast(title, message, isSuccess = true) {
+    const toast = document.getElementById('toast-notification');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMsg = document.getElementById('toast-message');
+    const toastIcon = document.getElementById('toast-icon');
+
+    toastTitle.textContent = title;
+    toastMsg.textContent = message;
+    toastIcon.textContent = isSuccess ? 'check_circle' : 'error';
+    toastIcon.className = isSuccess 
+      ? 'material-symbols-outlined text-on-tertiary-container text-[20px]' 
+      : 'material-symbols-outlined text-error text-[20px]';
+
+    toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+    toast.classList.add('opacity-100', 'translate-y-0');
+
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.remove('opacity-100', 'translate-y-0');
+    }, 3800);
+  }
+
+  function saveGuestData() {
+    const nombres = document.getElementById('input-nombres').value;
+    const apellidos = document.getElementById('input-apellidos').value;
+
+    if (!nombres || !apellidos) {
+      showToast('Error de Validación', 'Nombres y apellidos son campos relacionales requeridos.', false);
+      return;
+    }
+
+    showToast(
+      'Huésped Guardado', 
+      `El registro ${currentSelectedId} (${nombres} ${apellidos}) fue validado en la base de datos.`
+    );
+  }
+
+  function confirmDeleteUser() {
+    if (confirm(`¿Confirma dar de baja al huésped ${currentSelectedId}? Se comprobará la integridad referencial con reservas pasadas.`)) {
+      showToast('Registro Desactivado', `Huésped ${currentSelectedId} archivado con integridad referencial.`);
+      closeDrawer();
+    }
+  }
+
+  // Search filter
+  const searchInput = document.getElementById('guest-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const val = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(val) ? '' : 'none';
+      });
+    });
+  }
+
+  document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+    showToast('Exportación Iniciada', 'Generando volcado CSV del padrón de usuarios (1,420 registros)...');
+  });
+
+  document.getElementById('btn-import-csv')?.addEventListener('click', () => {
+    showToast('Módulo de Importación', 'Listo para procesar formato estándar CSV / Excel de huéspedes.');
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+</body></html>

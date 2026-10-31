@@ -1,0 +1,45 @@
+{
+  "skill_name": "HoteleriaStichDesign",
+  "evals": [
+    {
+      "id": 0,
+      "name": "layout-migration",
+      "prompt": "Migra el layout compartido del proyecto Hoteleria-App (Pages/Shared/_Layout.cshtml) de Bootstrap a Tailwind para que siga el sistema de diseño del hotel GrandStay (la referencia visual y de código está en Resources/Front-End/design/).",
+      "expected_output": "Un _Layout.cshtml que usa Tailwind CDN + los tokens de color del diseño, tipografía Plus Jakarta Sans y Material Symbols, con cabecera (logo + menú de módulos) y sin rastro de Bootstrap.",
+      "files": [],
+      "expectations": [
+        "El layout ya no referencia Bootstrap (sin 'lib/bootstrap' ni clases 'navbar')",
+        "Carga las fuentes Plus Jakarta Sans y Material Symbols Outlined",
+        "Carga Tailwind CDN y define tailwind.config con los tokens (primary y primary-container #131b2e)",
+        "Incluye una cabecera con logo y navegación de módulos (Dashboard/Habitaciones/Reservas)"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "login-screen",
+      "prompt": "Crea la pantalla de inicio de sesión (login) del hotel GrandStay siguiendo el diseño de Stitch (Resources/Front-End/design/stitch_hotel_management_system_interface/pantalla_de_inicio_y_acceso_grandstay_hms/).",
+      "expected_output": "Una página de login (Razor o HTML) con el estilo del diseño: título 'Iniciar sesión', campos de usuario y contraseña, botón de acceso, iconos Material Symbols y tipografía Plus Jakarta Sans.",
+      "files": [],
+      "expectations": [
+        "Contiene el título 'Iniciar sesión'",
+        "Tiene campos para usuario y contraseña (input de tipo password)",
+        "Tiene un botón o acción de acceso/entrar",
+        "Usa Tailwind (clases bg-/text-/rounded o CDN + config) y Material Symbols",
+        "La interfaz está en español"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "habitaciones-screen",
+      "prompt": "Implementa la página de 'Gestión de Habitaciones y Pisos' del proyecto Hoteleria-App siguiendo el diseño de Stitch (Resources/Front-End/design/stitch_hotel_management_system_interface/gesti_n_de_habitaciones_y_pisos_hms_unificado/).",
+      "expected_output": "Una página Razor (Pages/Habitaciones/Index.cshtml) que reproduce el diseño: título, uso de clases de token de color del sistema, listado/tabla de habitaciones con estados, y datos ligados con Razor en lugar de alert() de maqueta.",
+      "files": [],
+      "expectations": [
+        "Contiene el título 'Gestión de Habitaciones y Pisos'",
+        "Usa clases de token de color del sistema (bg-surface-container / text-on-surface / etc.)",
+        "Liga datos con Razor (@Model/@foreach/@if) y no deja alert() de maqueta",
+        "Muestra estados de habitación (Disponible/Ocupada/Mantenimiento u equivalente)"
+      ]
+    }
+  ]
+}

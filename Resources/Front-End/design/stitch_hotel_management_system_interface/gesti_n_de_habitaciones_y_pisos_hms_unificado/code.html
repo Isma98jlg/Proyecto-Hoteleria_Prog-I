@@ -1,0 +1,1574 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-secondary":"#ffffff","inverse-primary":"#bec6e0","error-container":"#ffdad6","on-primary-container":"#7c839b","primary":"#000000","on-primary-fixed":"#131b2e","on-secondary-container":"#663500","outline-variant":"#c6c6cd","secondary":"#904d00","background":"#faf9f7","surface-variant":"#e3e2e0","on-error":"#ffffff","tertiary-fixed-dim":"#68dba9","primary-fixed-dim":"#bec6e0","on-tertiary-container":"#069669","surface-container-high":"#e9e8e6","on-surface":"#1a1c1b","outline":"#76777d","tertiary-container":"#002114","secondary-fixed-dim":"#ffb77d","on-surface-variant":"#45464d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#6e3900","surface":"#faf9f7","surface-tint":"#565e74","surface-bright":"#faf9f7","tertiary-fixed":"#85f8c4","on-tertiary":"#ffffff","surface-container-low":"#f4f3f1","secondary-fixed":"#ffdcc3","primary-fixed":"#dae2fd","surface-container-lowest":"#ffffff","tertiary":"#000000","primary-container":"#131b2e","surface-container":"#efeeec","on-background":"#1a1c1b","secondary-container":"#fe932c","on-secondary-fixed":"#2f1500","inverse-on-surface":"#f1f1ef","error":"#ba1a1a","on-primary":"#ffffff","on-tertiary-fixed":"#002114","on-primary-fixed-variant":"#3f465c","inverse-surface":"#2f3130","surface-dim":"#dadad8","surface-container-highest":"#e3e2e0","on-error-container":"#93000a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.25rem","space-md":"0.75rem","space-lg":"1.25rem","space-xl":"2rem","space-xs":"0.25rem","gutter-desktop":"1.5rem","margin-desktop":"2rem","space-sm":"0.5rem","margin":"1rem"},"fontFamily":{"headline-md":["Plus Jakarta Sans"],"headline-xl":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"numeric-table":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"headline-md":["1.25rem",{"lineHeight":"1.625rem","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-xl-mobile":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"label-md":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.04em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["1.125rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["0.6875rem",{"lineHeight":"0.875rem","letterSpacing":"0.06em","fontWeight":"700"}],"numeric-table":["0.875rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"body-sm":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"0.005em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.5rem","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["3rem",{"lineHeight":"3.5rem","letterSpacing":"-0.03em","fontWeight":"700"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased overflow-x-hidden min-h-screen relative">
+<!-- ==================== FLYOUT LATERAL OFICIAL (DOCK / SLIDE-OVER) ==================== -->
+<div class="fixed inset-0 z-50 transition-all duration-300 pointer-events-none" id="flyout-drawer-container">
+<!-- Backdrop Overlay con Blur -->
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+<!-- Drawer Menu Panel (w-80) -->
+<aside class="absolute top-0 left-0 bottom-0 w-80 bg-surface-container-lowest shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out pointer-events-auto border-r border-surface-container-high -translate-x-full" id="drawer-panel">
+<div class="flex flex-col">
+<!-- Drawer Header con Logo y Botón Cerrar -->
+<div class="h-16 flex items-center justify-between px-6 border-b border-surface-container-high bg-surface-container-low/50">
+<div class="flex items-center gap-2.5">
+<img alt="GrandStay HMS Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF7v83ZsmNx50096-Lz_N34-IPz8mYAQDDVMf99b53JPw8rMkecPjPcckRTsPn6j6TGnJGVrtQqRXDHKJNXYqtBfqz4p6FcWJuNi7uoxORgQZuCaGOmOtVLfUeBKRPXs1VhXfwbYdQsV-1PSoWutnQU-fkx6ZNbN30zvbukSewSg4qZSs9aVdnYBD_XXx7eu2LyDhrZdtEwl9B-2jDsJR4agDSr2UqF3b6WZb6FfM">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-lg font-bold text-on-surface leading-tight">GrandStay HMS</span>
+<span class="font-label-sm text-[10px] text-outline uppercase tracking-wider">Consola Unificada</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface transition-colors cursor-pointer" onclick="toggleDrawer(false)" title="Cerrar menú" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Navigation to the 4 Canonical Modules Only -->
+<div class="px-5 pt-4 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
+</div>
+<nav class="flex flex-col gap-1 px-3">
+<!-- 1. Dashboard General & Analítica Histórica -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="dashboard" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="">1. Dashboard General</span>
+</div>
+</a>
+<!-- 2. Habitaciones y Pisos (Activo Canónico) -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-primary text-on-primary font-semibold shadow-sm transition-all" data-path="habitaciones-y-pisos" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-on-primary">meeting_room</span>
+<span class="">2. Habitaciones y Pisos</span>
+</div>
+<span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
+</a>
+<!-- 3. Gestión de Reservas y Estancias -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="reservas" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span class="">3. Reservas y Estancias</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">En vivo</span>
+</a>
+<!-- 4. Directorio y CRUD de Huéspedes / Usuarios -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" data-path="huespedes-y-usuarios" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="">4. Huéspedes y Usuarios</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">496 activos</span>
+</a>
+</nav>
+<!-- Quick Action Inside Drawer -->
+<div class="px-5 pt-6 pb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
+</div>
+<div class="px-3 flex flex-col gap-1.5">
+<button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors cursor-pointer" onclick="toggleDrawer(false); toggleBento(true);" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">terminal</span>
+<span class="">Comandos Bento ⌘K</span>
+</div>
+<span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
+</button>
+</div>
+</div>
+<!-- Drawer Footer Card -->
+<div class="p-4 border-t border-surface-container-high bg-surface-container-low/40">
+<div class="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between shadow-sm border border-surface-container-high/60">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">hotel_class</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Auditoría Nocturna</span>
+<span class="font-label-sm text-[10px] text-outline">02:00 AM Programada</span>
+</div>
+</div>
+<span class="font-label-sm text-[10px] text-secondary font-bold bg-secondary-fixed/70 px-2 py-0.5 rounded">Auto</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- ==================== COMMAND BENTO MODAL (⌘K) INTERACTIVO ==================== -->
+<div class="fixed inset-0 z-50 pointer-events-none hidden items-center justify-center p-4" id="bento-modal-container">
+<!-- Backdrop con Blur -->
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-200 pointer-events-auto" id="bento-backdrop" onclick="toggleBento(false)"></div>
+<!-- Bento Modal Card -->
+<div class="relative bg-surface-container-lowest rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-200 pointer-events-auto border border-surface-container-high flex flex-col" id="bento-panel">
+<!-- Top Search Input -->
+<div class="flex items-center px-4 py-3 border-b border-surface-container-high gap-3">
+<span class="material-symbols-outlined text-outline text-[22px]">search</span>
+<input class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-on-surface placeholder:text-outline font-body-md text-body-md" id="bento-search-input" placeholder="Buscar reservas, habitaciones, pisos o escribir una orden..." type="text">
+<kbd class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline font-mono cursor-pointer" onclick="toggleBento(false)">ESC</kbd>
+</div>
+<!-- Quick Module Jump (Only 4 Canonical Modules) -->
+<div class="p-4 flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Navegación Rápida</span>
+<div class="grid grid-cols-2 gap-2">
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">grid_view</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Dashboard</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^1</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px]">meeting_room</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Habitaciones</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^2</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">calendar_month</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Reservas</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^3</span>
+</a>
+<a class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface text-[20px]">group</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Huéspedes</span>
+</div>
+<span class="font-label-sm text-[10px] text-outline font-mono">^4</span>
+</a>
+</div>
+<!-- Quick Actions Bento Section -->
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold mt-2">Acciones Rápidas</span>
+<div class="flex flex-col gap-1.5">
+<button class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left cursor-pointer" onclick="toggleBento(false); openRoomDrawer('new');" type="button">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">+ Nueva Habitación</span>
+<span class="font-label-sm text-[11px] text-outline">Configurar habitación con regla 1 cama = 1 persona</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Inventario</span>
+</button>
+<button class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left cursor-pointer" onclick="toggleBento(false); toggleFloorModal(true);" type="button">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-secondary-fixed/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">layers</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Gestionar Pisos</span>
+<span class="font-label-sm text-[11px] text-outline">Ver y editar zonificación vertical</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Niveles</span>
+</button>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-4 py-2.5 bg-surface-container-low flex items-center justify-between text-outline font-label-sm text-label-sm border-t border-surface-container-high">
+<span class="">Navegar con teclas ↑ ↓ · Enter para seleccionar</span>
+<span class="">Esc para salir</span>
+</div>
+</div>
+</div>
+<!-- ==================== HEADER GLOBAL UNIFICADO OFICIAL ==================== -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest border-b border-surface-container-high/80 z-40 flex items-center justify-between px-6 shadow-sm">
+<div class="flex items-center gap-4">
+<!-- Botón interactivo Módulos HMS a la izquierda del logo con badge -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-all shadow-sm cursor-pointer" id="btn-toggle-drawer" onclick="toggleDrawer(true)" type="button">
+<span class="material-symbols-outlined text-[20px] text-on-surface">menu</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Módulos HMS</span>
+<span class="font-label-sm text-[10px] bg-primary text-on-primary px-1.5 py-0.5 rounded font-bold tracking-wider">v3.2</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/50 hidden sm:block"></div>
+<!-- Logo GrandStay HMS -->
+<div class="flex items-center gap-2.5"><img alt="GrandStay HOTELS" class="h-14 max-h-56 w-auto object-contain transition-all drop-shadow-xs" src="https://lh3.googleusercontent.com/aida/AEtjO1X7YyQRhDQRFZLuh0OL6o3M6Z2gMvsfJoEDf2Dh8gvXMvoCzyV1pGEKCSXHnhBX_mUCBqh7xhh953_ALzXFV7WL_8NRLEQILPOXNdwhQuAO6x3biezyottgZMPkpvwyDmFpfOYbs4RMGil_mgCQQhFNZLutSYJxWxBGToq7GCJtzXLxMH75feFPD6CRjbaowq1Qpz6qfG1106IHmdX4a_BQb7rQuFli4MM8H7teOtca"></div>
+<!-- Sede Hotelera Selector -->
+
+</div>
+<!-- Buscador global unificado -->
+<div class="flex-1 max-w-md mx-4 hidden md:block">
+<button class="flex items-center justify-between bg-surface-container-low hover:bg-surface-container px-3.5 py-1.5 rounded-lg w-full border border-outline-variant/30 text-left transition-colors group cursor-pointer" onclick="toggleBento(true)" type="button">
+<div class="flex items-center gap-2 text-outline group-hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span class="font-body-sm text-body-sm">Buscar en el sistema...</span>
+</div>
+<kbd class="font-label-sm text-label-sm bg-surface-container-lowest px-1.5 py-0.5 rounded text-on-surface-variant font-mono shadow-sm">⌘K</kbd>
+</button>
+</div>
+<!-- Acciones y Perfil de Usuario -->
+<div class="flex items-center gap-3">
+<button class="md:hidden w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface cursor-pointer" onclick="toggleBento(true)" title="Buscar" type="button">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<button class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative cursor-pointer" title="Notificaciones" type="button">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+</button>
+<div class="h-6 w-px bg-outline-variant/50 hidden sm:block"></div>
+<div class="flex items-center gap-3 pl-1">
+<div class="flex flex-col text-right hidden sm:flex">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Elena Rostova</span>
+<span class="font-label-sm text-label-sm text-outline leading-tight">Admin General</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-2 ring-primary/10">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+<main class="w-full pt-16 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+<!-- Sub-header Operativo de Alto Impacto -->
+<section class="px-8 pt-7 pb-5 bg-surface-container-lowest shadow-sm flex flex-col gap-5">
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold bg-secondary-fixed/50 px-2.5 py-0.5 rounded-full">• MÓDULO CANÓNICO 1 · EN VIVO · Catálogo de Activos &amp; Zonificación</span>
+<span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Sincronizado en tiempo real
+</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">Gestión de Habitaciones y Pisos</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Control de inventario inmobiliario, configuración de capacidad de camas por habitación (<strong>1 Cama = 1 Persona</strong>) y zonificación física por niveles bajo las 2 categorías canónicas: <strong>Estándar ($45/cama)</strong> y <strong>VIP ($95/cama)</strong>.</p>
+</div>
+<!-- Acciones Globales -->
+<div class="flex flex-wrap items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold transition-all shadow-sm cursor-pointer" onclick="toggleFloorModal(true)" type="button">
+<span class="material-symbols-outlined text-[20px]">layers</span>
+<span class="">Gestionar Pisos (4)</span>
+</button>
+<button class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm cursor-pointer" onclick="exportData()" title="Exportar CSV/Excel" type="button">
+<span class="material-symbols-outlined text-[19px]">file_download</span>
+<span class="">Exportar</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group cursor-pointer" onclick="openRoomDrawer('new')" type="button">
+<span class="material-symbols-outlined text-[20px] text-secondary-container transition-transform group-hover:rotate-45">key</span>
+<span class="">+ Nueva Habitación</span>
+</button>
+</div>
+</div>
+<!-- Barra / Cinta de KPIs y Resumen Operativo Desplegable -->
+<div class="w-full bg-surface-container-lowest border border-surface-container rounded-xl p-3 shadow-sm flex flex-col gap-2 shrink-0 transition-all duration-300" id="kpi-ribbon-container">
+<div class="flex items-center justify-between pb-1.5 border-b border-surface-container">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-on-primary uppercase tracking-wider">Cinta de KPIs Operativos</span>
+<span class="text-body-sm text-outline font-medium">Resumen consolidado de inventario y distribución canónica de tarifas</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[11px] text-outline font-numeric-table">Actualizado: 14:45 hrs</span>
+<button class="flex items-center gap-1 px-2 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container text-[12px] font-semibold transition-colors cursor-pointer" onclick="toggleKpiRibbon()" title="Colapsar / Expandir cinta" type="button">
+<span id="kpi-toggle-text" class="">Ocultar Métricas</span>
+<span class="material-symbols-outlined text-[18px] transition-transform duration-200" id="kpi-ribbon-toggle-icon">keyboard_arrow_up</span>
+</button>
+</div>
+</div>
+<!-- Tarjetas de métricas -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-1 transition-all duration-300" id="kpi-ribbon-cards">
+<!-- KPI 1: Ocupación Global -->
+<div class="bg-surface-container-low/80 p-3 rounded-lg border border-surface-container flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Ocupadas (En Estancia)</span>
+<div class="flex items-baseline gap-1.5 mt-0.5">
+<span class="font-numeric-table font-bold text-headline-sm text-secondary">16</span>
+<span class="text-[10px] text-outline">/ 48 habs</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-bold text-secondary bg-secondary-fixed px-2 py-0.5 rounded">33.4% ocupación</span>
+<span class="text-[10px] text-outline mt-1">28 libres • 4 mant.</span>
+</div>
+</div>
+<!-- KPI 2: Libres / Disponibles -->
+<div class="bg-surface-container-low/80 p-3 rounded-lg border border-surface-container flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-semibold text-on-tertiary-container uppercase tracking-wider">Libres / Disponibles</span>
+<div class="flex items-baseline gap-1.5 mt-0.5">
+<span class="font-numeric-table font-bold text-headline-sm text-on-tertiary-container">28</span>
+<span class="text-[10px] text-on-tertiary-container font-semibold">58.3%</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="w-2.5 h-2.5 rounded-full bg-on-tertiary-container animate-pulse"></span>
+<span class="text-[10px] text-outline mt-1">Listas para Check-in</span>
+</div>
+</div>
+<!-- KPI 3: Categoría Estándar -->
+<div class="bg-surface-container-low/80 p-3 rounded-lg border border-surface-container flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Cat. Estándar (EST)</span>
+<div class="flex items-baseline gap-1.5 mt-0.5">
+<span class="font-numeric-table font-bold text-headline-sm text-on-surface">36</span>
+<span class="text-[10px] text-outline">habs (75%)</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[11px] font-bold text-on-surface font-mono">$45.00</span>
+<span class="text-[10px] text-outline">por cama / noche</span>
+</div>
+</div>
+<!-- KPI 4: Categoría VIP -->
+<div class="bg-secondary-fixed/30 p-3 rounded-lg border border-secondary/20 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-semibold text-secondary uppercase tracking-wider">Cat. VIP (VIP)</span>
+<div class="flex items-baseline gap-1.5 mt-0.5">
+<span class="font-numeric-table font-bold text-headline-sm text-secondary">12</span>
+<span class="text-[10px] text-secondary font-semibold">habs (25%)</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[11px] font-bold text-secondary font-mono">$95.00</span>
+<span class="text-[10px] text-secondary">por cama / noche</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Espacio de Trabajo Principal -->
+<div class="p-8 flex flex-col gap-6">
+<!-- Selector de Pisos (Niveles del Edificio según Modelo PISOS) -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Filtrar por Nivel de Edificio (PISOS)</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg">
+<button class="p-1.5 rounded bg-surface-container-lowest shadow-sm text-on-surface flex items-center cursor-pointer" id="btnViewGrid" onclick="switchView('grid')" title="Vista en Cuadrícula" type="button">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+</button>
+<button class="p-1.5 rounded text-outline hover:text-on-surface flex items-center cursor-pointer" id="btnViewTable" onclick="switchView('table')" title="Vista en Tabla" type="button">
+<span class="material-symbols-outlined text-[18px]">view_list</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-1" id="floorPills">
+<button class="floor-pill px-4 py-2 rounded-xl bg-primary text-on-primary font-body-sm text-body-sm font-semibold whitespace-nowrap transition-all shadow-sm cursor-pointer" onclick="selectFloor('all', this)" type="button">Todos los pisos (48 habs)</button>
+<button class="floor-pill px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm whitespace-nowrap transition-all shadow-sm flex items-center gap-2 cursor-pointer" onclick="selectFloor('1', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="">Piso 1 (Nivel 1)</span>
+<span class="font-label-sm text-label-sm bg-surface-container px-1.5 py-0.5 rounded text-outline">8 habs</span>
+</button>
+<button class="floor-pill px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm whitespace-nowrap transition-all shadow-sm flex items-center gap-2 cursor-pointer" onclick="selectFloor('2', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="">Piso 2 (Nivel 2)</span>
+<span class="font-label-sm text-label-sm bg-surface-container px-1.5 py-0.5 rounded text-outline">14 habs</span>
+</button>
+<button class="floor-pill px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm whitespace-nowrap transition-all shadow-sm flex items-center gap-2 cursor-pointer" onclick="selectFloor('3', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="">Piso 3 (Nivel 3)</span>
+<span class="font-label-sm text-label-sm bg-surface-container px-1.5 py-0.5 rounded text-outline">14 habs</span>
+</button>
+<button class="floor-pill px-4 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm whitespace-nowrap transition-all shadow-sm flex items-center gap-2 cursor-pointer" onclick="selectFloor('4', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="">Piso 4 (Nivel 4)</span>
+<span class="font-label-sm text-label-sm bg-secondary-fixed text-on-secondary-fixed px-1.5 py-0.5 rounded font-bold">12 habs VIP</span>
+</button>
+</div>
+</div>
+<!-- Barra de Filtros Operativos Avanzados -->
+<div class="bg-surface-container-lowest p-4 rounded-2xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+<div class="flex-1 flex flex-wrap sm:flex-nowrap items-center gap-3">
+<!-- Buscador por código -->
+<div class="relative flex-1 min-w-[220px]">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-inner" id="searchInput" oninput="applyFilters()" placeholder="Buscar por código (ej: V-401, E-204) o referencia..." type="text">
+</div>
+<!-- Filtro por Tipo Canónico (Únicamente Estándar y VIP) -->
+<div class="min-w-[210px]">
+<select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none cursor-pointer font-medium" id="vipFilter" onchange="applyFilters()">
+<option value="all">Todas las Categorías</option>
+<option value="EST">Estándar (EST) • $45/cama</option>
+<option value="VIP">VIP (VIP) • $95/cama</option>
+</select>
+</div>
+<!-- Filtro por Estado Operativo -->
+<div class="min-w-[150px]">
+<select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none cursor-pointer" id="statusFilter" onchange="applyFilters()">
+<option value="all">Todos los Estados</option>
+<option value="libre">Libre / Disponible</option>
+<option value="ocupado">Ocupado</option>
+<option value="mantenimiento">Mantenimiento</option>
+</select>
+</div>
+<!-- Filtro por Capacidad -->
+<div class="min-w-[150px]">
+<select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none cursor-pointer" id="capacityFilter" onchange="applyFilters()">
+<option value="all">Capacidad (Camas)</option>
+<option value="1">1 Cama</option>
+<option value="2">2 Camas</option>
+<option value="3">3 Camas</option>
+<option value="4">4 Camas</option>
+</select>
+</div>
+</div>
+<!-- Reseteo y conteo -->
+<div class="flex items-center gap-3 justify-end shrink-0">
+<span class="font-label-sm text-label-sm text-outline" id="filteredCount">Mostrando 8 de 48 habitaciones</span>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors cursor-pointer" onclick="resetFilters()" type="button">
+            Limpiar Filtros
+          </button>
+</div>
+</div>
+<!-- CONTENEDOR VISTA CUADRÍCULA (Grid Operativo) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="roomsGrid"><!-- Card 1: V-401 (VIP) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="4" data-capacity="4" data-code="V-401" data-floor="4" data-status="ocupado" data-vip="VIP">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-secondary-container"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-primary-container text-surface-container-lowest flex items-center justify-center font-headline-md text-headline-md tracking-tight shadow-inner">V-401</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> VIP ($95/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 4 (Nivel 4)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed font-label-sm text-label-sm text-on-secondary-fixed font-semibold"><span class="w-2 h-2 rounded-full bg-secondary"></span>Ocupada</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-secondary text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="4" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">4 personas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">4 × $95.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$380.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface transition-colors cursor-pointer" onclick="assignReservation('V-401')" title="Ver detalle / Check-in" type="button"><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 2: E-305 (Estándar) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="3" data-capacity="3" data-code="E-305" data-floor="3" data-status="libre" data-vip="EST">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-outline"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline-md text-headline-md tracking-tight">E-305</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Estándar ($45/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 3 (Nivel 3)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-tertiary-container font-semibold"><span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>Libre</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-outline text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="3" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">3 personas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">3 × $45.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$135.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary transition-colors cursor-pointer" onclick="assignReservation('E-305')" title="Asignar reserva" type="button"><span class="material-symbols-outlined text-[18px]">login</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 3: E-204 (Estándar) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="2" data-capacity="2" data-code="E-204" data-floor="2" data-status="ocupado" data-vip="EST">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-outline"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline-md text-headline-md tracking-tight">E-204</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Estándar ($45/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 2 (Nivel 2)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed font-label-sm text-label-sm text-on-secondary-fixed font-semibold"><span class="w-2 h-2 rounded-full bg-secondary"></span>Ocupada</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-outline text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="2" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">2 personas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">2 × $45.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$90.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface transition-colors cursor-pointer" onclick="assignReservation('E-204')" title="Ver detalle / Check-in" type="button"><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 4: E-102 (Estándar - Mantenimiento) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="1" data-capacity="1" data-code="E-102" data-floor="1" data-status="mantenimiento" data-vip="EST">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-error"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline-md text-headline-md tracking-tight">E-102</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Estándar ($45/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 1 (Nivel 1)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-error-container font-label-sm text-label-sm text-on-error-container font-semibold"><span class="w-2 h-2 rounded-full bg-error"></span>Mant.</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-outline text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="1" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">1 persona</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">1 × $45.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$45.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface transition-colors cursor-pointer" onclick="assignReservation('E-102')" title="Ver detalle" type="button"><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 5: V-308 (VIP) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="2" data-capacity="2" data-code="V-308" data-floor="3" data-status="libre" data-vip="VIP">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-secondary-container"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-primary-container text-surface-container-lowest flex items-center justify-center font-headline-md text-headline-md tracking-tight shadow-inner">V-308</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> VIP ($95/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 3 (Nivel 3)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-tertiary-container font-semibold"><span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>Libre</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-secondary text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="2" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">2 personas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">2 × $95.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$190.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary transition-colors cursor-pointer" onclick="assignReservation('V-308')" title="Asignar reserva" type="button"><span class="material-symbols-outlined text-[18px]">login</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 6: E-210 (Estándar) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="1" data-capacity="1" data-code="E-210" data-floor="2" data-status="ocupado" data-vip="EST">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-outline"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline-md text-headline-md tracking-tight">E-210</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Estándar ($45/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 2 (Nivel 2)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed font-label-sm text-label-sm text-on-secondary-fixed font-semibold"><span class="w-2 h-2 rounded-full bg-secondary"></span>Ocupada</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-outline text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="1" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">1 persona</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">1 × $45.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$45.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface transition-colors cursor-pointer" onclick="assignReservation('E-210')" title="Ver detalle / Check-in" type="button"><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 7: V-402 (VIP) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="3" data-capacity="3" data-code="V-402" data-floor="4" data-status="ocupado" data-vip="VIP">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-secondary-container"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-primary-container text-surface-container-lowest flex items-center justify-center font-headline-md text-headline-md tracking-tight shadow-inner">V-402</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> VIP ($95/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 4 (Nivel 4)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed font-label-sm text-label-sm text-on-secondary-fixed font-semibold"><span class="w-2 h-2 rounded-full bg-secondary"></span>Ocupada</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-secondary text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="3" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">3 personas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">3 × $95.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$285.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface transition-colors cursor-pointer" onclick="assignReservation('V-402')" title="Ver detalle / Check-in" type="button"><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
+    </div>
+  </div>
+</div>
+<!-- Card 8: E-105 (Estándar) -->
+<div class="room-card group bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="2" data-capacity="2" data-code="E-105" data-floor="1" data-status="libre" data-vip="EST">
+  <div class="absolute top-0 left-0 right-0 h-1 bg-outline"></div>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline-md text-headline-md tracking-tight">E-105</div>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Estándar ($45/cama)</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso 1 (Nivel 1)</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-tertiary-container font-semibold"><span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>Libre</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
+      <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined text-outline text-[16px]">bed</span> Camas</span>
+        <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, -1)">-</button>
+          <input type="number" min="1" max="6" value="2" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" onchange="updateCardBeds(this)" oninput="updateCardBeds(this)">
+          <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors cursor-pointer text-body-md" onclick="changeCardBeds(this, 1)">+</button>
+        </div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
+        <span class="material-symbols-outlined text-outline text-[20px]">group</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
+          <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">2 personas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+    <div class="flex flex-col">
+      <span class="font-label-sm text-label-sm text-outline price-calc">2 × $45.00</span>
+      <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$90.00</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-2 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary transition-colors cursor-pointer" onclick="assignReservation('E-105')" title="Asignar reserva" type="button"><span class="material-symbols-outlined text-[18px]">login</span></button>
+    </div>
+  </div>
+</div></div>
+<!-- CONTENEDOR VISTA TABLA -->
+<div class="hidden bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden" id="roomsTableWrapper">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low font-label-md text-label-md text-outline uppercase tracking-wider">
+<tr>
+<th class="py-3 px-4">Código Hab.</th>
+<th class="py-3 px-4">Piso (Nivel)</th>
+<th class="py-3 px-4">Tipo Canónico</th>
+<th class="py-3 px-4">Cantidad de Camas</th>
+<th class="py-3 px-4">Precio Total (Tarifa)</th>
+<th class="py-3 px-4">Estado</th>
+<th class="py-3 px-4 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container font-body-sm text-body-sm"><tr class="hover:bg-surface-container-low/60 transition-colors"><td class="py-3 px-4 font-headline-sm text-headline-sm text-on-surface">V-401</td><td class="py-3 px-4 text-on-surface-variant">Piso 4 (Nivel 4)</td><td class="py-3 px-4"><span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed/60 px-2 py-0.5 rounded font-bold">VIP ($95/cama)</span></td><td class="py-3 px-4 font-semibold text-on-surface">4 Camas (4 pers.)</td><td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">$380.00 / noche</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">Ocupada</span></td><td class="py-3 px-4 text-right"><button class="p-1 hover:text-on-surface text-outline cursor-pointer" onclick="openRoomDrawer('edit', 'V-401')" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button></td></tr><tr class="hover:bg-surface-container-low/60 transition-colors"><td class="py-3 px-4 font-headline-sm text-headline-sm text-on-surface">E-305</td><td class="py-3 px-4 text-on-surface-variant">Piso 3 (Nivel 3)</td><td class="py-3 px-4"><span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded font-semibold">Estándar ($45/cama)</span></td><td class="py-3 px-4 font-semibold text-on-surface">3 Camas (3 pers.)</td><td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">$135.00 / noche</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-surface-container text-on-tertiary-container font-label-sm text-label-sm font-semibold">Libre</span></td><td class="py-3 px-4 text-right"><button class="p-1 hover:text-on-surface text-outline cursor-pointer" onclick="openRoomDrawer('edit', 'E-305')" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button></td></tr><tr class="hover:bg-surface-container-low/60 transition-colors"><td class="py-3 px-4 font-headline-sm text-headline-sm text-on-surface">E-204</td><td class="py-3 px-4 text-on-surface-variant">Piso 2 (Nivel 2)</td><td class="py-3 px-4"><span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded font-semibold">Estándar ($45/cama)</span></td><td class="py-3 px-4 font-semibold text-on-surface">2 Camas (2 pers.)</td><td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">$90.00 / noche</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">Ocupada</span></td><td class="py-3 px-4 text-right"><button class="p-1 hover:text-on-surface text-outline cursor-pointer" onclick="openRoomDrawer('edit', 'E-204')" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button></td></tr><tr class="hover:bg-surface-container-low/60 transition-colors"><td class="py-3 px-4 font-headline-sm text-headline-sm text-on-surface">E-102</td><td class="py-3 px-4 text-on-surface-variant">Piso 1 (Nivel 1)</td><td class="py-3 px-4"><span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded font-semibold">Estándar ($45/cama)</span></td><td class="py-3 px-4 font-semibold text-on-surface">1 Cama (1 pers.)</td><td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">$45.00 / noche</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">Mantenimiento</span></td><td class="py-3 px-4 text-right"><button class="p-1 hover:text-on-surface text-outline cursor-pointer" onclick="openRoomDrawer('edit', 'E-102')" type="button"><span class="material-symbols-outlined text-[18px]">edit</span></button></td></tr></tbody>
+</table>
+</div>
+</div>
+<!-- Sección de Gestión: Entidad PISOS (nro_piso, ref_piso) -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[22px]">stairs</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Estructura de Pisos Registrados</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tabla maestra de zonificación vertical (Entidad de Base de Datos: <code class="font-mono text-outline font-semibold">PISOS</code>)</p>
+</div>
+</div>
+<button class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer" onclick="openCreateFloorRow()" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span class="">Registrar Nuevo Nivel</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low font-label-md text-label-md text-outline uppercase tracking-wider">
+<tr>
+<th class="py-3 px-4">Número de Piso (<span class="font-mono">nro_piso</span>)</th>
+<th class="py-3 px-4">Referencia / Denominación (<span class="font-mono">ref_piso</span>)</th>
+<th class="py-3 px-4">Habitaciones Activas</th>
+<th class="py-3 px-4">Ocupación por Nivel</th>
+<th class="py-3 px-4 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container font-body-sm text-body-sm">
+<tr class="hover:bg-surface-container-low/50">
+<td class="py-3.5 px-4 font-bold text-on-surface">Piso 1</td>
+<td class="py-3.5 px-4 text-on-surface font-medium">Nivel 1 - 8 Habitaciones Estándar</td>
+<td class="py-3.5 px-4 text-on-surface-variant">8 Unidades (E-101 a E-108)</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-on-tertiary-container h-full" style="width: 75%"></div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">75%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold rounded hover:bg-surface-container transition-colors cursor-pointer" onclick="editFloor(1, 'Nivel 1 - 8 Habitaciones Estándar')" type="button">Editar</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50">
+<td class="py-3.5 px-4 font-bold text-on-surface">Piso 2</td>
+<td class="py-3.5 px-4 text-on-surface font-medium">Nivel 2 - 14 Habitaciones Estándar</td>
+<td class="py-3.5 px-4 text-on-surface-variant">14 Unidades (E-201 a E-214)</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-container h-full" style="width: 50%"></div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">50%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold rounded hover:bg-surface-container transition-colors cursor-pointer" onclick="editFloor(2, 'Nivel 2 - 14 Habitaciones Estándar')" type="button">Editar</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50">
+<td class="py-3.5 px-4 font-bold text-on-surface">Piso 3</td>
+<td class="py-3.5 px-4 text-on-surface font-medium">Nivel 3 - 14 Habitaciones (Mixtas)</td>
+<td class="py-3.5 px-4 text-on-surface-variant">14 Unidades (E-301 a E-314)</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-on-tertiary-container h-full" style="width: 85.7%"></div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">85.7%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold rounded hover:bg-surface-container transition-colors cursor-pointer" onclick="editFloor(3, 'Nivel 3 - 14 Habitaciones')" type="button">Editar</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50">
+<td class="py-3.5 px-4 font-bold text-on-surface">Piso 4</td>
+<td class="py-3.5 px-4 text-on-surface font-medium">Nivel 4 - 12 Habitaciones VIP Exclusivas</td>
+<td class="py-3.5 px-4 text-on-surface-variant">12 Unidades (V-401 a V-412)</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-container h-full" style="width: 66.6%"></div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">66.6%</span>
+</div>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold rounded hover:bg-surface-container transition-colors cursor-pointer" onclick="editFloor(4, 'Nivel 4 - 12 Habitaciones VIP Exclusivas')" type="button">Editar</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- ==================== DRAWER LATERAL: CREAR / EDITAR HABITACIÓN ==================== -->
+<aside class="fixed inset-y-0 right-0 w-full sm:w-[480px] bg-surface-container-lowest shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col justify-between" id="roomDrawer">
+<!-- Encabezado del Drawer -->
+<div class="p-6 bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">meeting_room</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface" id="drawerTitle">Nueva Habitación</h3>
+<span class="font-label-sm text-label-sm text-outline">Configuración de Instancia Inmobiliaria</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface transition-colors cursor-pointer" onclick="closeRoomDrawer()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Contenido del Formulario CRUD -->
+<form class="p-6 flex-1 overflow-y-auto flex flex-col gap-5" id="roomForm" onsubmit="saveRoom(event)">
+<!-- Código de Habitación (Prefijo Sigla + Correlativo) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">
+        Código de Habitación (Sigla + Número)
+      </label>
+<div class="grid grid-cols-3 gap-2">
+<div>
+<select class="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm font-bold focus:outline-none cursor-pointer" id="codePrefix" onchange="syncPrefixWithVip()">
+<option value="VIP">VIP</option>
+<option value="EST">EST</option>
+</select>
+</div>
+<div class="col-span-2">
+<input class="w-full px-3.5 py-2.5 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm font-bold focus:outline-none focus:bg-surface-container-lowest shadow-inner" id="codeNumber" oninput="autoComputeCode()" placeholder="ej. 403" required="" type="text" value="403">
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Identificador canónico: <span class="font-bold text-on-surface font-mono" id="computedPreviewCode">VIP-415</span></span>
+</div>
+<!-- Selección de Piso (PISOS) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">
+        Piso Asignado (Nivel)
+      </label>
+<select class="w-full px-3.5 py-2.5 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none cursor-pointer" id="roomFloorSelect" required="">
+<option value="1">Piso 1 (Nivel 1)</option>
+<option value="2">Piso 2 (Nivel 2)</option>
+<option value="3">Piso 3 (Nivel 3)</option>
+<option selected="" value="4">Piso 4 (Nivel 4)</option>
+</select>
+</div>
+<!-- Categoría Canónica Estricta: ÚNICAMENTE Estándar o VIP -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">
+        Categoría de Habitación (Regla Estricta)
+      </label>
+<select class="w-full px-3.5 py-2.5 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none cursor-pointer font-semibold" id="roomVipTypeSelect" onchange="syncVipWithPrefix()">
+<option data-rate="95" selected="" value="VIP">VIP ($95.00 / cama)</option>
+<option data-rate="45" value="EST">Estándar ($45.00 / cama)</option>
+</select>
+</div>
+<!-- Selector Operativo de Cantidad de Camas (1 a 4 Camas) -->
+<div class="flex flex-col gap-1.5">
+
+
+<input id="roomBedsInput" type="hidden" value="4">
+</div>
+<!-- Capacidad y Cálculo Automático de Precio Total -->
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">
+          CAntidad de CAMAS</label>
+<div class="flex items-center bg-surface-container-low rounded-xl px-2 py-1">
+<button class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface hover:bg-surface-variant cursor-pointer" onclick="adjustCapacity(-1)" type="button">-</button>
+<input class="w-full text-center bg-transparent font-headline-sm text-headline-sm text-on-surface focus:outline-none" id="roomCapacityInput" max="8" min="1" readonly="" type="number" value="4">
+<button class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface hover:bg-surface-variant cursor-pointer" onclick="adjustCapacity(1)" type="button">+</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">
+          Precio Total / Noche
+        </label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-outline font-bold">$</span>
+<input class="w-full pl-8 pr-3 py-2.5 bg-surface-container-low rounded-xl text-on-surface font-headline-sm text-headline-sm font-bold focus:outline-none shadow-inner" id="roomPriceInput" readonly="" required="" type="number" value="380.00">
+</div>
+<span class="font-label-sm text-label-sm text-outline" id="priceCalcFormula">4 camas × $95.00</span>
+</div>
+</div>
+<!-- Estado Operativo Inicial -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">
+        Estado Operativo Inicial
+      </label>
+<div class="grid grid-cols-3 gap-2">
+<label class="cursor-pointer">
+<input class="peer sr-only" name="roomInitialStatus" type="radio" value="libre">
+<div class="p-2.5 rounded-xl bg-surface-container-low text-center peer-checked:bg-surface-container peer-checked:text-on-tertiary-container peer-checked:font-bold transition-all">
+<span class="font-label-sm text-label-sm block">Libre</span>
+</div>
+</label>
+
+<label class="cursor-pointer">
+<input class="peer sr-only" name="roomInitialStatus" type="radio" value="mantenimiento">
+<div class="p-2.5 rounded-xl bg-surface-container-low text-center peer-checked:bg-error-container peer-checked:text-on-error-container peer-checked:font-bold transition-all">
+<span class="font-label-sm text-label-sm block">Mant.</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Botones de Acción -->
+<div class="pt-4 flex items-center gap-3">
+<button class="flex-1 py-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold transition-colors cursor-pointer" onclick="closeRoomDrawer()" type="button">
+        Cancelar
+      </button>
+<button class="flex-1 py-3 rounded-xl bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md cursor-pointer" type="submit">
+        Guardar Habitación
+      </button>
+</div>
+</form>
+</aside>
+<!-- ==================== MODAL: GESTIONAR PISOS (Entidad PISOS) ==================== -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" id="floorModalBackdrop" onclick="if(event.target === this) toggleFloorModal(false)">
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+<div class="p-6 bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">layers</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Configurar Pisos del Hotel</h3>
+<span class="font-label-sm text-label-sm text-outline">Tabla referencial de niveles físicos</span>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface cursor-pointer" onclick="toggleFloorModal(false)" type="button">
+<span class="material-symbols-outlined text-[22px]">close</span>
+</button>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<div class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3">
+<span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">Añadir / Actualizar Nivel</span>
+<div class="grid grid-cols-3 gap-2">
+<div>
+<input class="w-full px-3 py-2 bg-surface-container-lowest rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none" id="floorNumberInput" max="99" min="0" placeholder="N° Piso" type="number">
+</div>
+<div class="col-span-2">
+<input class="w-full px-3 py-2 bg-surface-container-lowest rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none" id="floorRefInput" placeholder="Referencia (ej: Piso 5 - Terraza &amp; VIP)" type="text">
+</div>
+</div>
+<button class="self-end px-4 py-1.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all cursor-pointer" onclick="addFloorToList()" type="button">
+          + Guardar Nivel
+        </button>
+</div>
+<div class="flex flex-col gap-2 max-h-56 overflow-y-auto">
+<span class="font-label-sm text-label-sm text-outline uppercase font-semibold">Pisos Existentes</span>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface">1</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Nivel 1 - 8 Habitaciones Estándar</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">8 habs</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface">2</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Nivel 2 - 14 Habitaciones Estándar</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">14 habs</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface">3</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Nivel 3 - 14 Habitaciones</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">14 habs</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface">4</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Nivel 4 - 12 Habitaciones VIP Exclusivas</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-bold">12 habs VIP</span>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-end">
+<button class="px-4 py-2 rounded-xl bg-primary text-on-primary font-body-sm text-body-sm font-semibold cursor-pointer" onclick="toggleFloorModal(false)" type="button">
+        Listo
+      </button>
+</div>
+</div>
+</div>
+<!-- ==================== SCRIPTS: INTERACTIVIDAD COMPLETA ==================== -->
+<script>
+  let activeFloorFilter = 'all';
+
+  // 1. Control del Flyout Drawer Oficial (SCREEN_16 / SCREEN_2)
+  function toggleDrawer(open) {
+    const container = document.getElementById('flyout-drawer-container');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const panel = document.getElementById('drawer-panel');
+
+    if (open) {
+      toggleBento(false);
+      container.classList.remove('pointer-events-none');
+      backdrop.classList.remove('pointer-events-none', 'opacity-0');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+      panel.classList.remove('-translate-x-full');
+      panel.classList.add('translate-x-0');
+    } else {
+      panel.classList.remove('translate-x-0');
+      panel.classList.add('-translate-x-full');
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        container.classList.add('pointer-events-none');
+      }, 300);
+    }
+  }
+
+  // 2. Control de Command Bento Launcher Modal (⌘K)
+  function toggleBento(open) {
+    const container = document.getElementById('bento-modal-container');
+    const backdrop = document.getElementById('bento-backdrop');
+    const panel = document.getElementById('bento-panel');
+    const searchInput = document.getElementById('bento-search-input');
+
+    if (open) {
+      toggleDrawer(false);
+      container.classList.remove('hidden', 'pointer-events-none');
+      container.classList.add('flex');
+      setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        panel.classList.remove('scale-95', 'opacity-0');
+        panel.classList.add('scale-100', 'opacity-100');
+        if (searchInput) searchInput.focus();
+      }, 10);
+    } else {
+      panel.classList.remove('scale-100', 'opacity-100');
+      panel.classList.add('scale-95', 'opacity-0');
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      setTimeout(() => {
+        container.classList.add('hidden', 'pointer-events-none');
+        container.classList.remove('flex');
+      }, 200);
+    }
+  }
+
+  // Atajos de teclado: ESC para cerrar todo, Cmd+K / Ctrl+K para Bento Modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      toggleBento(false);
+      toggleDrawer(false);
+      closeRoomDrawer();
+      toggleFloorModal(false);
+    }
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      const bentoContainer = document.getElementById('bento-modal-container');
+      const isVisible = !bentoContainer.classList.contains('hidden');
+      toggleBento(!isVisible);
+    }
+  });
+
+  // 3. Cinta Colapsable de KPIs
+  function toggleKpiRibbon() {
+    const cards = document.getElementById('kpi-ribbon-cards');
+    const icon = document.getElementById('kpi-ribbon-toggle-icon');
+    const label = document.getElementById('kpi-toggle-text');
+    if (cards.classList.contains('hidden')) {
+      cards.classList.remove('hidden');
+      icon.textContent = 'keyboard_arrow_up';
+      if (label) label.textContent = 'Ocultar Métricas';
+    } else {
+      cards.classList.add('hidden');
+      icon.textContent = 'keyboard_arrow_down';
+      if (label) label.textContent = 'Mostrar Métricas';
+    }
+  }
+
+  // 4. Filtro por Pisos y Filtros Generales
+  function selectFloor(floor, btn) {
+    activeFloorFilter = floor;
+    const pills = document.querySelectorAll('.floor-pill');
+    pills.forEach(p => {
+      p.classList.remove('bg-primary', 'text-on-primary');
+      p.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+    });
+    btn.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+    btn.classList.add('bg-primary', 'text-on-primary');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+    const vipVal = document.getElementById('vipFilter').value;
+    const statusVal = document.getElementById('statusFilter').value;
+    const capacityVal = document.getElementById('capacityFilter').value;
+
+    const cards = document.querySelectorAll('.room-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const code = card.getAttribute('data-code').toLowerCase();
+      const floor = card.getAttribute('data-floor');
+      const vip = card.getAttribute('data-vip');
+      const status = card.getAttribute('data-status');
+      const beds = card.getAttribute('data-beds');
+
+      let matchSearch = !searchVal || code.includes(searchVal);
+      let matchFloor = activeFloorFilter === 'all' || floor === activeFloorFilter;
+      let matchVip = vipVal === 'all' || vip === vipVal;
+      let matchStatus = statusVal === 'all' || status === statusVal;
+      let matchCapacity = capacityVal === 'all' || beds === capacityVal;
+
+      if (matchSearch && matchFloor && matchVip && matchStatus && matchCapacity) {
+        card.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    const countEl = document.getElementById('filteredCount');
+    if (countEl) {
+      countEl.textContent = `Mostrando ${visibleCount} de 48 habitaciones`;
+    }
+  }
+
+  function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('vipFilter').value = 'all';
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('capacityFilter').value = 'all';
+    
+    const firstPill = document.querySelector('.floor-pill');
+    if (firstPill) selectFloor('all', firstPill);
+    applyFilters();
+  }
+
+  function switchView(view) {
+    const grid = document.getElementById('roomsGrid');
+    const table = document.getElementById('roomsTableWrapper');
+    const btnGrid = document.getElementById('btnViewGrid');
+    const btnTable = document.getElementById('btnViewTable');
+
+    if (view === 'grid') {
+      grid.classList.remove('hidden');
+      table.classList.add('hidden');
+      btnGrid.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm');
+      btnGrid.classList.remove('text-outline');
+      btnTable.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm');
+      btnTable.classList.add('text-outline');
+    } else {
+      grid.classList.add('hidden');
+      table.classList.remove('hidden');
+      btnTable.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm');
+      btnTable.classList.remove('text-outline');
+      btnGrid.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm');
+      btnGrid.classList.add('text-outline');
+    }
+  }
+
+  // 5. Drawer de Habitación (Creación / Edición)
+  function openRoomDrawer(mode, code = '') {
+    const drawer = document.getElementById('roomDrawer');
+    const title = document.getElementById('drawerTitle');
+    const prefixEl = document.getElementById('codePrefix');
+    const numEl = document.getElementById('codeNumber');
+
+    if (mode === 'edit') {
+      title.textContent = `Editar Habitación ${code}`;
+      const parts = code.split('-');
+      if (parts.length === 2) {
+        prefixEl.value = parts[0] === 'V' ? 'VIP' : 'EST';
+        numEl.value = parts[1];
+      }
+    } else {
+      title.textContent = 'Nueva Habitación';
+      prefixEl.value = 'VIP';
+      numEl.value = '415';
+    }
+    syncPrefixWithVip();
+    drawer.classList.remove('translate-x-full');
+  }
+
+  function closeRoomDrawer() {
+    const drawer = document.getElementById('roomDrawer');
+    drawer.classList.add('translate-x-full');
+  }
+
+  function autoComputeCode() {
+    const p = document.getElementById('codePrefix').value;
+    const n = document.getElementById('codeNumber').value || '000';
+    const label = document.getElementById('computedPreviewCode');
+    label.textContent = `${p}-${n}`;
+  }
+
+  function syncPrefixWithVip() {
+    const p = document.getElementById('codePrefix').value;
+    const vipSelect = document.getElementById('roomVipTypeSelect');
+    vipSelect.value = p === 'VIP' ? 'VIP' : 'EST';
+    autoComputeCode();
+    recalculateRoomPrice();
+  }
+
+  function syncVipWithPrefix() {
+    const vipVal = document.getElementById('roomVipTypeSelect').value;
+    const prefixEl = document.getElementById('codePrefix');
+    prefixEl.value = vipVal === 'VIP' ? 'VIP' : 'EST';
+    autoComputeCode();
+    recalculateRoomPrice();
+  }
+
+  function selectBedCount(count) {
+    document.getElementById('roomBedsInput').value = count;
+    const btns = document.querySelectorAll('.bed-btn');
+    btns.forEach(btn => {
+      if (parseInt(btn.getAttribute('data-beds'), 10) === count) {
+        btn.className = 'bed-btn py-2.5 rounded-xl border border-primary bg-primary text-on-primary font-semibold text-center shadow-sm transition-all cursor-pointer';
+      } else {
+        btn.className = 'bed-btn py-2.5 rounded-xl border border-surface-container bg-surface-container-low text-on-surface font-semibold text-center hover:bg-surface-container transition-all cursor-pointer';
+      }
+    });
+    const capInput = document.getElementById('roomCapacityInput');
+    capInput.value = count; // Regla canónica 1 cama = 1 persona
+    recalculateRoomPrice();
+  }
+
+  function adjustCapacity(delta) {
+    const input = document.getElementById('roomCapacityInput');
+    let val = parseInt(input.value, 10) + delta;
+    if (val >= 1 && val <= 8) {
+      input.value = val;
+    }
+  }
+
+  function recalculateRoomPrice() {
+    const vipType = document.getElementById('roomVipTypeSelect').value;
+    const beds = parseInt(document.getElementById('roomBedsInput').value, 10) || 1;
+    const ratePerBed = vipType === 'VIP' ? 95 : 45;
+    const total = beds * ratePerBed;
+
+    document.getElementById('roomPriceInput').value = total.toFixed(2);
+    document.getElementById('priceCalcFormula').textContent = `${beds} cama${beds > 1 ? 's' : ''} × $${ratePerBed.toFixed(2)}`;
+  }
+
+  function saveRoom(e) {
+    e.preventDefault();
+    const code = document.getElementById('computedPreviewCode').textContent;
+    alert(`Habitación ${code} guardada exitosamente en el catálogo con tarifa canónica.`);
+    closeRoomDrawer();
+  }
+
+  // 6. Modal de Pisos
+  function toggleFloorModal(show) {
+    const modal = document.getElementById('floorModalBackdrop');
+    if (show) modal.classList.remove('hidden');
+    else modal.classList.add('hidden');
+  }
+
+  function openCreateFloorRow() {
+    toggleFloorModal(true);
+    document.getElementById('floorNumberInput').focus();
+  }
+
+  function editFloor(nro, ref) {
+    toggleFloorModal(true);
+    document.getElementById('floorNumberInput').value = nro;
+    document.getElementById('floorRefInput').value = ref;
+  }
+
+  function addFloorToList() {
+    const nro = document.getElementById('floorNumberInput').value;
+    const ref = document.getElementById('floorRefInput').value;
+    if (!nro || !ref) {
+      alert('Por favor complete el número y referencia del nivel.');
+      return;
+    }
+    alert(`Piso ${nro} ("${ref}") registrado exitosamente.`);
+    toggleFloorModal(false);
+  }
+
+  // 7. Acciones rápidas de tarjeta
+  function assignReservation(code) {
+    alert(`Iniciando wizard de Asignación / Check-in para habitación: ${code}`);
+  }
+
+  function viewFolio(code) {
+    alert(`Abriendo folio huésped de la habitación: ${code}`);
+  }
+
+  function unlockRoom(code) {
+    alert(`Habitación ${code} liberada de mantenimiento. Estado actualizado a DISPONIBLE.`);
+  }
+
+  function exportData() {
+    alert('Exportando catálogo completo de 48 habitaciones y 4 pisos con tarifas estándar y VIP.');
+  }
+
+  // Inicializar cálculo al cargar
+  recalculateRoomPrice();
+</script>
+
+
+<!-- ESTILO 1: BURBUJA FLOTANTE MINIMALISTA CIRCULAR (MODERN MICRO-FAB) -->
+<script id="card-beds-stepper-handler" class="">
+  function updateCardBeds(input) {
+    var card = input.closest('.room-card');
+    if (!card) return;
+    var beds = parseInt(input.value, 10);
+    if (isNaN(beds) || beds < 1) beds = 1;
+    if (beds > 6) beds = 6;
+    input.value = beds;
+    card.setAttribute('data-beds', beds);
+    card.setAttribute('data-capacity', beds);
+    var capDisplay = card.querySelector('.capacity-display');
+    if (capDisplay) capDisplay.textContent = beds + (beds === 1 ? ' persona' : ' personas');
+    var isVip = card.getAttribute('data-vip') === 'VIP';
+    var rate = isVip ? 95 : 45;
+    var total = beds * rate;
+    var priceCalc = card.querySelector('.price-calc');
+    if (priceCalc) priceCalc.textContent = beds + ' × $' + rate.toFixed(2);
+    var totalPrice = card.querySelector('.total-price');
+    if (totalPrice) totalPrice.textContent = '$' + total.toFixed(2);
+  }
+  function changeCardBeds(btn, delta) {
+    var container = btn.parentElement;
+    var input = container.querySelector('input[type="number"]');
+    if (!input) return;
+    var val = parseInt(input.value, 10) || 1;
+    val += delta;
+    if (val < 1) val = 1;
+    if (val > 6) val = 6;
+    input.value = val;
+    updateCardBeds(input);
+  }
+</script><div class="fixed bottom-6 right-6 z-50 flex flex-col items-end" id="hotel-ai-assistant">
+<!-- Ventana de Chatbot (380px x 530px, glassmorphism) -->
+<div class="mb-4 w-[380px] max-w-[calc(100vw-2rem)] bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-2xl border border-surface-container-high/90 overflow-hidden transition-all duration-300 transform origin-bottom-right flex flex-col scale-95 opacity-0 pointer-events-none hidden" id="ai-chat-window" style="height: 530px;">
+<!-- Cabecera Traslúcida Glassmorphism con Avatar y Controles -->
+<div class="px-4 py-3.5 bg-[#0f172a]/95 text-white backdrop-blur-md flex items-center justify-between border-b border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-9 h-9 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-center text-white shadow-inner">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed">auto_awesome</span>
+</div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-body-md font-bold leading-tight tracking-tight text-white">GrandStay AI Concierge</span>
+<span class="font-label-sm text-[9px] bg-secondary-container text-on-secondary-fixed px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">v3.2</span>
+</div>
+<span class="font-label-sm text-[11px] text-slate-300 flex items-center gap-1 leading-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Sistema en línea · Auditoría 24/7
+</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer" onclick="toggleChatWindow(false)" title="Minimizar ventana" type="button">
+<span class="material-symbols-outlined text-[18px]">minimize</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer" onclick="toggleChatWindow(false)" title="Cerrar chat" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- Historial de Conversación Hotelera Ejecutiva -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-surface-container-low/40" id="ai-chat-messages">
+<!-- Badge de sincronización de turno -->
+<div class="text-center my-1">
+<span class="font-label-sm text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-semibold uppercase tracking-wider border border-surface-container-high/60 shadow-xs">
+Turno Tarde · Conexión Segura Torre Principal
+</span>
+</div>
+<!-- Burbuja del Asistente (Resumen de Turno & Catálogo) -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl rounded-tl-xs border border-surface-container-high text-body-sm text-on-surface shadow-sm">
+<p class="leading-relaxed">Buenas tardes, <strong>Elena</strong>. Resumen de habitaciones y pisos:</p>
+<div class="mt-2 p-2.5 bg-surface-container-low rounded-xl border border-surface-container flex flex-col gap-1.5 text-[12px]">
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Habitaciones Libres:</span>
+<span class="font-bold text-on-tertiary-container">28 disponibles (58.3%)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-outline font-medium">Suites VIP Piso 4:</span>
+<span class="font-bold text-secondary">12 unidades ($95/cama)</span>
+</div>
+</div>
+<p class="mt-2.5 text-on-surface-variant text-[12px] leading-relaxed">¿Deseas filtrar disponibilidad por piso o pre-asignar una llave magnética?</p>
+</div>
+<span class="text-[10px] text-outline font-label-sm pl-1">14:46 hrs · Copiloto Concierge</span>
+</div>
+</div>
+<!-- Sugerencias / Chips Rápidos de Operación -->
+<div class="flex flex-col gap-1.5 pt-1">
+<span class="font-label-sm text-[11px] text-outline uppercase tracking-wider font-semibold pl-1">Consultas prioritarias</span>
+<div class="flex flex-wrap gap-1.5">
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer" onclick="sendQuickPrompt('Verificar disponibilidad VIP Piso 4')" type="button">
+<span class="material-symbols-outlined text-secondary-container text-[14px]">hotel_class</span>
+Suites VIP Piso 4
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer" onclick="sendQuickPrompt('Consultar habitaciones en mantenimiento')" type="button">
+<span class="material-symbols-outlined text-outline text-[14px]">build</span>
+Habitaciones en Mant.
+</button>
+<button class="text-left text-[11px] font-body-sm px-2.5 py-1.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container border border-surface-container-high text-on-surface font-medium transition-all shadow-xs flex items-center gap-1.5 active:scale-95 cursor-pointer" onclick="sendQuickPrompt('Filtrar habitaciones libres para Check-in')" type="button">
+<span class="material-symbols-outlined text-on-tertiary-container text-[14px]">door_front</span>
+Habitaciones Libres
+</button>
+</div>
+</div>
+</div>
+<!-- Campo Input Inferior Minimalista con Selector de Adjuntos y Enviar -->
+<div class="p-3 bg-surface-container-lowest border-t border-surface-container-high flex flex-col gap-2">
+<form class="flex items-center gap-2" onsubmit="handleAISubmit(event)">
+<button class="w-9 h-9 rounded-xl bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer" title="Adjuntar folio" type="button">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+</button>
+<div class="flex-1 relative flex items-center">
+<input class="w-full bg-surface-container-low hover:bg-surface-container focus:bg-surface-container-lowest px-3 py-2 rounded-xl text-body-sm text-on-surface placeholder:text-outline border border-outline-variant/30 focus:outline-none focus:ring-1 focus:ring-[#0f172a] font-body-sm transition-all" id="ai-chat-input" placeholder="Pregunta al Concierge o escribe un comando..." type="text">
+</div>
+<button class="w-9 h-9 rounded-xl bg-[#0f172a] hover:bg-slate-800 text-white flex items-center justify-center transition-all shadow-sm flex-shrink-0 active:scale-95 cursor-pointer" title="Enviar mensaje" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</form>
+<div class="flex items-center justify-between text-[10px] text-outline font-label-sm px-1">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-on-tertiary-container">verified_user</span> Privacidad HMS &amp; Registro auditado</span>
+<span class="">Presiona Enter ↵</span>
+</div>
+</div>
+</div>
+<!-- Botón Activador Circular Minimalista: Modern Micro-FAB (56x56px, #0f172a Slate Navy) -->
+<div class="relative group">
+<button aria-label="Abrir asistente de hotel GrandStay AI" class="w-14 h-14 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 hover:ring-4 hover:ring-slate-900/15 active:scale-95 flex items-center justify-center relative cursor-pointer" id="ai-fab-launcher" onclick="toggleChatWindow()" type="button">
+<span class="material-symbols-outlined text-[26px] text-tertiary-fixed transition-transform duration-300 group-hover:rotate-12" id="ai-fab-icon">auto_awesome</span>
+<span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-[#0f172a]" id="ai-fab-badge"></span>
+</button>
+</div>
+</div>
+<script>
+  function toggleChatWindow(forceState) {
+    var chatWindow = document.getElementById('ai-chat-window');
+    var fabIcon = document.getElementById('ai-fab-icon');
+    var chatInput = document.getElementById('ai-chat-input');
+    if (!chatWindow) return;
+
+    var isCurrentlyOpen = chatWindow.classList.contains('scale-100') && !chatWindow.classList.contains('pointer-events-none') && !chatWindow.classList.contains('hidden');
+    var shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
+
+    if (shouldOpen) {
+      chatWindow.classList.remove('scale-95', 'opacity-0', 'pointer-events-none', 'hidden');
+      chatWindow.classList.add('scale-100', 'opacity-100', 'pointer-events-auto', 'flex');
+      if (fabIcon) fabIcon.innerText = 'close';
+      if (chatInput) setTimeout(function() { chatInput.focus(); }, 150);
+    } else {
+      chatWindow.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
+      chatWindow.classList.add('scale-95', 'opacity-0', 'pointer-events-none', 'hidden');
+      if (fabIcon) fabIcon.innerText = 'auto_awesome';
+    }
+  }
+
+  function sendQuickPrompt(promptText) {
+    var input = document.getElementById('ai-chat-input');
+    if (input) {
+      input.value = promptText;
+      handleAISubmit();
+    }
+  }
+
+  function handleAISubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var input = document.getElementById('ai-chat-input');
+    var messagesContainer = document.getElementById('ai-chat-messages');
+    if (!input || !messagesContainer) return;
+
+    var userText = input.value.trim();
+    if (!userText) return;
+
+    var userMsgWrapper = document.createElement('div');
+    userMsgWrapper.className = 'flex items-start justify-end gap-2 text-right';
+    userMsgWrapper.innerHTML = '<div class="flex flex-col gap-1 max-w-[85%] items-end"><div class="bg-[#0f172a] text-white p-3 rounded-2xl rounded-tr-xs text-body-sm shadow-sm text-left">' + userText + '</div><span class="text-[10px] text-outline font-label-sm pr-1">Justo ahora</span></div>';
+    messagesContainer.appendChild(userMsgWrapper);
+    input.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    setTimeout(function() {
+      var botMsgWrapper = document.createElement('div');
+      botMsgWrapper.className = 'flex items-start gap-2.5';
+      botMsgWrapper.innerHTML = '<div class="w-7 h-7 rounded-lg bg-[#0f172a] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm"><span class="material-symbols-outlined text-[16px] text-tertiary-fixed">smart_toy</span></div><div class="flex flex-col gap-1 max-w-[85%]"><div class="bg-surface-container-lowest p-3.5 rounded-2xl rounded-tl-xs border border-surface-container-high text-body-sm text-on-surface shadow-sm"><p>Respuesta Concierge HMS: Se procesó la consulta para inventario de habitaciones. Hay 28 habitaciones libres listas para recepción inmediata.</p></div><span class="text-[10px] text-outline font-label-sm pl-1">En vivo · GrandStay Concierge</span></div>';
+      messagesContainer.appendChild(botMsgWrapper);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 550);
+  }
+</script>
+
+
+
+
+
+
+
+</body></html>

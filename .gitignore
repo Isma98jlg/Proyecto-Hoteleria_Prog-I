@@ -480,3 +480,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Skill eval workspace (artefactos de pruebas/benchmark generados)
+.opencode/skills/HoteleriaStichDesign-workspace/
