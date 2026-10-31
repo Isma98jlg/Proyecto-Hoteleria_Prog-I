@@ -23,8 +23,8 @@ public class HoteleriaDbContext : DbContext
         {
             entity.ToTable("Pisos");
             entity.HasKey(e => e.NroPiso);
-            entity.Property(e => e.NroPiso).HasColumnName("nro_piso");
-            entity.Property(e => e.RefPiso).HasColumnName("ref_piso").HasMaxLength(10).IsRequired(false);
+            entity.Property(e => e.NroPiso).HasColumnName("nro_piso").ValueGeneratedNever();
+            entity.Property(e => e.RefPiso).HasColumnName("ref_piso").HasMaxLength(20).IsRequired(false);
         });
 
         // TipoVip
@@ -43,7 +43,7 @@ public class HoteleriaDbContext : DbContext
         {
             entity.ToTable("Habitaciones");
             entity.HasKey(e => e.HabitacionId);
-            entity.Property(e => e.HabitacionId).HasColumnName("habitacion_id");
+            entity.Property(e => e.HabitacionId).HasColumnName("habitacion_id").ValueGeneratedNever();
             entity.Property(e => e.NroPiso).HasColumnName("nro_piso");
             entity.Property(e => e.NroCamas).HasColumnName("nro_camas");
             entity.Property(e => e.TipoVipNombre).HasColumnName("tipo_vip").HasMaxLength(15);
@@ -61,6 +61,10 @@ public class HoteleriaDbContext : DbContext
 
             entity.HasCheckConstraint("ck_estado", "estado IN ('MANTENIMIENTO', 'LIBRE', 'OCUPADO')");
             entity.HasCheckConstraint("ck_nro_camas", "nro_camas >= 1");
+
+            entity.HasIndex(e => e.Estado).HasDatabaseName("IX_Habitaciones_Estado");
+            entity.HasIndex(e => e.NroPiso).HasDatabaseName("IX_Habitaciones_Piso");
+            entity.HasIndex(e => e.TipoVipNombre).HasDatabaseName("IX_Habitaciones_TipoVip");
         });
 
         // Usuario
@@ -68,7 +72,7 @@ public class HoteleriaDbContext : DbContext
         {
             entity.ToTable("Usuarios");
             entity.HasKey(e => e.UsuarioId);
-            entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
+            entity.Property(e => e.UsuarioId).HasColumnName("usuario_id").ValueGeneratedNever();
             entity.Property(e => e.TipoDocumento).HasColumnName("tipo_documento").HasMaxLength(15);
             entity.Property(e => e.NumeroDocumento).HasColumnName("numero_documento").HasMaxLength(25);
             entity.Property(e => e.Nombres).HasColumnName("nombres").HasMaxLength(25);
@@ -83,7 +87,7 @@ public class HoteleriaDbContext : DbContext
         {
             entity.ToTable("Reservas");
             entity.HasKey(e => e.ReservaId);
-            entity.Property(e => e.ReservaId).HasColumnName("reserva_id");
+            entity.Property(e => e.ReservaId).HasColumnName("reserva_id").ValueGeneratedNever();
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
             entity.Property(e => e.EstadoReserva).HasColumnName("estado_reserva").HasMaxLength(15);
             entity.Property(e => e.FechaReservaCreacion).HasColumnName("fecha_reserva_creacion").HasColumnType("datetime2(7)");
@@ -99,6 +103,10 @@ public class HoteleriaDbContext : DbContext
             entity.HasCheckConstraint("check_estado_reserva", "estado_reserva IN ('CANCELADA', 'FINALIZADA', 'CONFIRMADA', 'PENDIENTE')");
             entity.HasCheckConstraint("check_fin_reserva", "fin_reserva > inicio_reserva");
             entity.HasCheckConstraint("check_total_noches", "total_noches >= 1");
+
+            entity.HasIndex(e => e.UsuarioId).HasDatabaseName("IX_Reservas_Usuario");
+            entity.HasIndex(e => e.EstadoReserva).HasDatabaseName("IX_Reservas_Estado");
+            entity.HasIndex(e => new { e.InicioReserva, e.FinReserva }).HasDatabaseName("IX_Reservas_Fechas");
         });
 
         // ReservaHabitacion (junction table)
