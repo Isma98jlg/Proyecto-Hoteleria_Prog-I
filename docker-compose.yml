@@ -1,0 +1,21 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:${MSSQL_IMAGE_TAG:-2022-latest}
+    container_name: hoteleria-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD_requerido_en_.env}
+      MSSQL_PID: ${MSSQL_PID:-Developer}
+    ports:
+      - "${MSSQL_PORT:-1433}:1433"
+    volumes:
+      - hoteleria-mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U '${DB_USER:-sa}' -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  hoteleria-mssql-data:

@@ -51,6 +51,18 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+// =============================================
+// APLICAR MIGRACIONES PENDIENTES + DATOS SEMILLA
+// (Solo cuando hay base de datos configurada)
+// =============================================
+if (useDatabase && GetAutoMigrateSetting(builder.Configuration))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<HoteleriaDbContext>();
+    await db.Database.MigrateAsync();
+    await DbSeeder.SeedAsync(db);
+}
+
 app.Run();
 
 /// <summary>
@@ -69,6 +81,25 @@ static bool GetUseDatabaseSetting(IConfiguration config)
         return bool.TryParse(cfg, out var b) && b;
 
     return true; // default: usar BD
+}
+
+/// <summary>
+/// Determina si se aplican migraciones + datos semilla al arrancar.
+/// Variable de entorno: DB_AUTO_MIGRATE (true/false, default: true).
+/// Desactívala (false) cuando la BD ya se aprovisiona por el Dockerfile
+/// (Resources/DDBB/Dockerfile + init-docker.sql) para no chocar con EF Core.
+/// </summary>
+static bool GetAutoMigrateSetting(IConfiguration config)
+{
+    var env = Environment.GetEnvironmentVariable("DB_AUTO_MIGRATE");
+    if (!string.IsNullOrWhiteSpace(env))
+        return bool.TryParse(env, out var b) && b;
+
+    var cfg = config["AutoMigrate"];
+    if (!string.IsNullOrWhiteSpace(cfg))
+        return bool.TryParse(cfg, out var b) && b;
+
+    return true; // default: migrar + semblar al arrancar
 }
 
 /// <summary>
