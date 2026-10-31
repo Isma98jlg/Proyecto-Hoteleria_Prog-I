@@ -1,6 +1,38 @@
 ## PROJECT' DATA SOURCE
 En este archi se detalla todo acerca de las dependencias informativas para el equipo de desarrollo y los agentes que trabajen sobre este proyecto.
 
+## 🚀 Primeros pasos para ejecutar (equipo nuevo)
+
+Requisitos:
+- **.NET SDK 10** (verifica con `dotnet --list-sdks`)
+- **Docker Desktop** (para la base de datos SQL Server)
+
+Pasos:
+1. Clonar el repositorio.
+2. Copiar el archivo de entorno en la raíz:
+   ```bash
+   cp .env.example .env     # Windows: copy .env.example .env
+   ```
+   `.env` **no se versiona**; ahí viven las credenciales locales (contraseña SA, host, BD).
+3. Levantar SQL Server (lee `.env` automáticamente):
+   ```bash
+   docker compose up -d
+   ```
+4. Ejecutar la app (el arranque aplica las migraciones EF Core + datos semilla):
+   ```bash
+   cd Hoteleria-App
+   dotnet run
+   ```
+5. Abrir `http://localhost:5003` (o `https://localhost:7097`).
+
+> ¿Sin base de datos (solo front-end)? Pon `DB_ENABLED=false` en el `.env` y usa el
+> servicio mock en memoria (`MockHabitacionService`), sin necesidad de SQL Server.
+
+Todo lo relacionado con la base de datos está en `Resources/DDBB/` (esquema, script
+SQL generado `hoteleria-schema.sql`, `Dockerfile` y `init-docker.sql`).
+
+---
+
 ## Table of Contents
 1. [La carpeta Resources](#1-resources-folder)
 
