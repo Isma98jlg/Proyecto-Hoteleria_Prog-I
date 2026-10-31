@@ -25,9 +25,6 @@ Pasos:
    ```
 5. Abrir `http://localhost:5003` (o `https://localhost:7097`).
 
-> ¿Sin base de datos (solo front-end)? Pon `DB_ENABLED=false` en el `.env` y usa el
-> servicio mock en memoria (`MockHabitacionService`), sin necesidad de SQL Server.
-
 Todo lo relacionado con la base de datos está en `Resources/DDBB/` (esquema, script
 SQL generado `hoteleria-schema.sql`, `Dockerfile` y `init-docker.sql`).
 

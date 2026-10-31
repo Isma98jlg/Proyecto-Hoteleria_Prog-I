@@ -11,33 +11,17 @@ LoadDotEnv(builder.Configuration, builder.Environment.ContentRootPath);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-// =============================================
-// CONFIGURACIÓN DE BASE DE DATOS (OPCIONAL)
-// =============================================
-// DB_ENABLED=false  →  NO registra DbContext, usa servicio mock (front-end sin BD).
-// Por defecto: true (conecta a SQL Server vía DB_SERVER / DB_PASSWORD...).
-var useDatabase = GetUseDatabaseSetting(builder.Configuration);
+// Base de datos SQL Server (config en .env / variables de entorno).
+var connectionString = BuildConnectionString(builder.Configuration);
 
-if (useDatabase)
-{
-    var connectionString = BuildConnectionString(builder.Configuration);
-    builder.Services.AddDbContext<HoteleriaDbContext>(options =>
-        options.UseSqlServer(connectionString, sqlOptions =>
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(10),
-                errorNumbersToAdd: null
-            )));
+builder.Services.AddDbContext<HoteleriaDbContext>(options =>
+    options.UseSqlServer(connectionString, sqlOptions =>
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null)));
 
-    builder.Services.AddScoped<IHabitacionService, HabitacionService>();
-}
-else
-{
-    // Modo "sin BD" - usa implementación en memoria para desarrollo frontend.
-    builder.Services.AddScoped<IHabitacionService, MockHabitacionService>();
-}
-
-// =============================================
+builder.Services.AddScoped<IHabitacionService, HabitacionService>();
 
 var app = builder.Build();
 
@@ -55,8 +39,8 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-// Aplica migraciones pendientes + datos semilla cuando hay BD configurada.
-if (useDatabase && GetAutoMigrateSetting(builder.Configuration))
+// Aplica migraciones pendientes + datos semilla al arrancar (salvo DB_AUTO_MIGRATE=false).
+if (GetAutoMigrateSetting(builder.Configuration))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<HoteleriaDbContext>();
@@ -115,13 +99,6 @@ static string? FindEnvFile(string contentRoot)
 }
 
 /// <summary>
-/// Determina si se debe usar base de datos real.
-/// Lee DB_ENABLED (entorno o .env); por defecto true.
-/// </summary>
-static bool GetUseDatabaseSetting(IConfiguration config) =>
-    GetBool(config, "DB_ENABLED", true);
-
-/// <summary>
 /// Determina si se aplican migraciones + datos semilla al arrancar.
 /// Lee DB_AUTO_MIGRATE (entorno o .env); por defecto true.
 /// Desactívala (false) cuando la BD ya se aprovisiona con el Dockerfile.
@@ -140,7 +117,7 @@ static bool GetBool(IConfiguration config, string key, bool defaultValue)
 /// <summary>
 /// Construye la connection string a partir de variables de entorno / .env.
 /// Variables: DB_CONNECTION_STRING (override total), DB_SERVER, DB_NAME, DB_USER,
-/// DB_PASSWORD (obligatoria si hay BD), DB_TRUST_CERT.
+/// DB_PASSWORD (obligatoria), DB_TRUST_CERT.
 /// </summary>
 static string BuildConnectionString(IConfiguration config)
 {

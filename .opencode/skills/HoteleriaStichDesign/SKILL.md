@@ -29,14 +29,13 @@ El front-end no es una SPA separada: vive **dentro** del monolito ASP.NET Core
 - CSS/JS/fonts/imágenes → `Hoteleria-App/wwwroot/**` (`css/site.css`, `js/site.js`)
 - Lógica de página → en el propio code-behind `*.cshtml.cs` (namespace raíz `Hoteleria_App`)
 
-**Estado del backend: aún sin desarrollar.** No asumas servicios/repositorios/modelos
-de negocio completos. Al implementar una vista:
-- Enlaza con `@Model` contra un code-behind simple o modelos *placeholder*; si el dato
-  aún no existe, usa datos de ejemplo en memoria **sin inventar** una API o BD.
-- Usa el fallback `DB_ENABLED=false` (mock) para iterar sin SQL Server.
-- La única pieza ya prevista es `IHabitacionService` / `MockHabitacionService` (en
-  `Services/`). Para el resto, mantén el front-end desacoplado y listo para conectar
-  cuando llegue el backend.
+**Backend en desarrollo.** Ya existe la capa de datos (EF Core + migraciones + `DbSeeder`
++ SQL Server vía Docker), pero la lógica de negocio se construye progresivamente. Al
+implementar una vista:
+- Enlaza `@Model` contra el code-behind y consume los servicios reales (hoy
+  `IHabitacionService`/`HabitacionService`) o el `HoteleriaDbContext` cuando aplique.
+- Si un servicio aún no existe, mantenlo desacoplado y listo para instanciar el real.
+  La BD se aprovisiona sola (migraciones + semilla); no inventes otra fuente de datos.
 
 ## Dónde vive el diseño (fuentes de verdad)
 
@@ -137,8 +136,8 @@ Sigue estos pasos en orden para cada pantalla pedida:
      o funciones en `site.js`. **No dejar `alert()` de maqueta.**
    - Enlaces de logo/imgs externos (`lh3.googleusercontent.com/…`) → asset local en
      `wwwroot` (el logo está en `design/…/logo-app/screen.png`).
-6. **Verifica** con `dotnet build` y `dotnet run` (usa `DB_ENABLED=false` para arrancar sin
-   base de datos y trabajar solo el front-end). Compara contra `screen.png`.
+6. **Verifica** con `dotnet build` y `dotnet run` (la BD se aprovisiona sola con
+   `docker compose up -d` + migraciones EF Core). Compara contra `screen.png`.
 
 ## Catálogo de pantallas (diseño → Razor Page)
 
@@ -200,8 +199,8 @@ navegación real (`asp-page`) y el estado activo con `@Model`/`ViewData` en luga
 - **`<img>` con SVG/logo:** usa `wwwroot`, no URLs de Google externas de maqueta.
 - **RootNamespace** del proyecto es `Hoteleria_App` (el modelo de página vive en
   `Hoteleria_App.Pages.*`). Cuidado con los `using` si creas páginas nuevas.
-- **Modo sin BD:** para iterar solo front-end, arranca con la variable `DB_ENABLED=false`
-  (ya existe el fallback `MockHabitacionService`).
+- **BBDD:** SQL Server por Docker (`docker compose up -d`); la app aplica migraciones
+  EF Core + semilla al arrancar. No hay modo "mock": la base de datos es siempre real.
 
 ## Si una pantalla no existe aún en el diseño
 
