@@ -4,45 +4,145 @@
     ViewData["Title"] = "Gestión de Reservas";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>📅 Gestión de Reservas</h1>
-    <a asp-page="Crear" class="btn btn-primary">➕ Nueva Reserva</a>
+<div class="flex flex-col gap-6 w-full">
+
+    <!-- ==================== SUB-HEADER ==================== -->
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-2">
+                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold bg-secondary-fixed/50 px-2.5 py-0.5 rounded-full">• MÓDULO RESERVAS · EN VIVO</span>
+                    <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Sistema de reservas activado
+                    </span>
+                </div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Gestión de Reservas</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Crear, editar y consultar reservas de huéspedes, asignar habitaciones y gestionar estados de estancia (Pendiente, Confirmada, Finalizada, Cancelada).</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <a class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group" asp-page="Crear">
+                    <span class="material-symbols-outlined text-[20px] text-secondary-container transition-transform group-hover:rotate-45">calendar_month</span>
+                    <span>+ Nueva Reserva</span>
+                </a>
+                <a class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page="Index">
+                    <span class="material-symbols-outlined text-[19px]">refresh</span>
+                    <span>Actualizar</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FILTROS ==================== -->
+    <form method="get" class="bg-surface-container-lowest border border-surface-container-high p-4 rounded-2xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+        <div class="flex-1 flex flex-wrap sm:flex-nowrap items-center gap-3">
+            <div class="relative flex-1 min-w-[220px]">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+                <input class="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-inner" name="Buscar" value="@Model.Buscar" placeholder="Buscar huésped por nombre, documento o correo..." type="text">
+            </div>
+            <div class="min-w-[200px]">
+                <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="Estado">
+                    <option value="">Todos los Estados</option>
+                    @foreach (var e in Model.Estados)
+                    {
+                        <option value="@e" selected="@(Model.Estado == e)">@e</option>
+                    }
+                </select>
+            </div>
+            <div class="min-w-[220px]">
+                <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="UsuarioId">
+                    <option value="">Todos los Huéspedes</option>
+                    @foreach (var u in Model.Usuarios)
+                    {
+                        <option value="@u.UsuarioId" selected="@(Model.UsuarioId == u.UsuarioId.ToString())">@u.NombreCompleto (@u.NumeroDocumento)</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 justify-end shrink-0">
+            <span class="font-label-sm text-label-sm text-outline">Mostrando @Model.Reservas.Count reservas</span>
+            <button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" type="submit">Aplicar</button>
+            <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" asp-page="Index">Limpiar Filtros</a>
+        </div>
+    </form>
+
+    <!-- ==================== LISTADO DE RESERVAS ==================== -->
+    <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-surface-container-low font-label-md text-label-md text-outline uppercase tracking-wider sticky top-0 z-10">
+                    <tr>
+                        <th class="py-3 px-4">N° Reserva</th>
+                        <th class="py-3 px-4">Huésped</th>
+                        <th class="py-3 px-4">Documento</th>
+                        <th class="py-3 px-4">Estado</th>
+                        <th class="py-3 px-4">Check-in</th>
+                        <th class="py-3 px-4">Check-out</th>
+                        <th class="py-3 px-4">Noches</th>
+                        <th class="py-3 px-4">Habitaciones</th>
+                        <th class="py-3 px-4">Precio Total</th>
+                        <th class="py-3 px-4 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-container font-body-sm text-body-sm">
+                    @if (!Model.Reservas.Any())
+                    {
+                        <tr>
+                            <td colspan="10" class="py-10 text-center">
+                                <span class="material-symbols-outlined text-[40px] text-outline">calendar_month</span>
+                                <span class="font-headline-sm text-headline-sm text-on-surface block mt-2">Sin reservas que coincidan</span>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant">Ajusta los filtros o crea una nueva reserva.</span>
+                                <a class="mt-4 px-4 py-2 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm font-semibold" asp-page="Crear">+ Nueva Reserva</a>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var r in Model.Reservas)
+                    {
+                        <tr class="hover:bg-surface-container-low/60 transition-colors group">
+                            <td class="py-3 px-4 font-headline-sm text-headline-sm text-on-surface font-mono">#@r.ReservaId</td>
+                            <td class="py-3 px-4">
+                                <div class="flex flex-col">
+                                    <span class="font-semibold text-on-surface">@r.UsuarioNombre</span>
+                                    <span class="font-label-sm text-[11px] text-outline">@r.UsuarioDocumento</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-on-surface-variant">@r.UsuarioDocumento</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full @r.BadgeEstado font-label-sm text-label-sm font-semibold"><span class="w-2 h-2 rounded-full @(r.EstadoReserva == "CONFIRMADA" ? "bg-secondary" : r.EstadoReserva == "FINALIZADA" ? "bg-on-tertiary-container" : "bg-error")"></span>@r.EstadoEtiqueta</span>
+                            </td>
+                            <td class="py-3 px-4 text-on-surface">@r.InicioReserva.ToString("dd/MM/yyyy")</td>
+                            <td class="py-3 px-4 text-on-surface">@r.FinReserva.ToString("dd/MM/yyyy")</td>
+                            <td class="py-3 px-4 font-numeric-table text-numeric-table text-on-surface">@r.TotalNoches</td>
+                            <td class="py-3 px-4 text-on-surface">@r.TotalHabitaciones</td>
+                            <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">@r.PrecioTotal.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="flex items-center gap-1.5">
+                                    <a class="p-2 rounded hover:bg-surface-container-low text-outline hover:text-on-surface transition-colors" asp-page="Detalles" asp-route-id="@r.ReservaId" title="Ver detalle">
+                                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    </a>
+                                    <a class="p-2 rounded hover:bg-surface-container-low text-outline hover:text-on-surface transition-colors" asp-page="Editar" asp-route-id="@r.ReservaId" title="Editar reserva">
+                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    </a>
+                                    @if (r.EstadoReserva == "PENDIENTE")
+                                    {
+                                        <form method="post" asp-page-handler="Eliminar" asp-route-id="@r.ReservaId" onsubmit="return confirm('¿Está seguro de eliminar esta reserva?')" class="inline">
+                                            <button class="p-2 rounded hover:bg-error-container text-error hover:text-on-error transition-colors" type="submit" title="Eliminar reserva">
+                                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
-<div class="alert alert-info">
-    <h5>🚧 En construcción</h5>
-    <p class="mb-0">Esta sección estará disponible próximamente. Incluirá:</p>
-    <ul class="mb-0">
-        <li>Listado de reservas con filtros por estado, fecha, cliente</li>
-        <li>Creación de nuevas reservas con selección de habitaciones</li>
-        <li>Check-in / Check-out</li>
-        <li>Historial de reservas por cliente</li>
-    </ul>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="text-warning">@Model.ReservasPendientes</h3>
-                <small class="text-muted">Pendientes</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="text-info">@Model.ReservasConfirmadas</h3>
-                <small class="text-muted">Confirmadas</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="text-success">@Model.ReservasFinalizadas</h3>
-                <small class="text-muted">Finalizadas</small>
-            </div>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <script>
+        // Helpers locales de la página de reservas
+    </script>
+}

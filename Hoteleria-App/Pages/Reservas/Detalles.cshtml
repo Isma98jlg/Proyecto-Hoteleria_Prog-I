@@ -1,0 +1,147 @@
+@page
+@model Hoteleria_App.Pages.Reservas.DetallesModel
+@{
+    ViewData["Title"] = "Detalle de Reserva";
+}
+
+<div class="flex flex-col gap-6 w-full max-w-3xl">
+
+    <!-- ==================== SUB-HEADER ==================== -->
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
+            <div class="flex flex-col gap-1.5">
+                <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold bg-secondary-fixed/50 px-2.5 py-0.5 rounded-full">• MÓDULO RESERVAS · DETALLE</span>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Reserva #@Model.Reserva?.ReservaId</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">Información completa de la reserva, huésped asociado y habitaciones asignadas.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page="Index">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    <span>Volver al listado</span>
+                </a>
+                <a class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page="Editar" asp-route-id="@Model.Reserva.ReservaId">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    <span>Editar reserva</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @if (Model.Reserva is null)
+    {
+        <div class="bg-error-container text-on-error-container rounded-2xl p-8 text-center">
+            <span class="material-symbols-outlined text-[40px] text-on-error-container block mb-3">error</span>
+            <h2 class="font-headline-sm text-headline-sm text-on-error-container">Reserva no encontrada</h2>
+            <a class="px-4 py-2 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm font-semibold" asp-page="Index">Volver al listado</a>
+        </div>
+    }
+    else
+    {
+        <!-- ==================== RESUMEN DE LA RESERVA ==================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 flex flex-col gap-4">
+                <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center text-secondary">
+                                <span class="material-symbols-outlined text-[20px]">person</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">Huésped</span>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant">@Model.Reserva.UsuarioNombre</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-label-sm text-[10px] text-outline block">Documento</span>
+                            <span class="font-body-sm text-body-sm font-mono text-on-surface">@Model.Reserva.UsuarioDocumento</span>
+                            <span class="font-label-sm text-[10px] text-outline block">Correo</span>
+                            <span class="font-body-sm text-body-sm text-on-surface">@Model.Reserva.UsuarioEmail</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Estado</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full @Model.Reserva.BadgeEstado font-label-sm text-label-sm font-semibold"><span class="w-2 h-2 rounded-full @(Model.Reserva.EstadoReserva == "CONFIRMADA" ? "bg-secondary" : Model.Reserva.EstadoReserva == "FINALIZADA" ? "bg-on-tertiary-container" : "bg-error")"></span>@Model.Reserva.EstadoEtiqueta</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Fecha Reserva</span>
+                            <span class="font-body-sm text-body-sm text-on-surface">@Model.Reserva.FechaReservaCreacion.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Check-in</span>
+                            <span class="font-body-sm text-body-sm text-on-surface">@Model.Reserva.InicioReserva.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Check-out</span>
+                            <span class="font-body-sm text-body-sm text-on-surface">@Model.Reserva.FinReserva.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Noches</span>
+                            <span class="font-body-sm text-body-sm font-mono text-on-surface">@Model.Reserva.TotalNoches</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Precio Total</span>
+                            <span class="font-body-sm text-body-sm font-mono font-bold text-on-surface">$@Model.Reserva.PrecioTotal.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habitaciones asignadas -->
+                <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">Habitaciones Asignadas (@Model.Reserva.Habitaciones.Count)</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-surface-container-low font-label-md text-label-md text-outline uppercase tracking-wider">
+                                <tr>
+                                    <th class="py-3 px-4">Código</th>
+                                    <th class="py-3 px-4">Tipo</th>
+                                    <th class="py-3 px-4">Camas</th>
+                                    <th class="py-3 px-4">Precio Noche</th>
+                                    <th class="py-3 px-4 text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-container font-body-sm text-body-sm">
+                                @foreach (var h in Model.Reserva.Habitaciones)
+                                {
+                                    <tr class="hover:bg-surface-container-low/60 transition-colors">
+                                        <td class="py-3 px-4 font-mono text-on-surface">@h.CodigoHabitacion</td>
+                                        <td class="py-3 px-4 text-on-surface-variant">@h.TipoVip</td>
+                                        <td class="py-3 px-4 text-on-surface">@h.NroCamas</td>
+                                        <td class="py-3 px-4 text-on-surface">$@h.PrecioNochePactado.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                        <td class="py-3 px-4 text-right font-numeric-table text-numeric-table font-bold text-on-surface">$@(h.PrecioNochePactado * Model.Reserva.TotalNoches).ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel lateral rápido -->
+            <div class="lg:col-span-1 flex flex-col gap-4">
+                <div class="bg-surface-container-low rounded-xl p-4 shadow-sm border border-surface-container">
+                    <span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">Acciones Rápidas</span>
+                    <div class="mt-3 flex flex-col gap-2">
+                        <a class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors" asp-page="Editar" asp-route-id="@Model.Reserva.ReservaId">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                            <span>Editar Reserva</span>
+                        </a>
+                        @if (Model.Reserva.EstadoReserva == "PENDIENTE")
+                        {
+                            <form method="post" asp-page="Index" asp-route-handler="Eliminar" asp-route-id="@Model.Reserva.ReservaId" onsubmit="return confirm('¿Está seguro de eliminar esta reserva?')" class="inline">
+                                <button class="flex items-center gap-2 px-3 py-2 rounded-lg bg-error-container hover:bg-error text-on-error hover:text-on-error-container font-body-sm text-body-sm transition-colors" type="submit">
+                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                    <span>Eliminar Reserva</span>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

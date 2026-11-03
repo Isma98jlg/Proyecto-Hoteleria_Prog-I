@@ -25,6 +25,7 @@ builder.Services.AddDbContext<HoteleriaDbContext>(options =>
             errorNumbersToAdd: null)));
 
 builder.Services.AddScoped<IHabitacionService, HabitacionService>();
+builder.Services.AddScoped<IReservaService, ReservaService>();
 
 // Identidad (cuentas de acceso del personal) persistida en SQL Server.
 builder.Services.AddIdentity<HotelUser, HotelRole>(options =>
