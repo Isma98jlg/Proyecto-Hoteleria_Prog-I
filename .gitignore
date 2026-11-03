@@ -484,3 +484,7 @@ $RECYCLE.BIN/
 
 # Skill eval workspace (artefactos de pruebas/benchmark generados)
 .opencode/skills/HoteleriaStichDesign-workspace/
+
+# Pruebas de curl / autenticación (no versionar)
+cookies.txt
+Hoteleria-App/cookies.txt

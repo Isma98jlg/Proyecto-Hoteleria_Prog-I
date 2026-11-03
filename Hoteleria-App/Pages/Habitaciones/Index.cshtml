@@ -7,7 +7,7 @@
 <div class="flex flex-col gap-6 w-full">
 
     <!-- ==================== SUB-HEADER OPERATIVO ==================== -->
-    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-5">
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
         <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
             <div class="flex flex-col gap-1.5">
                 <div class="flex items-center gap-2">
@@ -16,7 +16,7 @@
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Sincronizado en tiempo real
                     </span>
                 </div>
-                <h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">Gestión de Habitaciones y Pisos</h1>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Gestión de Habitaciones y Pisos</h1>
                 <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Control de inventario inmobiliario, configuración de capacidad de camas por habitación (<strong>1 Cama = 1 Persona</strong>) y zonificación física por niveles bajo las categorías canónicas <strong>Estándar</strong> y <strong>VIP</strong>.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
@@ -45,12 +45,12 @@
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-outline font-numeric-table">Actualizado: ahora</span>
                     <button class="flex items-center gap-1 px-2 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container text-[12px] font-semibold transition-colors" onclick="toggleKpiRibbon()" title="Colapsar / Expandir cinta" type="button">
-                        <span id="kpi-toggle-text">Ocultar Métricas</span>
-                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200" id="kpi-ribbon-toggle-icon">keyboard_arrow_up</span>
+                        <span id="kpi-toggle-text">Mostrar Métricas</span>
+                        <span class="material-symbols-outlined text-[18px] transition-transform duration-200" id="kpi-ribbon-toggle-icon">keyboard_arrow_down</span>
                     </button>
                 </div>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-1 transition-all duration-300" id="kpi-ribbon-cards">
+            <div class="hidden grid grid-cols-2 md:grid-cols-4 gap-3 pt-1 transition-all duration-300" id="kpi-ribbon-cards">
                 <div class="bg-surface-container-low/80 p-3 rounded-lg border border-surface-container flex items-center justify-between">
                     <div class="flex flex-col">
                         <span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Ocupadas (En Estancia)</span>
@@ -210,59 +210,40 @@
                 var precio = Model.PrecioCama(h);
                 var precioTotal = Model.PrecioTotal(h);
 
-                <div class="room-card group bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden" data-beds="@h.NroCamas" data-rate="@Model.Dinero(precio)">
+                <div class="group bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden">
                     <div class="absolute top-0 left-0 right-0 h-1 @topBar"></div>
                     <div class="flex flex-col gap-3">
                         <div class="flex items-start justify-between">
                             <div class="flex items-center gap-2.5">
-                                <div class="w-12 h-12 rounded-xl @codeChip flex items-center justify-center font-headline-md text-headline-md tracking-tight">@Model.Codigo(h)</div>
+                                <div class="h-9 px-2.5 rounded-lg @codeChip flex items-center justify-center font-numeric-table text-numeric-table font-bold tracking-tight whitespace-nowrap">@Model.Codigo(h)</div>
                                 <div class="flex flex-col">
                                     @if (esVip)
                                     {
-                                        <span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> @h.TipoVipNombre ($@Model.Dinero(precio)/cama)</span>
+                                        <span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider flex items-center gap-1 whitespace-nowrap"><span class="material-symbols-outlined text-[14px]">star</span> @h.TipoVipNombre</span>
                                     }
                                     else
                                     {
-                                        <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider">Estándar ($@Model.Dinero(precio)/cama)</span>
+                                        <span class="font-label-sm text-label-sm text-outline font-semibold uppercase tracking-wider whitespace-nowrap">Estándar</span>
                                     }
                                     <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso @h.NroPiso @(string.IsNullOrWhiteSpace(h.Piso?.RefPiso) ? "" : "· " + h.Piso.RefPiso)</span>
                                 </div>
                             </div>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold"><span class="w-2 h-2 rounded-full @dotEstado"></span>@Model.EstadoEtiqueta(estado)</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 pt-2 pb-1">
-                            <div class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-1">
-                                <span class="font-label-sm text-label-sm text-outline flex items-center gap-1"><span class="material-symbols-outlined @(esVip ? "text-secondary" : "text-outline") text-[16px]">bed</span> Camas</span>
-                                <div class="flex items-center justify-between bg-surface-container-lowest rounded-lg p-0.5 border border-surface-container">
-                                    <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors text-body-md" onclick="changeCardBeds(this, -1)">-</button>
-                                    <input type="number" min="1" max="6" value="@h.NroCamas" class="w-9 text-center bg-transparent font-headline-sm text-headline-sm font-bold text-on-surface p-0 border-0 focus:ring-0" oninput="updateCardBeds(this)">
-                                    <button type="button" class="w-7 h-7 rounded flex items-center justify-center font-bold text-on-surface hover:bg-surface-container transition-colors text-body-md" onclick="changeCardBeds(this, 1)">+</button>
-                                </div>
-                            </div>
-                            <div class="p-2.5 rounded-lg bg-surface-container-low flex items-center gap-2">
-                                <span class="material-symbols-outlined text-outline text-[20px]">group</span>
-                                <div class="flex flex-col">
-                                    <span class="font-label-sm text-label-sm text-outline">Capacidad</span>
-                                    <span class="font-body-sm text-body-sm font-semibold text-on-surface capacity-display">@h.NroCamas @(h.NroCamas == 1 ? "persona" : "personas")</span>
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-4 pt-2 text-on-surface-variant">
+                            <span class="flex items-center gap-1.5 font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">bed</span> @h.NroCamas camas</span>
+                            <span class="flex items-center gap-1.5 font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">group</span> @h.NroCamas @(h.NroCamas == 1 ? "persona" : "personas")</span>
                         </div>
                     </div>
-                    <div class="pt-4 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+                    <div class="pt-3 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
                         <div class="flex flex-col">
-                            <span class="font-label-sm text-label-sm text-outline price-calc">@h.NroCamas × $@Model.Dinero(precio)</span>
-                            <div class="flex items-baseline gap-1"><span class="font-headline-md text-headline-md font-bold text-on-surface total-price">$@Model.Dinero(precioTotal)</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+                            <span class="font-label-sm text-label-sm text-outline">@h.NroCamas × $@Model.Dinero(precio)</span>
+                            <div class="flex items-baseline gap-1"><span class="font-headline-sm text-headline-sm font-bold text-on-surface">$@Model.Dinero(precioTotal)</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
                         </div>
-                        <div class="flex items-center gap-1">
-                            @if (estado == "LIBRE")
-                            {
-                                <a class="p-2 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary transition-colors" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Asignar reserva"><span class="material-symbols-outlined text-[18px]">login</span></a>
-                            }
-                            else
-                            {
-                                <a class="p-2 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface transition-colors" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Ver detalle / Check-in"><span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
-                            }
-                        </div>
+                        <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Ver y editar detalle de la habitación">
+                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                            <span>Editar habitación</span>
+                        </a>
                     </div>
                 </div>
             }
@@ -488,36 +469,6 @@
             if (refInput) refInput.value = ref;
             abrirModalPisos();
             if (nroInput) nroInput.focus();
-        }
-
-        // Stepper de camas en tarjetas (1 cama = 1 persona)
-        function updateCardBeds(input) {
-            const card = input.closest('.room-card');
-            if (!card) return;
-            let beds = parseInt(input.value, 10);
-            if (isNaN(beds) || beds < 1) beds = 1;
-            if (beds > 6) beds = 6;
-            input.value = beds;
-            card.setAttribute('data-beds', beds);
-            card.setAttribute('data-capacity', beds);
-            const capDisplay = card.querySelector('.capacity-display');
-            if (capDisplay) capDisplay.textContent = beds + (beds === 1 ? ' persona' : ' personas');
-            const rate = parseFloat(card.getAttribute('data-rate') || '0');
-            const total = beds * rate;
-            const priceCalc = card.querySelector('.price-calc');
-            if (priceCalc) priceCalc.textContent = beds + ' × $' + rate.toFixed(2);
-            const totalPrice = card.querySelector('.total-price');
-            if (totalPrice) totalPrice.textContent = '$' + total.toFixed(2);
-        }
-        function changeCardBeds(btn, delta) {
-            const input = btn.parentElement.querySelector('input[type="number"]');
-            if (!input) return;
-            let val = parseInt(input.value, 10) || 1;
-            val += delta;
-            if (val < 1) val = 1;
-            if (val > 6) val = 6;
-            input.value = val;
-            updateCardBeds(input);
         }
 
         // Cerrar el modal de pisos con ESC

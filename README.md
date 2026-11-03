@@ -25,6 +25,20 @@ Pasos:
    ```
 5. Abrir `http://localhost:5003` (o `https://localhost:7097`).
 
+### ⚡ Nuevas funcionalidades de autenticación
+
+A partir de esta versión, la aplicación incluye autenticación de personal con **ASP.NET Core Identity** en SQL Server y sesión mediante cookie segura. La cookie representa la sesión; las credenciales, roles y cuentas se guardan en la base de datos.
+
+- **Cuenta admin por defecto:** Al primer arranque (si no existe), se crea automáticamente una cuenta con:
+  - Correo: `ADMIN_EMAIL` (por defecto `admin@hoteleria.com`, definible en `.env`)
+  - Contraseña: `ADMIN_PASSWORD` (por defecto `Admin123!`, definible en `.env`)
+- **Cuentas de prueba:** `DEMO_WORKER_EMAIL` / `DEMO_WORKER_PASSWORD` y `DEMO_USER_EMAIL` / `DEMO_USER_PASSWORD` crean cuentas para los cargos trabajador y usuario.
+- **Diagnóstico del login:** En Development, la consola del navegador muestra el usuario, cargo, roles Identity y permisos cargados después de iniciar sesión; nunca muestra la contraseña.
+- **Identificador compartido:** `Usuarios.usuario_id` es la clave compartida por el perfil laboral (`Empleados`) y la cuenta (`AspNetUsers.Id`).
+- **Cargos y permisos:** `Roles` es la entidad de cargos del diagrama y también la tabla de roles de Identity; conserva los permisos CRUD booleanos (`0`/`1`). `Usuarios.cargo_id` apunta al cargo asignado.
+- **Acceso a la app:** Todas las páginas ahora requieren sesión iniciada (política de fallback `RequireAuthenticatedUser`). La única página pública es `/Account/Login` (y `/Error`). El header muestra el nombre del usuario logueado y un botón "Cerrar sesión".
+- **Base de datos:** La migración añade las tablas `AspNet*`, `Empleados` y `Roles` a `HOTEL`. Se aplica al arrancar si `DB_AUTO_MIGRATE=true` (valor por defecto).
+
 Todo lo relacionado con la base de datos está en `Resources/DDBB/` (esquema, script
 SQL generado `hoteleria-schema.sql`, `Dockerfile` y `init-docker.sql`).
 

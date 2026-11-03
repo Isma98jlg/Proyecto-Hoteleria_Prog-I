@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Hoteleria_App.Models;
 
 namespace Hoteleria_App.Data;
 
-public class HoteleriaDbContext : DbContext
+public class HoteleriaDbContext : IdentityDbContext<HotelUser, HotelRole, long>
 {
     public HoteleriaDbContext(DbContextOptions<HoteleriaDbContext> options) : base(options) { }
 
@@ -13,6 +15,7 @@ public class HoteleriaDbContext : DbContext
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Reserva> Reservas => Set<Reserva>();
     public DbSet<ReservaHabitacion> ReservaHabitaciones => Set<ReservaHabitacion>();
+    public DbSet<Employee> Employees => Set<Employee>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,6 +83,38 @@ public class HoteleriaDbContext : DbContext
             entity.Property(e => e.Nacionalidad).HasColumnName("nacionalidad").HasMaxLength(25);
             entity.Property(e => e.Telefono).HasColumnName("telefono").HasMaxLength(25);
             entity.Property(e => e.EMail).HasColumnName("e_mail").HasMaxLength(25);
+            entity.Property(e => e.CargoId).HasColumnName("cargo_id");
+            entity.HasOne<HotelRole>().WithMany().HasForeignKey(e => e.CargoId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Cuentas Identity y empleados comparten la PK de Usuario.
+        modelBuilder.Entity<Employee>(entity =>
+        {
+            entity.ToTable("Empleados");
+            entity.HasKey(e => e.UsuarioId);
+            entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
+            entity.Property(e => e.FechaContratacion).HasColumnName("fecha_contratacion").HasColumnType("date");
+            entity.Property(e => e.Sueldo).HasColumnName("sueldo").HasColumnType("decimal(12,2)");
+            entity.HasOne(e => e.Usuario).WithOne(u => u.Employee).HasForeignKey<Employee>(e => e.UsuarioId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<HotelRole>(entity =>
+        {
+            entity.ToTable("Roles");
+            entity.Property(r => r.Id).HasColumnName("cargo_id");
+            entity.Property(r => r.Name).HasColumnName("cargo_nombre").HasMaxLength(256);
+            entity.Property(r => r.NormalizedName).HasColumnName("nombre_normalizado").HasMaxLength(256);
+            entity.Property(r => r.Ver).HasColumnName("ver");
+            entity.Property(r => r.CrudRequerimientos).HasColumnName("crud_requerimientos");
+            entity.Property(r => r.CrudPisos).HasColumnName("crud_pisos");
+            entity.Property(r => r.CrudUsuarios).HasColumnName("crud_usuarios");
+            entity.Property(r => r.CrudHabitaciones).HasColumnName("crud_habitaciones");
+            entity.Property(r => r.CrudTipoVip).HasColumnName("crud_tipo_vip");
+        });
+
+        modelBuilder.Entity<HotelUser>(entity =>
+        {
+            entity.HasOne(u => u.Usuario).WithOne().HasForeignKey<HotelUser>(u => u.Id).OnDelete(DeleteBehavior.Cascade);
         });
 
         // Reserva

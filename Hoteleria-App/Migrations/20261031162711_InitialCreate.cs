@@ -177,10 +177,10 @@ namespace Hoteleria_App.Migrations
 
             // Vista de consulta (no la genera EF Core; la creamos igual que init-docker.sql)
             migrationBuilder.Sql(
-                @"CREATE VIEW [dbo].[TotalPrice_Habitacion_plus_Codigo] AS
+                @"EXEC(N'CREATE VIEW [dbo].[TotalPrice_Habitacion_plus_Codigo] AS
 SELECT h.[habitacion_id], (CONVERT(VARCHAR(4), h.[nro_piso]) + tv.[sigla]) AS [codigo], h.[nro_piso], h.[nro_camas], h.[tipo_vip], h.[estado], h.[nro_camas] * tv.[precio_cama] AS [precio_total]
 FROM [dbo].[Habitaciones] h
-JOIN [dbo].[Tipo Vip] tv ON h.[tipo_vip] = tv.[tipo_vip];");
+JOIN [dbo].[Tipo Vip] tv ON h.[tipo_vip] = tv.[tipo_vip]');");
         }
 
         /// <inheritdoc />

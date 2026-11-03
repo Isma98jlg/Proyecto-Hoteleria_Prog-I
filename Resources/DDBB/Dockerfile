@@ -1,8 +1,6 @@
 # ============================================================================
-# Imagen de base de datos SQL Server para Hoteleria (auto-provisionada).
-# En el PRIMER arranque, el entrypoint de mssql ejecuta los scripts de
-# /docker-entrypoint-initdb.d/ (aquí init-docker.sql) y la base "HOTEL" queda
-# creada con esquema + vista + índices + datos semilla.
+# Imagen SQL Server para Hoteleria. El entrypoint espera a que SQL Server esté
+# listo y ejecuta init-docker.sql para crear la estructura de HOTEL.
 #
 # Construir (desde la raíz del repo):
 #   docker build -t hoteleria-sql -f Resources/DDBB/Dockerfile ./Resources/DDBB
@@ -19,7 +17,10 @@ FROM mcr.microsoft.com/mssql/server:2022-latest
 ENV ACCEPT_EULA=Y \
     MSSQL_PID=Developer
 
-# Script de inicialización (esquema + semilla) — se ejecuta una sola vez.
+# Inicializador real; la imagen oficial no ejecuta SQL automáticamente.
+COPY --chmod=755 ./init-db.sh /usr/local/bin/init-db.sh
 COPY ./init-docker.sql /docker-entrypoint-initdb.d/01_init.sql
+
+ENTRYPOINT ["/usr/local/bin/init-db.sh"]
 
 EXPOSE 1433

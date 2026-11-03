@@ -1,5 +1,8 @@
 using Hoteleria_App.Data;
 using Hoteleria_App.Services;
+using Hoteleria_App.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +26,27 @@ builder.Services.AddDbContext<HoteleriaDbContext>(options =>
 
 builder.Services.AddScoped<IHabitacionService, HabitacionService>();
 
+// Identidad (cuentas de acceso del personal) persistida en SQL Server.
+builder.Services.AddIdentity<HotelUser, HotelRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+    .AddEntityFrameworkStores<HoteleriaDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/Login";
+});
+
+// Todo requiere autenticación salvo las páginas marcadas [AllowAnonymous].
+builder.Services.Configure<AuthorizationOptions>(options =>
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,6 +59,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
@@ -46,6 +71,20 @@ if (GetAutoMigrateSetting(builder.Configuration))
     var db = scope.ServiceProvider.GetRequiredService<HoteleriaDbContext>();
     await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(db);
+
+    // Cuenta de acceso del administrador (Identity).
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<HotelUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<HotelRole>>();
+    await DbSeeder.SeedAccessAccountsAsync(
+        db,
+        userManager,
+        roleManager,
+        builder.Configuration["ADMIN_EMAIL"] ?? "admin@hoteleria.com",
+        builder.Configuration["ADMIN_PASSWORD"] ?? "Admin123!",
+        builder.Configuration["DEMO_WORKER_EMAIL"] ?? "trabajador@hoteleria.com",
+        builder.Configuration["DEMO_WORKER_PASSWORD"] ?? "Worker123!",
+        builder.Configuration["DEMO_USER_EMAIL"] ?? "usuario@hoteleria.com",
+        builder.Configuration["DEMO_USER_PASSWORD"] ?? "User123!");
 }
 
 app.Run();

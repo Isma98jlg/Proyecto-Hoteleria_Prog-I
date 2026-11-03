@@ -1,6 +1,9 @@
 services:
   mssql:
-    image: mcr.microsoft.com/mssql/server:${MSSQL_IMAGE_TAG:-2022-latest}
+    build:
+      context: ./Resources/DDBB
+      dockerfile: Dockerfile
+    image: hoteleria-sql:${MSSQL_IMAGE_TAG:-local}
     container_name: hoteleria-mssql
     environment:
       ACCEPT_EULA: "Y"
@@ -9,7 +12,7 @@ services:
     ports:
       - "${MSSQL_PORT:-1433}:1433"
     volumes:
-      - hoteleria-mssql-data:/var/opt/mssql
+      - hoteleria-auth-data:/var/opt/mssql
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U '${DB_USER:-sa}' -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
@@ -18,4 +21,4 @@ services:
       start_period: 30s
 
 volumes:
-  hoteleria-mssql-data:
+  hoteleria-auth-data:
