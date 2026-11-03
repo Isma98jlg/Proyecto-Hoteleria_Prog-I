@@ -202,7 +202,9 @@
                     <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
                 </div>
                 <nav class="flex flex-col gap-1 px-3">
-                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Index">
+                    @if (User.IsInRole("admin"))
+{
+    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">grid_view</span>
                             <span>1. Dashboard General</span>
@@ -212,6 +214,7 @@
                             <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
                         }
                     </a>
+}
                     <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Habitaciones/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">meeting_room</span>
@@ -304,6 +307,8 @@
             <div class="p-4 flex flex-col gap-3">
                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Navegación Rápida</span>
                 <div class="grid grid-cols-2 gap-2">
+                    @if (User.IsInRole("admin"))
+{
                     <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Index">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined @(IsActive("/") ? "text-on-primary" : "text-on-tertiary-container") text-[20px]">grid_view</span>
@@ -311,6 +316,7 @@
                         </div>
                         <span class="font-label-sm text-[10px] @(IsActive("/") ? "text-on-primary" : "text-outline") font-mono">^1</span>
                     </a>
+}
                     <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Habitaciones/Index">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined @(IsActive("/Habitaciones") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">meeting_room</span>
