@@ -139,9 +139,38 @@
                 <span class="font-label-sm text-[10px] bg-primary text-on-primary px-1.5 py-0.5 rounded font-bold tracking-wider">v3.2</span>
             </button>
             <div class="h-5 w-px bg-outline-variant/50 hidden sm:block"></div>
-            <!-- Logo GrandStay HMS -->
-            <div class="flex items-center gap-2.5">
-                <img alt="GrandStay Hotels Logo" class="h-8 w-auto object-contain" src="~/images/grandstay-logo.png" />
+            <!-- Logo GrandStay HMS + Perfil desplegable -->
+            <div class="flex items-center gap-2.5 group relative">
+                <img alt="GrandStay Hotels Logo" class="h-8 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" src="~/images/grandstay-logo.png" onclick="toggleUserProfile()" />
+                <div id="user-profile-dropdown" class="absolute right-0 mt-2 w-56 bg-surface-container-lowest border border-surface-container-high rounded-xl shadow-lg hidden z-50 p-3 flex flex-col gap-2">
+                    <div class="flex items-center gap-3 pb-2 border-b border-surface-container-high">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                            <span class="material-symbols-outlined text-[16px]">person</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-body-sm text-body-sm font-semibold text-on-surface">@User.Identity?.Name</span>
+                            <span class="font-label-sm text-[11px] text-outline">Personal HMS</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Habitaciones/Index">
+                            <span class="material-symbols-outlined text-[16px]">meeting_room</span>
+                            <span>Habitaciones</span>
+                        </a>
+                        <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Reservas/Index">
+                            <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                            <span>Reservas</span>
+                        </a>
+                    </div>
+                    <div class="pt-2 border-t border-surface-container-high flex items-center gap-2">
+                        <form method="post" asp-page="/Account/Logout">
+                            <button type="submit" class="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg bg-error-container hover:bg-error text-on-error hover:text-on-error-container text-left font-body-sm text-body-sm transition-colors" title="Cerrar sesión">
+                                <span class="material-symbols-outlined text-[16px]">logout</span>
+                                <span>Cerrar sesión</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Buscador global unificado -->
@@ -391,5 +420,24 @@
     }
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Perfil desplegable al hacer click en el logo
+        function toggleUserProfile() {
+            const dropdown = document.getElementById('user-profile-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+        }
+
+        // Cerrar dropdown al hacer click fuera
+        document.addEventListener('click', function (e) {
+            const dropdown = document.getElementById('user-profile-dropdown');
+            const logo = document.querySelector('img[alt="GrandStay Hotels Logo"]');
+            if (dropdown && !dropdown.contains(e.target) && logo && !logo.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
