@@ -1,11 +1,11 @@
 using Hoteleria_App.Services;
-using Microsoft.AspNetCore.Authorization;
+using Hoteleria_App.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hoteleria_App.Pages.Reservas;
 
-[Authorize]
+[Microsoft.AspNetCore.Authorization.Authorize(Policy = HotelPermissionPolicies.CrudRequerimientos)]
 public class DetallesModel : PageModel
 {
     private readonly IReservaService _reservaService;

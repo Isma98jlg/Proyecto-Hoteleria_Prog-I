@@ -1,21 +1,8 @@
-using Hoteleria_App.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+using Hoteleria_App.Security;
 
 namespace Hoteleria_App.Pages.Chat;
 
-public class IndexModel : PageModel
-{
-    private readonly HoteleriaDbContext _context;
-
-    public IndexModel(HoteleriaDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task OnGetAsync()
-    {
-        // Placeholder - will be implemented with SignalR
-        await Task.CompletedTask;
-    }
-}
+[Authorize(Policy = HotelPermissionPolicies.Ver)]
+public class IndexModel : PageModel { }

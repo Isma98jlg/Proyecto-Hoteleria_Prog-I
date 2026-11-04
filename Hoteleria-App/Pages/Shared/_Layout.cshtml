@@ -120,8 +120,12 @@
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased min-h-screen">
 @inject IWebHostEnvironment HostEnvironment
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AuthorizationService
 @{
     var authLoginDebug = HostEnvironment.IsDevelopment() ? TempData["AuthLoginDebug"] as string : null;
+    var canViewHotel = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.Ver)).Succeeded;
+    var canManageReservations = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.CrudRequerimientos)).Succeeded;
+    var canManageRooms = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.CrudHabitaciones)).Succeeded;
     var currentPath = (Context.Request.Path.Value ?? "/").ToLowerInvariant();
     System.Func<string, bool> IsActive = (page) =>
         page == "/"
@@ -153,14 +157,14 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-1.5">
-                        <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Habitaciones/Index">
+                        @if (canViewHotel) { <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Habitaciones/Index">
                             <span class="material-symbols-outlined text-[16px]">meeting_room</span>
                             <span>Habitaciones</span>
-                        </a>
-                        <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Reservas/Index">
+                        </a> }
+                        @if (canManageReservations) { <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Reservas/Index">
                             <span class="material-symbols-outlined text-[16px]">calendar_month</span>
                             <span>Reservas</span>
-                        </a>
+                        </a> }
                     </div>
                     <div class="pt-2 border-t border-surface-container-high flex items-center gap-2">
                         <form method="post" asp-page="/Account/Logout">
@@ -187,10 +191,6 @@
         <div class="flex items-center gap-3">
             <button class="md:hidden w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface" onclick="toggleBento(true)" title="Buscar" type="button">
                 <span class="material-symbols-outlined text-[20px]">search</span>
-            </button>
-            <button class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative" title="Notificaciones" type="button">
-                <span class="material-symbols-outlined text-[20px]">notifications</span>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
             </button>
             <div class="h-6 w-px bg-outline-variant/50 hidden sm:block"></div>
             <div class="flex items-center gap-3 pl-1">
@@ -244,7 +244,7 @@
                         }
                     </a>
 }
-                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Habitaciones/Index">
+                    @if (canViewHotel) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Habitaciones/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">meeting_room</span>
                             <span>2. Habitaciones y Pisos</span>
@@ -257,8 +257,8 @@
                         {
                             <span class="font-label-sm text-label-sm text-outline">280 habs</span>
                         }
-                    </a>
-                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Reservas") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Reservas/Index">
+                    </a> }
+                    @if (canManageReservations) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Reservas") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Reservas/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">calendar_month</span>
                             <span>3. Reservas</span>
@@ -271,8 +271,8 @@
                         {
                             <span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">En vivo</span>
                         }
-                    </a>
-                    <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Usuarios/Index">
+                    </a> }
+                    @if (canViewHotel) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Usuarios/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">group</span>
                             <span>4. Huéspedes / Directorio</span>
@@ -285,7 +285,7 @@
                         {
                             <span class="font-label-sm text-label-sm text-outline">496 activos</span>
                         }
-                    </a>
+                    </a> }
                 </nav>
                 <div class="px-5 pt-6 pb-2">
                     <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
@@ -346,31 +346,31 @@
                         <span class="font-label-sm text-[10px] @(IsActive("/") ? "text-on-primary" : "text-outline") font-mono">^1</span>
                     </a>
 }
-                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Habitaciones/Index">
+                    @if (canViewHotel) { <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Habitaciones/Index">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined @(IsActive("/Habitaciones") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">meeting_room</span>
                             <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Habitaciones") ? "text-on-primary" : "text-on-surface")">Habitaciones</span>
                         </div>
                         <span class="font-label-sm text-[10px] @(IsActive("/Habitaciones") ? "text-on-primary" : "text-outline") font-mono">^2</span>
-                    </a>
-                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Reservas") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Reservas/Index">
+                    </a> }
+                    @if (canManageReservations) { <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Reservas") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Reservas/Index">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined @(IsActive("/Reservas") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">calendar_month</span>
                             <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Reservas") ? "text-on-primary" : "text-on-surface")">Reservas</span>
                         </div>
                         <span class="font-label-sm text-[10px] @(IsActive("/Reservas") ? "text-on-primary" : "text-outline") font-mono">^3</span>
-                    </a>
-                    <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Usuarios/Index">
+                    </a> }
+                    @if (canViewHotel) { <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Usuarios/Index">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined @(IsActive("/Usuarios") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">group</span>
                             <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Usuarios") ? "text-on-primary" : "text-on-surface")">Huéspedes</span>
                         </div>
                         <span class="font-label-sm text-[10px] @(IsActive("/Usuarios") ? "text-on-primary" : "text-outline") font-mono">^4</span>
-                    </a>
+                    </a> }
                 </div>
                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold mt-2">Acciones de Mostrador</span>
                 <div class="flex flex-col gap-1.5">
-                    <a class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" asp-page="/Reservas/Index">
+                    @if (canManageReservations) { <a class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" asp-page="/Reservas/Crear">
                         <div class="flex items-center gap-2.5">
                             <div class="w-7 h-7 rounded bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container">
                                 <span class="material-symbols-outlined text-[16px]">add_task</span>
@@ -381,8 +381,8 @@
                             </div>
                         </div>
                         <span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">IR</span>
-                    </a>
-                    <a class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" asp-page="/Habitaciones/Crear">
+                    </a> }
+                    @if (canManageRooms) { <a class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container transition-colors text-left" asp-page="/Habitaciones/Crear">
                         <div class="flex items-center gap-2.5">
                             <div class="w-7 h-7 rounded bg-primary-container/10 flex items-center justify-center text-primary-container">
                                 <span class="material-symbols-outlined text-[16px]">meeting_room</span>
@@ -393,7 +393,7 @@
                             </div>
                         </div>
                         <span class="font-label-sm text-label-sm text-on-surface font-semibold">Folio Nuevo</span>
-                    </a>
+                    </a> }
                 </div>
             </div>
             <div class="px-4 py-2.5 bg-surface-container-low flex items-center justify-between text-outline font-label-sm text-label-sm border-t border-surface-container-high">
@@ -409,6 +409,13 @@
             @RenderBody()
         </div>
     </main>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a asp-page="/Chat/Index" aria-label="Chat operativo, todavía no habilitado" title="Chat operativo · todavía no habilitado" class="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-xl transition duration-200 hover:-translate-y-0.5 hover:bg-on-surface-variant hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/15">
+            <span class="material-symbols-outlined text-[25px]">chat_bubble_outline</span>
+        </a>
+    }
 
     <script src="~/js/site.js" asp-append-version="true"></script>
 

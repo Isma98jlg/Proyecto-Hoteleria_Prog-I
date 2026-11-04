@@ -1,43 +1,60 @@
 @page
 @model Hoteleria_App.Pages.Usuarios.IndexModel
 @{
-    ViewData["Title"] = "Gestión de Clientes";
+    ViewData["Title"] = "Directorio de huéspedes";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>👥 Gestión de Clientes</h1>
-    <a asp-page="Crear" class="btn btn-primary">➕ Nuevo Cliente</a>
-</div>
-
-<div class="alert alert-info">
-    <h5>🚧 En construcción</h5>
-    <p class="mb-0">Esta sección estará disponible próximamente. Incluirá:</p>
-    <ul class="mb-0">
-        <li>Listado de clientes con búsqueda por documento, nombre, email</li>
-        <li>Registro de nuevos huéspedes</li>
-        <li>Historial de estancias por cliente</li>
-        <li>Preferencias y notas</li>
-    </ul>
-</div>
-
-<div class="card">
-    <div class="card-header bg-light">
-        <h5 class="mb-0">📊 Resumen</h5>
-    </div>
-    <div class="card-body">
-        <div class="row text-center">
-            <div class="col-md-4">
-                <h2 class="text-primary">@Model.TotalClientes</h2>
-                <small class="text-muted">Total registrados</small>
-            </div>
-            <div class="col-md-4">
-                <h2 class="text-info">@Model.ConReservas</h2>
-                <small class="text-muted">Con reservas</small>
-            </div>
-            <div class="col-md-4">
-                <h2 class="text-warning">@Model.SinReservas</h2>
-                <small class="text-muted">Sin reservas</small>
-            </div>
+<main class="flex flex-col gap-6 w-full">
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <span class="font-label-sm uppercase tracking-wider text-secondary font-bold">DIRECTORIO</span>
+            <h1 class="font-headline-lg text-headline-lg tracking-tight mt-1">Huéspedes y personas</h1>
+            <p class="text-on-surface-variant mt-1">Consulta sus datos de contacto y el historial de reservas.</p>
         </div>
-    </div>
-</div>
+        @if (Model.PuedeAdministrar)
+        {
+            <a asp-page="Crear" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-on-primary font-semibold shadow-sm"><span class="material-symbols-outlined">person_add</span>Nuevo huésped</a>
+        }
+    </section>
+
+    @if (TempData["MensajeExito"] is string success) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@success</div> }
+    @if (TempData["MensajeError"] is string error) { <div class="rounded-xl bg-error-container text-on-error-container p-3">@error</div> }
+
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Personas registradas</span><strong class="block text-3xl mt-2">@Model.TotalClientes</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Con reservas</span><strong class="block text-3xl mt-2">@Model.ConReservas</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Sin reservas</span><strong class="block text-3xl mt-2">@Model.SinReservas</strong></div>
+    </section>
+
+    <form method="get" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 flex flex-col sm:flex-row gap-3">
+        <input name="Buscar" value="@Model.Buscar" class="flex-1 px-4 py-2 bg-surface-container-low rounded-xl" placeholder="Buscar por nombre, documento, correo o teléfono" />
+        <button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold" type="submit">Buscar</button>
+        <a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container text-center">Limpiar</a>
+    </form>
+
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm">
+            <thead class="bg-surface-container-low text-outline uppercase text-xs tracking-wider"><tr><th class="p-4">Persona</th><th class="p-4">Documento</th><th class="p-4">Contacto</th><th class="p-4">Reservas</th><th class="p-4">Tipo</th><th class="p-4 text-right">Acciones</th></tr></thead>
+            <tbody class="divide-y divide-surface-container">
+            @if (!Model.Personas.Any()) { <tr><td colspan="6" class="p-10 text-center text-outline">No hay personas que coincidan con la búsqueda.</td></tr> }
+            @foreach (var p in Model.Personas)
+            {
+                <tr class="hover:bg-surface-container-low/60">
+                    <td class="p-4"><strong>@p.NombreCompleto</strong><small class="block text-outline">ID @p.UsuarioId</small></td>
+                    <td class="p-4">@p.TipoDocumento · @p.NumeroDocumento</td>
+                    <td class="p-4">@p.EMail<small class="block text-outline">@p.Telefono</small></td>
+                    <td class="p-4">@p.TotalReservas</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs @(p.EsEmpleado ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-surface-container text-on-surface-variant")">@(p.EsEmpleado ? "Personal" : "Huésped")</span></td>
+                    <td class="p-4"><div class="flex justify-end gap-1">
+                        <a asp-page="Detalles" asp-route-id="@p.UsuarioId" title="Ver ficha" class="p-2 rounded-lg hover:bg-surface-container"><span class="material-symbols-outlined">visibility</span></a>
+                        @if (Model.PuedeAdministrar && !p.EsEmpleado)
+                        {
+                            <a asp-page="Editar" asp-route-id="@p.UsuarioId" title="Editar" class="p-2 rounded-lg hover:bg-surface-container"><span class="material-symbols-outlined">edit</span></a>
+                        }
+                    </div></td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    </section>
+</main>

@@ -48,8 +48,6 @@ public class LoginModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
     {
-        returnUrl ??= Url.Content("~/");
-
         if (ModelState.IsValid)
         {
             var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
@@ -83,13 +81,36 @@ public class LoginModel : PageModel
                         crudTipoVip = cargo.CrudTipoVip
                     }
                 });
-                return LocalRedirect(returnUrl);
+                var destinoPredeterminado = string.Equals(cargo?.Name, "admin", StringComparison.OrdinalIgnoreCase)
+                    ? Url.Content("~/")
+                    : cargo?.CrudRequerimientos == true
+                        ? Url.Page("/Reservas/Index")!
+                        : cargo?.Ver == true
+                            ? Url.Page("/Habitaciones/Index")!
+                            : Url.Content("~/Account/Login");
+                var destino = EsDestinoPermitido(returnUrl, cargo) ? returnUrl! : destinoPredeterminado;
+                return LocalRedirect(destino);
             }
 
             ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
         }
 
-        ReturnUrl = returnUrl;
+        ReturnUrl = returnUrl ?? Url.Content("~/");
         return Page();
+    }
+
+    private bool EsDestinoPermitido(string? returnUrl, HotelRole? cargo)
+    {
+        if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl)) return false;
+        var path = returnUrl.Split('?', '#')[0];
+        if (path.Equals("/", StringComparison.OrdinalIgnoreCase))
+            return string.Equals(cargo?.Name, "admin", StringComparison.OrdinalIgnoreCase);
+        if (path.StartsWith("/Reservas", StringComparison.OrdinalIgnoreCase))
+            return cargo?.CrudRequerimientos == true;
+        if (path.StartsWith("/Habitaciones", StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith("/Usuarios", StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith("/Chat", StringComparison.OrdinalIgnoreCase))
+            return cargo?.Ver == true;
+        return path.StartsWith("/Account", StringComparison.OrdinalIgnoreCase);
     }
 }

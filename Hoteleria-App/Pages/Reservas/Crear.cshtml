@@ -25,7 +25,8 @@
     </section>
 
     <!-- ==================== FORMULARIO ==================== -->
-    <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-6">
+    <form method="post" id="reservation-form" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-6">
+        <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3"></div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- Datos del Huésped -->
@@ -46,10 +47,10 @@
                     <label class="font-label-sm text-label-sm text-on-surface-variant">Huésped</label>
                     <select asp-for="Reserva.UsuarioId"
                             class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none">
-                        <option value="">Seleccione un huésped</option>
+                        <option value="0">Seleccione un huésped</option>
                         @foreach (var u in Model.Usuarios)
                         {
-                            <option value="@u.UsuarioId">@u.NombreCompleto — @u.NumeroDocumento</option>
+                            <option value="@u.UsuarioId">@u.NombreCompleto · @u.CargoNombre</option>
                         }
                     </select>
                     <span asp-validation-for="Reserva.UsuarioId" class="text-label-sm text-error"></span>
@@ -57,14 +58,14 @@
 
                 <div class="flex flex-col gap-3">
                     <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha de entrada (Check-in)</label>
-                    <input asp-for="Reserva.InicioReserva" type="date"
+                    <input asp-for="Reserva.InicioReserva" type="date" id="reservation-start" min="@DateTime.Today.ToString("yyyy-MM-dd")"
                            class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none" />
                     <span asp-validation-for="Reserva.InicioReserva" class="text-label-sm text-error"></span>
                 </div>
 
                 <div class="flex flex-col gap-3">
                     <label class="font-label-sm text-label-sm text-on-surface-variant">Número de noches</label>
-                    <input asp-for="Reserva.TotalNoches" type="number" min="1" max="30"
+                    <input asp-for="Reserva.TotalNoches" type="number" min="1" max="365" id="reservation-nights"
                            class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none" />
                     <span asp-validation-for="Reserva.TotalNoches" class="text-label-sm text-error"></span>
                 </div>
@@ -92,13 +93,27 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-2 max-h-[400px] overflow-y-auto p-3 rounded-xl bg-surface-container-low border border-surface-container">
-    <div class="text-center text-[11px] text-outline py-8">
-        <span class="material-symbols-outlined text-[32px] text-outline block mb-2">meeting_room</span>
-        <span class="block">Habitaciones disponibles</span>
-        <span class="font-label-sm text-[10px] text-outline block mt-1">Seleccione habitaciones libres para esta reserva.</span>
-    </div>
-</div>
+                <div id="available-rooms" class="flex flex-col gap-2 max-h-[400px] overflow-y-auto p-3 rounded-xl bg-surface-container-low border border-surface-container">
+                    @if (!Model.Habitaciones.Any())
+                    {
+                        <div class="text-center text-[11px] text-outline py-8">No hay habitaciones disponibles para esas fechas.</div>
+                    }
+                    @foreach (var room in Model.Habitaciones)
+                    {
+                        <label class="room-option flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-container-lowest border border-surface-container cursor-pointer hover:border-secondary">
+                            <span class="flex items-center gap-3">
+                                <input type="checkbox" name="Reserva.HabitacionIds" value="@room.HabitacionId" data-rate="@(room.PrecioCama * room.NroCamas)" class="room-checkbox rounded border-outline text-secondary focus:ring-secondary" />
+                                <span><strong class="block text-on-surface">@room.Codigo · @room.TipoVip</strong><small class="text-outline">@room.NroCamas cama(s)</small></span>
+                            </span>
+                            <span class="text-right"><strong class="block">$@((room.PrecioCama * room.NroCamas).ToString("N0"))</strong><small class="text-outline">por noche</small></span>
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="Reserva.HabitacionIds" class="text-label-sm text-error"></span>
+                <div class="rounded-xl bg-secondary-fixed/40 p-3 flex items-center justify-between">
+                    <span class="font-body-sm text-body-sm text-on-surface-variant"><span id="selected-room-count">0</span> habitación(es) · estimado por estancia</span>
+                    <strong id="reservation-estimate" class="font-headline-sm text-headline-sm text-on-surface">$0</strong>
+                </div>
             </div>
 
         </div>
@@ -118,8 +133,37 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        // Placeholder para selección de habitaciones (pendiente de implementar UI completa)
-        console.log('[Reservas] Página Crear cargada');
+        (() => {
+            const start = document.getElementById('reservation-start');
+            const nights = document.getElementById('reservation-nights');
+            const list = document.getElementById('available-rooms');
+            const currency = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+            const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+            function updateEstimate() {
+                const selected = [...list.querySelectorAll('.room-checkbox:checked')];
+                const total = selected.reduce((sum, item) => sum + Number(item.dataset.rate || 0), 0) * Math.max(1, Number(nights.value || 1));
+                document.getElementById('selected-room-count').textContent = selected.length;
+                document.getElementById('reservation-estimate').textContent = '$' + currency.format(total);
+            }
+            async function loadRooms() {
+                if (!start.value || !nights.value || Number(nights.value) < 1) return;
+                list.innerHTML = '<p class="text-center text-outline py-5">Buscando disponibilidad…</p>';
+                const url = new URL(window.location.href);
+                url.search = new URLSearchParams({ handler: 'Disponibles', inicio: start.value, noches: nights.value });
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('No se pudo consultar la disponibilidad.');
+                    const rooms = await response.json();
+                    list.innerHTML = rooms.length ? rooms.map(room => `<label class="room-option flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-container-lowest border border-surface-container cursor-pointer hover:border-secondary"><span class="flex items-center gap-3"><input type="checkbox" name="Reserva.HabitacionIds" value="${Number(room.habitacionId)}" data-rate="${Number(room.precioCama) * Number(room.nroCamas)}" class="room-checkbox rounded border-outline text-secondary focus:ring-secondary" /><span><strong class="block text-on-surface">${escapeHtml(room.codigo)} · ${escapeHtml(room.tipoVip)}</strong><small class="text-outline">${Number(room.nroCamas)} cama(s)</small></span></span><span class="text-right"><strong class="block">$${currency.format(Number(room.precioCama) * Number(room.nroCamas))}</strong><small class="text-outline">por noche</small></span></label>`).join('') : '<p class="text-center text-outline py-5">No hay habitaciones libres para esas fechas.</p>';
+                    updateEstimate();
+                } catch { list.innerHTML = '<p class="text-center text-error py-5">Error al consultar habitaciones. Recargue la página e inténtelo de nuevo.</p>'; }
+            }
+            list.addEventListener('change', updateEstimate);
+            nights.addEventListener('change', () => { updateEstimate(); loadRooms(); });
+            start.addEventListener('change', loadRooms);
+            updateEstimate();
+        })();
     </script>
 }

@@ -5,6 +5,8 @@
 }
 
 <div class="flex flex-col gap-6 w-full">
+    @if (TempData["MensajeExito"] is string success) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@success</div> }
+    @if (TempData["MensajeError"] is string error) { <div class="rounded-xl bg-error-container text-on-error-container p-3">@error</div> }
 
     <!-- ==================== SUB-HEADER ==================== -->
     <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
@@ -20,10 +22,10 @@
                 <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Crear, editar y consultar reservas de huéspedes, asignar habitaciones y gestionar estados de estancia (Pendiente, Confirmada, Finalizada, Cancelada).</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <a class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group" asp-page="Crear">
+                <button type="button" onclick="abrirModalReserva()" class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group">
                     <span class="material-symbols-outlined text-[20px] text-secondary-container transition-transform group-hover:rotate-45">calendar_month</span>
                     <span>+ Nueva Reserva</span>
-                </a>
+                </button>
                 <a class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page="Index">
                     <span class="material-symbols-outlined text-[19px]">refresh</span>
                     <span>Actualizar</span>
@@ -37,7 +39,7 @@
         <div class="flex-1 flex flex-wrap sm:flex-nowrap items-center gap-3">
             <div class="relative flex-1 min-w-[220px]">
                 <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
-                <input class="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-inner" name="Buscar" value="@Model.Buscar" placeholder="Buscar huésped por nombre, documento o correo..." type="text">
+                <input class="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-inner" name="Buscar" value="@Model.Buscar" placeholder="Buscar huésped por nombre..." type="text">
             </div>
             <div class="min-w-[200px]">
                 <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="Estado">
@@ -53,7 +55,7 @@
                     <option value="">Todos los Huéspedes</option>
                     @foreach (var u in Model.Usuarios)
                     {
-                        <option value="@u.UsuarioId" selected="@(Model.UsuarioId == u.UsuarioId.ToString())">@u.NombreCompleto (@u.NumeroDocumento)</option>
+                        <option value="@u.UsuarioId" selected="@(Model.UsuarioId == u.UsuarioId.ToString())">@u.NombreCompleto · @u.CargoNombre</option>
                     }
                 </select>
             </div>
@@ -91,7 +93,6 @@
                                 <span class="material-symbols-outlined text-[40px] text-outline">calendar_month</span>
                                 <span class="font-headline-sm text-headline-sm text-on-surface block mt-2">Sin reservas que coincidan</span>
                                 <span class="font-body-sm text-body-sm text-on-surface-variant">Ajusta los filtros o crea una nueva reserva.</span>
-                                <a class="mt-4 px-4 py-2 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm font-semibold" asp-page="Crear">+ Nueva Reserva</a>
                             </td>
                         </tr>
                     }
@@ -141,8 +142,176 @@
 
 </div>
 
+<div id="reservationModal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto bg-primary/50 p-3 backdrop-blur-sm md:p-6" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle" onclick="if(event.target===this) cerrarModalReserva()">
+    <section class="my-auto flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-surface-container-high bg-surface-container-lowest shadow-2xl">
+        <header class="flex shrink-0 items-center justify-between gap-4 border-b border-surface-container-high bg-surface-container-low/60 px-5 py-4 md:px-6">
+            <div class="flex min-w-0 items-center gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary"><span class="material-symbols-outlined">calendar_add_on</span></span>
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-baseline gap-x-2">
+                        <h2 id="reservationModalTitle" class="font-headline-md text-headline-md text-on-surface">Crear nueva reserva</h2>
+                        <span class="text-xs text-outline">GrandStay HMS</span>
+                    </div>
+                    <p class="mt-1 flex items-center gap-1.5 text-xs text-on-surface-variant"><span class="material-symbols-outlined text-[15px] text-on-tertiary-container">schedule</span>Fecha de registro automática al guardar</p>
+                </div>
+            </div>
+            <button type="button" onclick="cerrarModalReserva()" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-outline transition-colors hover:bg-surface-container hover:text-on-surface" aria-label="Cerrar">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </header>
+        <form method="post" asp-page-handler="Crear" id="reservation-form" class="flex min-h-0 flex-1 flex-col">
+            <div class="flex-1 space-y-4 overflow-y-auto bg-background p-4 md:p-5">
+                <div asp-validation-summary="ModelOnly" class="rounded-xl border border-error/20 bg-error-container p-3 text-sm text-on-error-container"></div>
+
+                <section class="flex flex-col gap-3 rounded-xl border border-surface-container-high bg-surface-container-low/50 p-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">1</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Usuario titular</h3>
+                    </div>
+                    <div class="grid grid-cols-1 items-end gap-3 md:grid-cols-12">
+                        <label class="flex flex-col gap-1.5 md:col-span-7">
+                            <span class="text-xs font-medium text-on-surface">Buscar usuario registrado <span class="text-error">*</span></span>
+                            <select asp-for="Reserva.UsuarioId" id="reservation-user" class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                                <option value="0">Seleccione un usuario</option>
+                                @foreach (var u in Model.Usuarios)
+                                {
+                                    <option value="@u.UsuarioId" data-name="@u.NombreCompleto" data-role="@u.CargoNombre">@u.NombreCompleto · @u.CargoNombre</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Reserva.UsuarioId" class="text-xs text-error"></span>
+                        </label>
+                        <div id="selected-user-summary" class="flex min-h-[50px] items-center gap-3 rounded-lg border border-surface-container-high bg-surface-container-lowest px-3 py-2 md:col-span-5">
+                            <span id="selected-user-initials" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary-fixed text-xs font-bold text-on-secondary-fixed">—</span>
+                            <span class="flex min-w-0 flex-col"><strong id="selected-user-name" class="truncate text-sm font-semibold text-on-surface">Sin usuario seleccionado</strong><small id="selected-user-role" class="text-xs text-outline">Usuario titular</small></span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="flex flex-col gap-3 rounded-xl border border-surface-container-high bg-surface-container-low/50 p-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">2</span>
+                        <div><h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Fechas y estancia</h3><p class="text-xs text-outline">Las fechas aplican a todas las habitaciones de esta reserva.</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <label class="flex flex-col gap-1.5"><span class="text-xs font-medium text-on-surface">Check-in <span class="text-error">*</span></span><input asp-for="Reserva.InicioReserva" type="date" id="reservation-start" min="@DateTime.Today.ToString("yyyy-MM-dd")" class="w-full rounded-lg border border-surface-container-high bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" /><span asp-validation-for="Reserva.InicioReserva" class="text-xs text-error"></span></label>
+                        <label class="flex flex-col gap-1.5"><span class="text-xs font-medium text-on-surface">Número de noches <span class="text-error">*</span></span><input asp-for="Reserva.TotalNoches" type="number" min="1" max="365" id="reservation-nights" class="w-full rounded-lg border border-surface-container-high bg-surface-container-lowest px-3 py-2 text-sm tabular-nums text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" /><span asp-validation-for="Reserva.TotalNoches" class="text-xs text-error"></span></label>
+                        <div class="flex flex-col justify-end gap-1.5"><span class="text-xs font-medium text-on-surface">Check-out calculado</span><div class="flex min-h-[38px] items-center gap-2 rounded-lg bg-surface-container px-3 py-2 text-sm font-semibold tabular-nums text-on-surface"><span class="material-symbols-outlined text-base text-on-tertiary-container">event_available</span><span id="reservation-checkout">—</span></div></div>
+                    </div>
+                </section>
+
+                <section class="flex flex-col gap-3 rounded-xl border border-surface-container-high bg-surface-container-low/50 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">3</span><div><h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Habitaciones asignadas</h3><p class="text-xs text-outline">Elija una o más habitaciones libres para las fechas seleccionadas.</p></div></div>
+                        <span class="rounded-md border border-surface-container-high bg-surface-container px-2 py-1 text-[11px] font-mono text-on-surface-variant">1 reserva → varias habitaciones</span>
+                    </div>
+                    <div id="available-rooms" class="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-xl border border-surface-container-high bg-surface-container-low/60 p-2.5">
+                        @if (!Model.Habitaciones.Any())
+                        {
+                            <p class="py-8 text-center text-sm text-outline">No hay habitaciones disponibles para esas fechas.</p>
+                        }
+                        @foreach (var room in Model.Habitaciones)
+                        {
+                            <label class="room-option flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-surface-container-high bg-surface-container-lowest p-3 transition-colors hover:border-primary/40">
+                                <span class="flex min-w-0 items-center gap-3">
+                                    <input type="checkbox" name="Reserva.HabitacionIds" value="@room.HabitacionId" data-rate="@(room.PrecioCama * room.NroCamas)" class="room-checkbox h-4 w-4 rounded border-outline accent-primary" />
+                                    <span class="flex min-w-0 flex-col"><strong class="truncate text-sm font-semibold text-on-surface">Habitación @room.Codigo</strong><small class="text-xs text-on-surface-variant">@room.TipoVip · @room.NroCamas cama(s)</small></span>
+                                </span>
+                                <span class="shrink-0 text-right"><strong class="block text-sm font-bold tabular-nums text-primary">$@((room.PrecioCama * room.NroCamas).ToString("N0"))</strong><small class="text-[11px] text-outline">por noche</small></span>
+                            </label>
+                        }
+                    </div>
+                    <span asp-validation-for="Reserva.HabitacionIds" class="text-xs text-error"></span>
+                </section>
+
+                <section class="flex flex-col gap-3 rounded-xl border border-surface-container-high bg-surface-container-low/50 p-4">
+                    <div class="flex items-center gap-2.5"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">4</span><div><h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Estado inicial</h3><p class="text-xs text-outline">Puede actualizarse después desde la reserva.</p></div></div>
+                    <select asp-for="Reserva.EstadoReserva" class="w-full rounded-lg border border-surface-container-high bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:max-w-xs">
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="CONFIRMADA">Confirmada</option>
+                    </select>
+                </section>
+            </div>
+            <footer class="flex shrink-0 flex-col gap-3 border-t border-surface-container-high bg-surface-container-lowest px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
+                <div class="flex items-center justify-between gap-4 md:justify-start">
+                    <span class="flex items-center gap-2 text-xs text-on-surface-variant"><span class="material-symbols-outlined text-lg">hotel</span><span><strong id="selected-room-count" class="text-on-surface">0</strong> habitaciones</span></span>
+                    <span class="hidden h-6 w-px bg-surface-container-high md:block"></span>
+                    <span class="text-xs font-semibold text-on-surface-variant">Total estimado</span>
+                    <strong id="reservation-estimate" class="text-lg font-bold tabular-nums text-primary">$0</strong>
+                </div>
+                <div class="flex items-center justify-end gap-2">
+                    <button type="button" onclick="cerrarModalReserva()" class="rounded-lg border border-surface-container-high bg-surface-container-lowest px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container">Cancelar</button>
+                    <button type="submit" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container"><span class="material-symbols-outlined text-base">save</span>Crear reserva</button>
+                </div>
+            </footer>
+        </form>
+    </section>
+</div>
+
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        // Helpers locales de la página de reservas
+        (() => {
+            const modal = document.getElementById('reservationModal');
+            const start = document.getElementById('reservation-start');
+            const nights = document.getElementById('reservation-nights');
+            const list = document.getElementById('available-rooms');
+            const userSelect = document.getElementById('reservation-user');
+            const currency = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+            const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+            window.abrirModalReserva = () => { modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('overflow-hidden'); };
+            window.cerrarModalReserva = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); };
+            function updateSelectedUser() {
+                const option = userSelect.options[userSelect.selectedIndex];
+                const name = option?.dataset.name || '';
+                const role = option?.dataset.role || '';
+                document.getElementById('selected-user-name').textContent = name || 'Sin usuario seleccionado';
+                document.getElementById('selected-user-role').textContent = role || 'Usuario titular';
+                document.getElementById('selected-user-initials').textContent = name
+                    ? name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase()
+                    : '—';
+            }
+            function updateCheckout() {
+                if (!start.value || !nights.value || Number(nights.value) < 1) {
+                    document.getElementById('reservation-checkout').textContent = '—';
+                    return;
+                }
+                const [year, month, day] = start.value.split('-').map(Number);
+                const checkout = new Date(year, month - 1, day);
+                checkout.setDate(checkout.getDate() + Number(nights.value));
+                document.getElementById('reservation-checkout').textContent = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }).format(checkout);
+            }
+            function updateEstimate() {
+                const selected = [...list.querySelectorAll('.room-checkbox:checked')];
+                const total = selected.reduce((sum, item) => sum + Number(item.dataset.rate || 0), 0) * Math.max(1, Number(nights.value || 1));
+                document.getElementById('selected-room-count').textContent = selected.length;
+                document.getElementById('reservation-estimate').textContent = '$' + currency.format(total);
+                list.querySelectorAll('.room-checkbox').forEach(input => {
+                    input.closest('.room-option')?.classList.toggle('border-primary', input.checked);
+                    input.closest('.room-option')?.classList.toggle('bg-primary/5', input.checked);
+                });
+            }
+            async function loadRooms() {
+                if (!start.value || !nights.value || Number(nights.value) < 1) return;
+                list.innerHTML = '<p class="py-5 text-center text-outline">Buscando disponibilidad…</p>';
+                const url = new URL(window.location.href);
+                url.search = new URLSearchParams({ handler: 'Disponibles', inicio: start.value, noches: nights.value });
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error();
+                    const rooms = await response.json();
+                    list.innerHTML = rooms.length ? rooms.map(room => `<label class="room-option flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-surface-container-high bg-surface-container-lowest p-3 transition-colors hover:border-primary/40"><span class="flex min-w-0 items-center gap-3"><input type="checkbox" name="Reserva.HabitacionIds" value="${Number(room.habitacionId)}" data-rate="${Number(room.precioCama) * Number(room.nroCamas)}" class="room-checkbox h-4 w-4 rounded accent-primary" /><span class="flex min-w-0 flex-col"><strong class="truncate text-sm font-semibold text-on-surface">Habitación ${escapeHtml(room.codigo)}</strong><small class="text-xs text-on-surface-variant">${escapeHtml(room.tipoVip)} · ${Number(room.nroCamas)} cama(s)</small></span></span><span class="shrink-0 text-right"><strong class="block text-sm font-bold tabular-nums text-primary">$${currency.format(Number(room.precioCama) * Number(room.nroCamas))}</strong><small class="text-[11px] text-outline">por noche</small></span></label>`).join('') : '<p class="py-5 text-center text-sm text-outline">No hay habitaciones libres para esas fechas.</p>';
+                    updateEstimate();
+                } catch { list.innerHTML = '<p class="py-5 text-center text-error">Error al consultar habitaciones. Recargue la página e inténtelo de nuevo.</p>'; }
+            }
+            list.addEventListener('change', updateEstimate);
+            userSelect.addEventListener('change', updateSelectedUser);
+            nights.addEventListener('change', () => { updateCheckout(); updateEstimate(); loadRooms(); });
+            start.addEventListener('change', () => { updateCheckout(); loadRooms(); });
+            document.addEventListener('keydown', event => { if (event.key === 'Escape') cerrarModalReserva(); });
+            updateSelectedUser();
+            updateCheckout();
+            updateEstimate();
+            @if (Model.AbrirModalReserva) { <text>abrirModalReserva();</text> }
+        })();
     </script>
 }

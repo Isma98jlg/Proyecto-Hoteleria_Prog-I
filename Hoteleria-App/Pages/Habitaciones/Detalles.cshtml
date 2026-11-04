@@ -2,254 +2,37 @@
 @model Hoteleria_App.Pages.Habitaciones.DetallesModel
 @{
     ViewData["Title"] = $"Habitación #{Model.Habitacion?.HabitacionId}";
+    var room = Model.Habitacion;
+    var rate = room is null ? 0m : room.NroCamas * (room.TipoVip?.PrecioCama ?? 0m);
 }
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>🛏️ Detalles de Habitación</h1>
-    <div>
-        <a asp-page="Editar" asp-route-id="@Model.Habitacion?.HabitacionId" class="btn btn-warning me-2">✏️ Editar</a>
-        <a asp-page="Index" class="btn btn-secondary">← Volver</a>
-    </div>
-</div>
-
-@if (Model.Habitacion == null)
-{
-    <div class="alert alert-danger">Habitación no encontrada.</div>
-}
-else
-{
-    var habitacion = Model.Habitacion;
-    var precioTotal = habitacion.NroCamas * (habitacion.TipoVip?.PrecioCama ?? 0);
-    var codigo = $"{habitacion.NroPiso:D4}{habitacion.TipoVip?.Sigla}";
-    var badgeClass = habitacion.Estado switch
+<main class="flex flex-col gap-6 w-full">
+    @if (TempData["SuccessMessage"] is string success) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@success</div> }
+    @if (room is null) { <div class="rounded-xl bg-error-container text-on-error-container p-5">No se encontró la habitación.</div> }
+    else
     {
-        "LIBRE" => "bg-success",
-        "OCUPADO" => "bg-danger",
-        "MANTENIMIENTO" => "bg-warning text-dark",
-        _ => "bg-secondary"
-    };
-
-    <div class="row">
-        <!-- Información principal -->
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">📋 Información General</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">ID Habitación</label>
-                            <div class="fw-bold fs-5">@habitacion.HabitacionId</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted small">Código</label>
-                            <div class="fw-bold fs-5">
-                                <span class="badge bg-secondary fs-6">@codigo</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small">Piso</label>
-                            <div class="fw-bold">@habitacion.NroPiso @(habitacion.Piso?.RefPiso != null ? $"({habitacion.Piso.RefPiso})" : "")</div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small">N° Camas</label>
-                            <div class="fw-bold">@habitacion.NroCamas</div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small">Estado</label>
-                            <div><span class="badge @badgeClass fs-6">@habitacion.Estado</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tipo VIP -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">⭐ Tipo VIP</h5>
-                </div>
-                <div class="card-body">
-                    @if (habitacion.TipoVip != null)
-                    {
-                        var tv = habitacion.TipoVip;
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small">Nombre</label>
-                                <div class="fw-bold">@tv.TipoVipNombre</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small">Sigla</label>
-                                <div class="fw-bold"><span class="badge bg-warning text-dark">@tv.Sigla</span></div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label text-muted small">Precio por cama</label>
-                                <div class="fw-bold text-success">@tv.PrecioCama.ToString("C")</div>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-muted">No hay información de tipo VIP asociada.</div>
-                    }
-                </div>
-            </div>
-
-            <!-- Precios -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">💰 Precios</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card text-center">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Precio por cama</h6>
-                                    <h3 class="text-primary">@(habitacion.TipoVip?.PrecioCama.ToString("C") ?? "N/A")</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card text-center">
-                                <div class="card-body">
-                                    <h6 class="text-muted">N° Camas</h6>
-                                    <h3 class="text-primary">@habitacion.NroCamas</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card text-center border-success">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Total por noche</h6>
-                                    <h3 class="text-success fw-bold">@precioTotal.ToString("C")</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Historial de reservas -->
-            @if (habitacion.ReservaHabitaciones?.Any() == true)
+        <section class="bg-primary-container text-on-primary rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm">
+            <div><span class="text-xs uppercase tracking-[.18em] text-primary-fixed-dim">INVENTARIO · PISO @room.NroPiso</span><h1 class="font-headline-lg text-headline-lg mt-2">Habitación @room.HabitacionId</h1><p class="text-on-primary/70 mt-1">@(room.Piso?.RefPiso ?? "Sin referencia") · @room.TipoVipNombre</p></div>
+            <div class="flex gap-2"><a asp-page="Index" class="px-4 py-2.5 rounded-lg bg-surface-container-lowest/10 text-on-primary">Volver</a>@if (Model.PuedeEditar) { <a asp-page="Editar" asp-route-id="@room.HabitacionId" class="px-4 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-semibold">Editar habitación</a> }</div>
+        </section>
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Estado</span><strong class="block text-xl mt-2">@room.Estado</strong></div>
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Capacidad</span><strong class="block text-xl mt-2">@room.NroCamas cama(s)</strong></div>
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa por cama / noche</span><strong class="block text-xl mt-2">$@room.TipoVip?.PrecioCama.ToString("N0")</strong></div>
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa total / noche</span><strong class="block text-xl mt-2">$@rate.ToString("N0")</strong></div>
+        </section>
+        <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl overflow-hidden">
+            <div class="p-5 border-b border-surface-container-high"><h2 class="font-headline-sm text-headline-sm">Historial de reservas <span class="text-outline">(@(room.ReservaHabitaciones?.Count ?? 0))</span></h2></div>
+            <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-surface-container-low text-outline uppercase text-xs"><tr><th class="p-3">Reserva</th><th class="p-3">Huésped</th><th class="p-3">Estado</th><th class="p-3">Estancia</th><th class="p-3 text-right">Precio / noche</th><th class="p-3"></th></tr></thead><tbody class="divide-y divide-surface-container">
+            @if (room.ReservaHabitaciones is null || !room.ReservaHabitaciones.Any()) { <tr><td colspan="6" class="p-8 text-center text-outline">Esta habitación todavía no tiene reservas.</td></tr> }
+            @foreach (var line in room.ReservaHabitaciones!.OrderByDescending(x => x.Reserva?.InicioReserva))
             {
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">📅 Historial de Reservas</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-sm mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Reserva ID</th>
-                                        <th>Cliente</th>
-                                        <th>Estado</th>
-                                        <th>Inicio</th>
-                                        <th>Fin</th>
-                                        <th>Noches</th>
-                                        <th>Precio/Noche</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var rh in habitacion.ReservaHabitaciones.OrderByDescending(r => r.Reserva?.InicioReserva))
-                                    {
-                                        var r = rh.Reserva;
-                                        if (r != null)
-                                        {
-                                            var estadoBadge = r.EstadoReserva switch
-                                            {
-                                                "PENDIENTE" => "bg-warning text-dark",
-                                                "CONFIRMADA" => "bg-info",
-                                                "FINALIZADA" => "bg-success",
-                                                "CANCELADA" => "bg-danger",
-                                                _ => "bg-secondary"
-                                            };
-                                            <tr>
-                                                <td>@r.ReservaId</td>
-                                                <td>@(r.Usuario?.Nombres) @(r.Usuario?.Apellidos)</td>
-                                                <td><span class="badge @estadoBadge">@r.EstadoReserva</span></td>
-                                                <td>@r.InicioReserva.ToString("dd/MM/yyyy")</td>
-                                                <td>@r.FinReserva.ToString("dd/MM/yyyy")</td>
-                                                <td>@r.TotalNoches</td>
-                                                <td>@rh.PrecioNochePactado.ToString("C")</td>
-                                            </tr>
-                                        }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                var reservation = line.Reserva;
+                if (reservation is not null)
+                {
+                    <tr><td class="p-3 font-mono">#@reservation.ReservaId</td><td class="p-3">@(reservation.Usuario?.Nombres) @(reservation.Usuario?.Apellidos)</td><td class="p-3">@reservation.EstadoReserva</td><td class="p-3">@reservation.InicioReserva.ToString("dd/MM/yyyy") – @reservation.FinReserva.ToString("dd/MM/yyyy")</td><td class="p-3 text-right">$@line.PrecioNochePactado.ToString("N0")</td><td class="p-3 text-right"><a asp-page="/Reservas/Detalles" asp-route-id="@reservation.ReservaId" class="text-secondary underline">Ver</a></td></tr>
+                }
             }
-            else
-            {
-                <div class="card">
-                    <div class="card-body text-center text-muted py-4">
-                        📭 Esta habitación no tiene historial de reservas.
-                    </div>
-                </div>
-            }
-        </div>
-
-        <!-- Panel lateral -->
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">⚡ Acciones Rápidas</h5>
-                </div>
-                <div class="card-body d-grid gap-2">
-                    @if (habitacion.Estado == "LIBRE")
-                    {
-                        <button class="btn btn-success" disabled>✅ Disponible para reserva</button>
-                    }
-                    else if (habitacion.Estado == "OCUPADO")
-                    {
-                        <button class="btn btn-danger" disabled>🔴 Ocupada actualmente</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-warning text-dark" disabled>🔧 En mantenimiento</button>
-                    }
-                    <a asp-page="Editar" asp-route-id="@habitacion.HabitacionId" class="btn btn-outline-primary">✏️ Editar datos</a>
-                    <a asp-page="/Reservas/Crear" asp-route-habitacionId="@habitacion.HabitacionId" class="btn btn-outline-success">📅 Nueva reserva</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">📊 Resumen</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-6 text-muted small">Total reservas</dt>
-                        <dd class="col-sm-6 fw-bold">@habitacion.ReservaHabitaciones?.Count ?? 0</dd>
-                        
-                        <dt class="col-sm-6 text-muted small">Noches totales</dt>
-                        <dd class="col-sm-6 fw-bold">@(habitacion.ReservaHabitaciones?.Sum(r => r.Reserva?.TotalNoches ?? 0) ?? 0)</dd>
-                        
-                        <dt class="col-sm-6 text-muted small">Ingresos generados</dt>
-                        <dd class="col-sm-6 fw-bold text-success">@(habitacion.ReservaHabitaciones?.Sum(r => r.PrecioNochePactado * (r.Reserva?.TotalNoches ?? 0)) ?? 0).ToString("C")</dd>
-                        
-                        <dt class="col-sm-6 text-muted small">Última reserva</dt>
-                        <dd class="col-sm-6">
-                            @{
-                                var ultima = habitacion.ReservaHabitaciones?.OrderByDescending(r => r.Reserva?.InicioReserva).FirstOrDefault();
-                                if (ultima?.Reserva != null)
-                                {
-                                    @ultima.Reserva.InicioReserva.ToString("dd/MM/yyyy")
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Ninguna</span>
-                                }
-                            }
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+            </tbody></table></div>
+        </section>
+    }
+</main>

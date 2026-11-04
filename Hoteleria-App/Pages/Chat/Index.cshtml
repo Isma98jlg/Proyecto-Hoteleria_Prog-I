@@ -1,82 +1,15 @@
 @page
-@model Hoteleria_App.Pages.Chat.IndexModel
 @{
-    ViewData["Title"] = "Chat - Soporte";
+    ViewData["Title"] = "Comunicación";
 }
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>💬 Chat de Soporte</h1>
-</div>
-
-<div class="alert alert-info">
-    <h5>🚧 En construcción</h5>
-    <p class="mb-0">Esta sección estará disponible próximamente. Incluirá:</p>
-    <ul class="mb-0">
-        <li>Chat en tiempo real entre administrador y clientes (SignalR)</li>
-        <li>Historial de conversaciones</li>
-        <li>Notificaciones push</li>
-        <li>Estados: en línea, ocupado, fuera de línea</li>
-        <li>Transferencia de chat entre agentes</li>
-    </ul>
-</div>
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">👨‍💼 Vista Administrador</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Panel para que el administrador gestione todas las conversaciones activas.</p>
-                <ul>
-                    <li>Lista de chats activos</li>
-                    <li>Asignación de agentes</li>
-                    <li>Respuestas rápidas / plantillas</li>
-                    <li>Métricas de tiempo de respuesta</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">👤 Vista Cliente</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Widget de chat embebido para que los clientes contacten al hotel.</p>
-                <ul>
-                    <li>Botón flotante en la web</li>
-                    <li>Envío de mensajes offline</li>
-                    <li>Adjuntar archivos/fotos</li>
-                    <li>Calificación de atención</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="card mt-4">
-    <div class="card-header bg-light">
-        <h5 class="mb-0">🛠️ Tecnologías previstas</h5>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h6>Backend</h6>
-                <ul>
-                    <li>ASP.NET Core SignalR</li>
-                    <li>Entity Framework Core para persistencia</li>
-                    <li>Redis para backplane (escalabilidad)</li>
-                </ul>
-            </div>
-            <div class="col-md-6">
-                <h6>Frontend</h6>
-                <ul>
-                    <li>SignalR JavaScript Client</li>
-                    <li>Razor Components / Blazor (opcional)</li>
-                    <li>PWA para notificaciones push</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+<main class="max-w-4xl flex flex-col gap-6">
+    <section class="bg-primary-container text-on-primary rounded-2xl p-6 md:p-8 shadow-sm">
+        <span class="text-xs uppercase tracking-[.18em] text-primary-fixed-dim">MÓDULO COMPLEMENTARIO</span>
+        <h1 class="font-headline-lg text-headline-lg mt-2">Comunicación con huéspedes</h1>
+        <p class="text-on-primary/70 mt-2 max-w-2xl">El chat todavía no está habilitado en esta versión. La base de datos del proyecto no incluye conversaciones ni mensajes guardados.</p>
+    </section>
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 flex flex-col gap-4">
+        <div class="flex items-start gap-4"><span class="material-symbols-outlined text-secondary text-3xl">info</span><div><h2 class="font-headline-sm text-headline-sm">Qué falta para activar el chat</h2><p class="text-on-surface-variant mt-1">Se requiere definir cómo se guardan conversaciones y mensajes, quién puede participar y si el intercambio será en tiempo real. Esta pantalla no crea ni muestra mensajes ficticios.</p></div></div>
+        <div class="flex flex-wrap gap-3 border-t border-surface-container-high pt-4">@if (User.IsInRole("admin") || User.IsInRole("trabajador")) { <a asp-page="/Reservas/Index" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Ir a reservas</a> }<a asp-page="/Usuarios/Index" class="px-4 py-2 rounded-lg bg-surface-container">Ver directorio</a></div>
+    </section>
+</main>

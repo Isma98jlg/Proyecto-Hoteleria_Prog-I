@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Hoteleria_App.Security;
 
 namespace Hoteleria_App.Pages.Habitaciones;
 
+[Authorize(Policy = HotelPermissionPolicies.CrudHabitaciones)]
 public class CrearModel : PageModel
 {
     private readonly HoteleriaDbContext _context;
@@ -32,19 +35,24 @@ public class CrearModel : PageModel
     {
         await CargarDatosAsync();
 
+        if (Habitacion.NroCamas < 1) ModelState.AddModelError("Habitacion.NroCamas", "Debe registrar al menos una cama.");
+        if (!await _context.Pisos.AnyAsync(p => p.NroPiso == Habitacion.NroPiso)) ModelState.AddModelError("Habitacion.NroPiso", "Seleccione un piso válido.");
+        if (!await _context.TiposVip.AnyAsync(t => t.TipoVipNombre == Habitacion.TipoVipNombre)) ModelState.AddModelError("Habitacion.TipoVipNombre", "Seleccione una categoría válida.");
+        if (!new[] { "LIBRE", "OCUPADO", "MANTENIMIENTO" }.Contains(Habitacion.Estado)) ModelState.AddModelError("Habitacion.Estado", "Seleccione un estado válido.");
+
         if (!ModelState.IsValid)
         {
             return Page();
         }
 
-        // Generar ID automático (max + 1)
+        // El esquema usa identificadores explícitos, por lo que se asigna el siguiente ID disponible.
         var maxId = await _context.Habitaciones.MaxAsync(h => (long?)h.HabitacionId) ?? 0;
         Habitacion.HabitacionId = maxId + 1;
 
         _context.Habitaciones.Add(Habitacion);
         await _context.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = $"Habitación #{Habitacion.HabitacionId} creada correctamente.";
+        TempData["MensajeExito"] = $"Habitación #{Habitacion.HabitacionId} creada correctamente.";
         return RedirectToPage("./Index");
     }
 

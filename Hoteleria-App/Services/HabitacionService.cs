@@ -37,6 +37,7 @@ public class HabitacionService : IHabitacionService
         return await _context.Habitaciones
             .Include(h => h.Piso)
             .Include(h => h.TipoVip)
+            .Include(h => h.ReservaHabitaciones).ThenInclude(rh => rh.Reserva).ThenInclude(r => r.Usuario)
             .FirstOrDefaultAsync(h => h.HabitacionId == id);
     }
 

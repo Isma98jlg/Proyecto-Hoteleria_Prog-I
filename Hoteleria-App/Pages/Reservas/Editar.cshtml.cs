@@ -3,10 +3,11 @@ using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Hoteleria_App.Security;
 
 namespace Hoteleria_App.Pages.Reservas;
 
-[Authorize]
+[Authorize(Policy = HotelPermissionPolicies.CrudRequerimientos)]
 public class EditarModel : PageModel
 {
     private readonly IReservaService _reservaService;
@@ -43,6 +44,8 @@ public class EditarModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(long id)
     {
+        if (!new[] { "PENDIENTE", "CONFIRMADA", "FINALIZADA", "CANCELADA" }.Contains(Reserva.EstadoReserva))
+            ModelState.AddModelError("Reserva.EstadoReserva", "Seleccione un estado válido.");
         if (!ModelState.IsValid)
         {
             Detalle = await _reservaService.GetByIdAsync(id);

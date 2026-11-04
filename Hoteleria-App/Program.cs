@@ -4,6 +4,7 @@ using Hoteleria_App.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Hoteleria_App.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ LoadDotEnv(builder.Configuration, builder.Environment.ContentRootPath);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<IAuthorizationHandler, HotelPermissionAuthorizationHandler>();
 
 // Base de datos SQL Server (config en .env / variables de entorno).
 var connectionString = BuildConnectionString(builder.Configuration);
@@ -39,14 +41,28 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
 // Todo requiere autenticación salvo las páginas marcadas [AllowAnonymous].
 builder.Services.Configure<AuthorizationOptions>(options =>
+{
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
-        .Build());
+        .Build();
+    options.AddPolicy(HotelPermissionPolicies.Ver, policy => policy.RequireAuthenticatedUser()
+        .AddRequirements(new HotelPermissionRequirement("ver")));
+    options.AddPolicy(HotelPermissionPolicies.CrudRequerimientos, policy => policy.RequireAuthenticatedUser()
+        .AddRequirements(new HotelPermissionRequirement("crud_requerimientos")));
+    options.AddPolicy(HotelPermissionPolicies.CrudPisos, policy => policy.RequireAuthenticatedUser()
+        .AddRequirements(new HotelPermissionRequirement("crud_pisos")));
+    options.AddPolicy(HotelPermissionPolicies.CrudUsuarios, policy => policy.RequireAuthenticatedUser()
+        .AddRequirements(new HotelPermissionRequirement("crud_usuarios")));
+    options.AddPolicy(HotelPermissionPolicies.CrudHabitaciones, policy => policy.RequireAuthenticatedUser()
+        .AddRequirements(new HotelPermissionRequirement("crud_habitaciones")));
+    options.AddPolicy(HotelPermissionPolicies.CrudTipoVip, policy => policy.RequireAuthenticatedUser()
+        .AddRequirements(new HotelPermissionRequirement("crud_tipo_vip")));
+});
 
 var app = builder.Build();
 

@@ -1,61 +1,19 @@
 @page
 @model Hoteleria_App.Pages.Habitaciones.CrearModel
 @{
-    ViewData["Title"] = "Nueva Habitación";
+    ViewData["Title"] = "Nueva habitación";
 }
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>➕ Nueva Habitación</h1>
-    <a asp-page="Index" class="btn btn-secondary">← Volver</a>
-</div>
-
-<div class="alert alert-info">
-    <h5>🚧 En construcción</h5>
-    <p class="mb-0">Formulario para crear nuevas habitaciones. Incluirá:</p>
-    <ul class="mb-0">
-        <li>Selección de piso</li>
-        <li>Número de camas</li>
-        <li>Tipo VIP</li>
-        <li>Estado inicial (LIBRE por defecto)</li>
-    </ul>
-</div>
-
-<form method="post" class="card">
-    <div class="card-header bg-light">
-        <h5 class="mb-0">Datos de la Habitación</h5>
-    </div>
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label asp-for="Habitacion.NroPiso" class="form-label">Piso *</label>
-                <select asp-for="Habitacion.NroPiso" class="form-select" asp-items="@Model.PisosDisponibles">
-                    <option value="">Seleccionar piso...</option>
-                </select>
-                <span asp-validation-for="Habitacion.NroPiso" class="text-danger"></span>
-            </div>
-            <div class="col-md-6">
-                <label asp-for="Habitacion.NroCamas" class="form-label">N° Camas *</label>
-                <input asp-for="Habitacion.NroCamas" class="form-control" min="1" />
-                <span asp-validation-for="Habitacion.NroCamas" class="text-danger"></span>
-            </div>
-            <div class="col-md-6">
-                <label asp-for="Habitacion.TipoVipNombre" class="form-label">Tipo VIP *</label>
-                <select asp-for="Habitacion.TipoVipNombre" class="form-select" asp-items="@Model.TiposVipDisponibles">
-                    <option value="">Seleccionar tipo VIP...</option>
-                </select>
-                <span asp-validation-for="Habitacion.TipoVipNombre" class="text-danger"></span>
-            </div>
-            <div class="col-md-6">
-                <label asp-for="Habitacion.Estado" class="form-label">Estado *</label>
-                <select asp-for="Habitacion.Estado" class="form-select" asp-items="@Model.EstadosDisponibles">
-                    <option value="">Seleccionar estado...</option>
-                </select>
-                <span asp-validation-for="Habitacion.Estado" class="text-danger"></span>
-            </div>
+<main class="max-w-4xl flex flex-col gap-6">
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">HABITACIONES · REGISTRO</span><h1 class="font-headline-lg text-headline-lg mt-1">Nueva habitación</h1><p class="text-on-surface-variant">Agrega una habitación al inventario del hotel.</p></section>
+    @if (!ViewData.ModelState.IsValid) { <div asp-validation-summary="All" class="rounded-xl bg-error-container text-on-error-container p-3"></div> }
+    <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1">Piso<select asp-for="Habitacion.NroPiso" asp-items="Model.PisosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="">Seleccione un piso</option></select><span asp-validation-for="Habitacion.NroPiso" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Número de camas<input asp-for="Habitacion.NroCamas" type="number" min="1" max="20" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Habitacion.NroCamas" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Categoría<select asp-for="Habitacion.TipoVipNombre" asp-items="Model.TiposVipDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="">Seleccione una categoría</option></select><span asp-validation-for="Habitacion.TipoVipNombre" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Estado inicial<select asp-for="Habitacion.Estado" asp-items="Model.EstadosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"></select><span asp-validation-for="Habitacion.Estado" class="text-error text-sm"></span></label>
         </div>
-        <div class="mt-4 d-flex gap-2">
-            <button type="submit" class="btn btn-primary">💾 Crear</button>
-            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-        </div>
-    </div>
-</form>
+        <div class="flex justify-between border-t border-surface-container-high pt-4"><a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Cancelar</a><button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Guardar habitación</button></div>
+    </form>
+</main>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

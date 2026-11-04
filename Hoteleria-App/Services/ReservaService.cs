@@ -1,6 +1,7 @@
 using Hoteleria_App.Data;
 using Hoteleria_App.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hoteleria_App.Services;
 
@@ -62,8 +63,7 @@ public class UsuarioComboViewModel
 {
     public long UsuarioId { get; set; }
     public string NombreCompleto { get; set; } = "";
-    public string NumeroDocumento { get; set; } = "";
-    public string EMail { get; set; } = "";
+    public string CargoNombre { get; set; } = "";
 }
 
 public class HabitacionDisponibleViewModel
@@ -77,8 +77,11 @@ public class HabitacionDisponibleViewModel
 
 public class ReservaCreateModel
 {
+    [Range(1, long.MaxValue, ErrorMessage = "Seleccione un huésped.")]
     public long UsuarioId { get; set; }
+    [DataType(DataType.Date)]
     public DateTime InicioReserva { get; set; }
+    [Range(1, 365, ErrorMessage = "El número de noches debe estar entre 1 y 365.")]
     public int TotalNoches { get; set; }
     public string EstadoReserva { get; set; } = "PENDIENTE";
     public List<long> HabitacionIds { get; set; } = new();
@@ -116,9 +119,7 @@ public class ReservaService : IReservaService
         {
             query = query.Where(r =>
                 r.Usuario.Nombres.Contains(buscar) ||
-                r.Usuario.Apellidos.Contains(buscar) ||
-                r.Usuario.NumeroDocumento.Contains(buscar) ||
-                r.Usuario.EMail.Contains(buscar));
+                r.Usuario.Apellidos.Contains(buscar));
         }
 
         if (!string.IsNullOrWhiteSpace(usuario))
@@ -139,7 +140,7 @@ public class ReservaService : IReservaService
                 FinReserva = r.FinReserva,
                 TotalNoches = r.TotalNoches,
                 TotalHabitaciones = r.ReservaHabitaciones.Count,
-                PrecioTotal = r.ReservaHabitaciones.Sum(rh => rh.PrecioNochePactado),
+                PrecioTotal = r.ReservaHabitaciones.Sum(rh => rh.PrecioNochePactado) * r.TotalNoches,
                 EstadoEtiqueta = GetEstadoEtiqueta(r.EstadoReserva),
                 BadgeEstado = GetBadgeEstado(r.EstadoReserva)
             })
@@ -152,6 +153,7 @@ public class ReservaService : IReservaService
             .Include(r => r.Usuario)
             .Include(r => r.ReservaHabitaciones)
                 .ThenInclude(rh => rh.Habitacion)
+                    .ThenInclude(h => h.TipoVip)
             .FirstOrDefaultAsync(r => r.ReservaId == id);
 
         if (r is null) return null;
@@ -167,13 +169,13 @@ public class ReservaService : IReservaService
             InicioReserva = r.InicioReserva,
             FinReserva = r.FinReserva,
             TotalNoches = r.TotalNoches,
-            PrecioTotal = r.ReservaHabitaciones.Sum(rh => rh.PrecioNochePactado),
+            PrecioTotal = r.ReservaHabitaciones.Sum(rh => rh.PrecioNochePactado) * r.TotalNoches,
             EstadoEtiqueta = GetEstadoEtiqueta(r.EstadoReserva),
             BadgeEstado = GetBadgeEstado(r.EstadoReserva),
             Habitaciones = r.ReservaHabitaciones.Select(rh => new ReservaHabitacionDetalle
             {
                 HabitacionId = rh.HabitacionId,
-                CodigoHabitacion = $"S-{rh.Habitacion.HabitacionId:D3}",
+                CodigoHabitacion = $"{rh.Habitacion.NroPiso}{rh.Habitacion.TipoVip.Sigla}-{rh.Habitacion.HabitacionId:D3}",
                 NroCamas = rh.Habitacion.NroCamas,
                 TipoVip = rh.Habitacion.TipoVipNombre,
                 PrecioNochePactado = rh.PrecioNochePactado
@@ -183,17 +185,32 @@ public class ReservaService : IReservaService
 
     public async Task<List<UsuarioComboViewModel>> GetUsuariosActivosAsync()
     {
-        return await _context.Usuarios
+        var usuarios = await _context.Usuarios
+            .Where(u => u.CargoId != null)
+            .Join(_context.Roles,
+                usuario => usuario.CargoId,
+                cargo => (long?)cargo.Id,
+                (usuario, cargo) => new { usuario, cargo })
+            .Where(x => x.cargo.NormalizedName == "USUARIO")
+            .Select(x => new
+            {
+                x.usuario.UsuarioId,
+                x.usuario.Nombres,
+                x.usuario.Apellidos,
+                CargoNombre = x.cargo.Name ?? "Usuario"
+            })
+            .ToListAsync();
+
+        return usuarios
             .OrderBy(u => u.Nombres)
             .ThenBy(u => u.Apellidos)
             .Select(u => new UsuarioComboViewModel
             {
                 UsuarioId = u.UsuarioId,
                 NombreCompleto = $"{u.Nombres} {u.Apellidos}".Trim(),
-                NumeroDocumento = u.NumeroDocumento,
-                EMail = u.EMail
+                CargoNombre = u.CargoNombre
             })
-            .ToListAsync();
+            .ToList();
     }
 
     public async Task<List<HabitacionDisponibleViewModel>> GetHabitacionesDisponiblesAsync(DateTime inicio, DateTime fin)
@@ -215,88 +232,104 @@ public class ReservaService : IReservaService
             .Select(h => new HabitacionDisponibleViewModel
             {
                 HabitacionId = h.HabitacionId,
-                Codigo = $"S-{h.HabitacionId:D3}",
+                Codigo = $"{h.NroPiso}{h.TipoVip.Sigla}-{h.HabitacionId:D3}",
                 NroCamas = h.NroCamas,
                 TipoVip = h.TipoVipNombre,
-                PrecioCama = 0 // Se puede calcular desde TipoVip si se necesita
+                PrecioCama = h.TipoVip.PrecioCama
             })
             .ToListAsync();
     }
 
     public async Task<bool> CrearAsync(ReservaCreateModel model)
     {
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        var strategy = _context.Database.CreateExecutionStrategy();
         try
         {
-            var reserva = new Reserva
+            return await strategy.ExecuteAsync(async () =>
             {
-                UsuarioId = model.UsuarioId,
-                EstadoReserva = model.EstadoReserva,
-                FechaReservaCreacion = DateTime.Now,
-                InicioReserva = model.InicioReserva,
-                TotalNoches = model.TotalNoches,
-                FinReserva = model.InicioReserva.AddDays(model.TotalNoches)
-            };
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                if (model.HabitacionIds.Count == 0 || model.HabitacionIds.Distinct().Count() != model.HabitacionIds.Count)
+                    return false;
 
-            _context.Reservas.Add(reserva);
-            await _context.SaveChangesAsync();
+                var esUsuarioRegistrado = await _context.Usuarios
+                    .Join(_context.Roles,
+                        usuario => usuario.CargoId,
+                        cargo => (long?)cargo.Id,
+                        (usuario, cargo) => new { usuario.UsuarioId, cargo.NormalizedName })
+                    .AnyAsync(x => x.UsuarioId == model.UsuarioId && x.NormalizedName == "USUARIO");
+                if (!esUsuarioRegistrado) return false;
 
-            // Crear las líneas ReservaHabitacion
-            for (int i = 0; i < model.HabitacionIds.Count; i++)
-            {
-                _context.ReservaHabitaciones.Add(new ReservaHabitacion
+                var inicio = model.InicioReserva.Date;
+                var fin = inicio.AddDays(model.TotalNoches);
+                var ocupadas = await _context.ReservaHabitaciones
+                    .Where(rh => rh.Reserva.EstadoReserva != "CANCELADA"
+                        && rh.Reserva.InicioReserva < fin && rh.Reserva.FinReserva > inicio)
+                    .Select(rh => rh.HabitacionId).ToListAsync();
+                var disponibles = await _context.Habitaciones
+                    .Where(h => model.HabitacionIds.Contains(h.HabitacionId)
+                        && h.Estado == "LIBRE" && !ocupadas.Contains(h.HabitacionId))
+                    .Select(h => h.HabitacionId).ToListAsync();
+                if (disponibles.Count != model.HabitacionIds.Count) return false;
+
+                var reserva = new Reserva
                 {
-                    ReservaId = reserva.ReservaId,
-                    HabitacionId = model.HabitacionIds[i],
-                    PrecioNochePactado = i < model.PreciosNochePactado.Count ? model.PreciosNochePactado[i] : 0m
-                });
-            }
+                    ReservaId = (await _context.Reservas.MaxAsync(r => (long?)r.ReservaId) ?? 0) + 1,
+                    UsuarioId = model.UsuarioId,
+                    EstadoReserva = model.EstadoReserva,
+                    FechaReservaCreacion = DateTime.Now,
+                    InicioReserva = inicio,
+                    TotalNoches = model.TotalNoches,
+                    FinReserva = fin
+                };
 
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return true;
+                _context.Reservas.Add(reserva);
+                await _context.SaveChangesAsync();
+
+                var preciosNoche = await _context.Habitaciones
+                    .Where(h => model.HabitacionIds.Contains(h.HabitacionId))
+                    .Select(h => new { h.HabitacionId, Precio = h.NroCamas * h.TipoVip.PrecioCama })
+                    .ToDictionaryAsync(h => h.HabitacionId, h => h.Precio);
+
+                for (int i = 0; i < model.HabitacionIds.Count; i++)
+                {
+                    _context.ReservaHabitaciones.Add(new ReservaHabitacion
+                    {
+                        ReservaId = reserva.ReservaId,
+                        HabitacionId = model.HabitacionIds[i],
+                        PrecioNochePactado = preciosNoche[model.HabitacionIds[i]]
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            });
         }
         catch
         {
-            await transaction.RollbackAsync();
             return false;
         }
     }
 
     public async Task<bool> EditarAsync(long id, ReservaEditModel model)
     {
+        if (!new[] { "PENDIENTE", "CONFIRMADA", "FINALIZADA", "CANCELADA" }.Contains(model.EstadoReserva))
+            return false;
         var reserva = await _context.Reservas
             .Include(r => r.ReservaHabitaciones)
             .FirstOrDefaultAsync(r => r.ReservaId == id);
 
         if (reserva is null) return false;
 
-        using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
             reserva.EstadoReserva = model.EstadoReserva;
 
-            // Eliminar y recrear las líneas de habitación
-            _context.ReservaHabitaciones.RemoveRange(reserva.ReservaHabitaciones);
             await _context.SaveChangesAsync();
-
-            for (int i = 0; i < model.HabitacionIds.Count; i++)
-            {
-                _context.ReservaHabitaciones.Add(new ReservaHabitacion
-                {
-                    ReservaId = id,
-                    HabitacionId = model.HabitacionIds[i],
-                    PrecioNochePactado = i < model.PreciosNochePactado.Count ? model.PreciosNochePactado[i] : 0m
-                });
-            }
-
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
             return true;
         }
         catch
         {
-            await transaction.RollbackAsync();
             return false;
         }
     }
@@ -307,7 +340,7 @@ public class ReservaService : IReservaService
             .Include(r => r.ReservaHabitaciones)
             .FirstOrDefaultAsync(r => r.ReservaId == id);
 
-        if (reserva is null) return false;
+        if (reserva is null || reserva.EstadoReserva != "PENDIENTE") return false;
 
         _context.ReservaHabitaciones.RemoveRange(reserva.ReservaHabitaciones);
         _context.Reservas.Remove(reserva);
@@ -315,14 +348,8 @@ public class ReservaService : IReservaService
         return true;
     }
 
-    public async Task<List<string>> GetEstadosDisponiblesAsync()
-    {
-        return await _context.Reservas
-            .Select(r => r.EstadoReserva)
-            .Distinct()
-            .OrderBy(e => e)
-            .ToListAsync();
-    }
+    public Task<List<string>> GetEstadosDisponiblesAsync() =>
+        Task.FromResult(new List<string> { "PENDIENTE", "CONFIRMADA", "FINALIZADA", "CANCELADA" });
 
     private static string GetEstadoEtiqueta(string estado) => estado switch
     {

@@ -2,6 +2,10 @@ using Hoteleria_App.Models;
 using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
+using Hoteleria_App.Data;
+using Hoteleria_App.Security;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hoteleria_App.Pages.Habitaciones;
 
@@ -20,14 +24,22 @@ namespace Hoteleria_App.Pages.Habitaciones;
 /// Las tarjetas individuales muestran SIEMPRE el TipoVip y la tarifa reales de cada
 /// habitación (sin cifras hardcodeadas).
 /// </summary>
+[Authorize(Policy = HotelPermissionPolicies.Ver)]
 public class IndexModel : PageModel
 {
     private readonly IHabitacionService _habitacionService;
+    private readonly HoteleriaDbContext _db;
+    private readonly IAuthorizationService _authorization;
 
-    public IndexModel(IHabitacionService habitacionService)
+    public IndexModel(IHabitacionService habitacionService, HoteleriaDbContext db, IAuthorizationService authorization)
     {
         _habitacionService = habitacionService;
+        _db = db;
+        _authorization = authorization;
     }
+
+    public bool PuedeAdministrarHabitaciones { get; private set; }
+    public bool PuedeAdministrarPisos { get; private set; }
 
     // ---------------------------------------------------------------
     // Datos calculados para el renderizado
@@ -100,6 +112,8 @@ public class IndexModel : PageModel
     // ---------------------------------------------------------------
     public async Task OnGetAsync()
     {
+        PuedeAdministrarHabitaciones = (await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudHabitaciones)).Succeeded;
+        PuedeAdministrarPisos = (await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudPisos)).Succeeded;
         Todas = (await _habitacionService.GetAllAsync())
             .OrderBy(h => h.NroPiso)
             .ThenBy(h => h.HabitacionId)
@@ -141,17 +155,20 @@ public class IndexModel : PageModel
         Habitaciones = query.OrderBy(h => h.NroPiso).ThenBy(h => h.HabitacionId).ToList();
 
         // Estructura de pisos (Entidad PISOS) derivada de las habitaciones reales.
-        Pisos = Todas
-            .GroupBy(h => h.NroPiso)
-            .Select(g => new PisoResumen
+        var habitacionesPorPiso = Todas.GroupBy(h => h.NroPiso).ToDictionary(g => g.Key, g => g.ToList());
+        Pisos = (await _db.Pisos.AsNoTracking().OrderBy(p => p.NroPiso).ToListAsync())
+            .Select(p =>
             {
-                NroPiso = g.Key,
-                RefPiso = g.FirstOrDefault()?.Piso?.RefPiso,
-                Cantidad = g.Count(),
-                Ocupadas = g.Count(h => h.Estado == "OCUPADO"),
-                EsVipPiso = g.Any(h => h.TipoVipNombre != "ESTANDAR"),
+                var habitaciones = habitacionesPorPiso.GetValueOrDefault(p.NroPiso) ?? new List<Habitacion>();
+                return new PisoResumen
+                {
+                    NroPiso = p.NroPiso,
+                    RefPiso = p.RefPiso,
+                    Cantidad = habitaciones.Count,
+                    Ocupadas = habitaciones.Count(h => h.Estado == "OCUPADO"),
+                    EsVipPiso = habitaciones.Any(h => h.TipoVipNombre != "ESTANDAR"),
+                };
             })
-            .OrderBy(p => p.NroPiso)
             .ToList();
     }
 
@@ -198,8 +215,23 @@ public class IndexModel : PageModel
     /// se delega a un futuro IPisoService en la integración con BD; esta maqueta de
     /// front-end conserva la interacción completa sin efectos laterales.
     /// </summary>
-    public IActionResult OnPostGuardarPiso()
+    public async Task<IActionResult> OnPostGuardarPisoAsync()
     {
+        if (!(await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudPisos)).Succeeded)
+            return Forbid();
+        if (PisoNro is null || PisoNro < 0 || PisoNro > 99 || string.IsNullOrWhiteSpace(PisoRef) || PisoRef.Trim().Length > 20)
+        {
+            TempData["MensajeError"] = "Indica un número de piso entre 0 y 99 y una referencia de hasta 20 caracteres.";
+            return RedirectToPage();
+        }
+
+        var piso = await _db.Pisos.SingleOrDefaultAsync(p => p.NroPiso == PisoNro.Value);
+        if (piso is null)
+            _db.Pisos.Add(new Piso { NroPiso = PisoNro.Value, RefPiso = PisoRef.Trim() });
+        else
+            piso.RefPiso = PisoRef.Trim();
+        await _db.SaveChangesAsync();
+        TempData["MensajeExito"] = piso is null ? "Piso registrado correctamente." : "Referencia del piso actualizada.";
         return RedirectToPage();
     }
 }

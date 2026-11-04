@@ -5,6 +5,8 @@
 }
 
 <div class="flex flex-col gap-6 w-full">
+    @if (TempData["MensajeExito"] is string success) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@success</div> }
+    @if (TempData["MensajeError"] is string error) { <div class="rounded-xl bg-error-container text-on-error-container p-3">@error</div> }
 
     <!-- ==================== SUB-HEADER OPERATIVO ==================== -->
     <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
@@ -20,18 +22,18 @@
                 <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Control de inventario inmobiliario, configuración de capacidad de camas por habitación (<strong>1 Cama = 1 Persona</strong>) y zonificación física por niveles bajo las categorías canónicas <strong>Estándar</strong> y <strong>VIP</strong>.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <button class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold transition-all shadow-sm" onclick="abrirModalPisos()" type="button">
+                @if (Model.PuedeAdministrarPisos) { <button class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold transition-all shadow-sm" onclick="abrirModalPisos()" type="button">
                     <span class="material-symbols-outlined text-[20px]">layers</span>
                     <span>Gestionar Pisos (@Model.Pisos.Count)</span>
-                </button>
+                </button> }
                 <a class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page-handler="Export" title="Exportar CSV">
                     <span class="material-symbols-outlined text-[19px]">file_download</span>
                     <span>Exportar</span>
                 </a>
-                <a class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group" asp-page="Crear">
+                @if (Model.PuedeAdministrarHabitaciones) { <a class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group" asp-page="Crear">
                     <span class="material-symbols-outlined text-[20px] text-secondary-container transition-transform group-hover:rotate-45">key</span>
                     <span>+ Nueva Habitación</span>
-                </a>
+                </a> }
             </div>
         </div>
 
@@ -240,10 +242,13 @@
                             <span class="font-label-sm text-label-sm text-outline">@h.NroCamas × $@Model.Dinero(precio)</span>
                             <div class="flex items-baseline gap-1"><span class="font-headline-sm text-headline-sm font-bold text-on-surface">$@Model.Dinero(precioTotal)</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
                         </div>
-                        <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Ver y editar detalle de la habitación">
+                        <div class="flex gap-2"><a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Ver detalle">
+                            <span class="material-symbols-outlined text-[16px]">visibility</span><span>Detalle</span>
+                        </a>
+                        @if (Model.PuedeAdministrarHabitaciones) { <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Editar habitación">
                             <span class="material-symbols-outlined text-[16px]">edit</span>
                             <span>Editar habitación</span>
-                        </a>
+                        </a> }</div>
                     </div>
                 </div>
             }
@@ -293,7 +298,8 @@
                                 <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">$@Model.Dinero(precioTotal) / noche</td>
                                 <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold">@Model.EstadoEtiqueta(estado)</span></td>
                                 <td class="py-3 px-4 text-right">
-                                    <a class="p-1 hover:text-on-surface text-outline" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Editar"><span class="material-symbols-outlined text-[18px]">edit</span></a>
+                                    <a class="p-1 hover:text-on-surface text-outline" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Ver detalle"><span class="material-symbols-outlined text-[18px]">visibility</span></a>
+                                    @if (Model.PuedeAdministrarHabitaciones) { <a class="p-1 hover:text-on-surface text-outline" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Editar"><span class="material-symbols-outlined text-[18px]">edit</span></a> }
                                 </td>
                             </tr>
                         }
@@ -314,10 +320,10 @@
                         <p class="font-body-sm text-body-sm text-on-surface-variant">Tabla maestra de zonificación vertical (Entidad de Base de Datos: <code class="font-mono text-outline font-semibold">PISOS</code>)</p>
                     </div>
                 </div>
-                <button class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors" onclick="abrirModalPisos()" type="button">
+                @if (Model.PuedeAdministrarPisos) { <button class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors" onclick="abrirModalPisos()" type="button">
                     <span class="material-symbols-outlined text-[18px]">add_circle</span>
                     <span>Registrar Nuevo Nivel</span>
-                </button>
+                </button> }
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -378,6 +384,8 @@
             </button>
         </div>
         <div class="p-6 flex flex-col gap-4">
+            @if (Model.PuedeAdministrarPisos)
+            {
             <form method="post" asp-page-handler="GuardarPiso" class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3">
                 <span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">Añadir / Actualizar Nivel</span>
                 <div class="grid grid-cols-3 gap-2">
@@ -390,6 +398,7 @@
                 </div>
                 <button class="self-end px-4 py-1.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all" type="submit">+ Guardar Nivel</button>
             </form>
+            }
             <div class="flex flex-col gap-2 max-h-56 overflow-y-auto">
                 <span class="font-label-sm text-label-sm text-outline uppercase font-semibold">Pisos Existentes</span>
                 @foreach (var p in Model.Pisos)

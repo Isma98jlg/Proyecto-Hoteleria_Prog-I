@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Hoteleria_App.Security;
 
 namespace Hoteleria_App.Pages.Habitaciones;
 
+[Authorize(Policy = HotelPermissionPolicies.CrudHabitaciones)]
 public class EditarModel : PageModel
 {
     private readonly HoteleriaDbContext _context;
@@ -25,12 +28,14 @@ public class EditarModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(long id)
     {
-        Habitacion = await _context.Habitaciones.FindAsync(id);
+        var habitacion = await _context.Habitaciones.FindAsync(id);
         
-        if (Habitacion == null)
+        if (habitacion is null)
         {
             return NotFound();
         }
+
+        Habitacion = habitacion;
 
         await CargarDatosAsync();
         return Page();
@@ -39,6 +44,11 @@ public class EditarModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         await CargarDatosAsync();
+
+        if (Habitacion.NroCamas < 1) ModelState.AddModelError("Habitacion.NroCamas", "Debe registrar al menos una cama.");
+        if (!await _context.Pisos.AnyAsync(p => p.NroPiso == Habitacion.NroPiso)) ModelState.AddModelError("Habitacion.NroPiso", "Seleccione un piso válido.");
+        if (!await _context.TiposVip.AnyAsync(t => t.TipoVipNombre == Habitacion.TipoVipNombre)) ModelState.AddModelError("Habitacion.TipoVipNombre", "Seleccione una categoría válida.");
+        if (!new[] { "LIBRE", "OCUPADO", "MANTENIMIENTO" }.Contains(Habitacion.Estado)) ModelState.AddModelError("Habitacion.Estado", "Seleccione un estado válido.");
 
         if (!ModelState.IsValid)
         {

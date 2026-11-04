@@ -3,9 +3,11 @@ using Hoteleria_App.Models;
 using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hoteleria_App.Pages;
 
+[Authorize(Roles = "admin")]
 public class IndexModel : PageModel
 {
     private readonly IHabitacionService _habitacionService;
@@ -39,7 +41,7 @@ public class IndexModel : PageModel
         TotalReservas = reservas.Count;
         ReservasPendientes = reservas.Count(r => r.EstadoReserva == "PENDIENTE");
         ReservasConfirmadas = reservas.Count(r => r.EstadoReserva == "CONFIRMADA");
-        TotalClientes = await _context.Usuarios.CountAsync();
+        TotalClientes = await _context.Usuarios.CountAsync(u => u.CargoId == null);
 
         HabitacionesPorPiso = habitaciones
             .GroupBy(h => h.NroPiso)
