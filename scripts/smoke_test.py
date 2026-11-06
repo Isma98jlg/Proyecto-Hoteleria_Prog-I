@@ -69,9 +69,8 @@ def error_de(body):
     return re.sub(r"<[^>]+>", " ", m.group(1)).strip() if m else ""
 
 
-def crear_reserva(c, usuario, inicio, habitacion, noches=1, estado="PENDIENTE"):
-    return c.post("/Reservas", "/Reservas?handler=Crear", {"Reserva.UsuarioId": usuario, "Reserva.InicioReserva": inicio, "Reserva.TotalNoches": noches,
-                                                            "Reserva.EstadoReserva": estado, "Reserva.HabitacionIds": habitacion})
+def crear_reserva(c, usuario, inicio, habitacion, noches=1):
+    return c.post("/Reservas", "/Reservas?handler=Crear", {"Reserva.UsuarioId": usuario, "Reserva.InicioReserva": inicio, "Reserva.TotalNoches": noches, "Reserva.HabitacionIds": habitacion})
 
 
 def estado_reserva(c, rid, estado):
@@ -199,7 +198,7 @@ check("no se marca ocupada a mano", s == 200, str(s))
 worker.post(p, p, {"Habitacion.NroPiso": 2, "Habitacion.NroCamas": 2, "Habitacion.TipoVipNombre": "ESTANDAR", "Habitacion.Estado": "LIBRE"})
 
 # --- T7 check-in / check-out
-s, _, _ = crear_reserva(worker, gid, hoy, 202, noches=2, estado="CONFIRMADA")
+s, _, _ = crear_reserva(worker, gid, hoy, 202, noches=2)
 rc = ultima_reserva(worker, gid)
 check("reserva de hoy", s == 302, str(s))
 check("confirmar no ocupa la habitación", estado_hab(worker, 202) == "LIBRE")
@@ -220,7 +219,7 @@ tok = token(f)
 exitos_max = 0
 for i in range(12):
     res = []
-    campos = {"Reserva.UsuarioId": gid, "Reserva.InicioReserva": d(150 + i * 3), "Reserva.TotalNoches": 1, "Reserva.EstadoReserva": "PENDIENTE", "Reserva.HabitacionIds": 301, "__RequestVerificationToken": tok}
+    campos = {"Reserva.UsuarioId": gid, "Reserva.InicioReserva": d(150 + i * 3), "Reserva.TotalNoches": 1, "Reserva.HabitacionIds": 301, "__RequestVerificationToken": tok}
     ts = [threading.Thread(target=lambda: res.append(admin.req("/Reservas?handler=Crear", campos)[0])) for _ in range(8)]
     [t.start() for t in ts]
     [t.join() for t in ts]
@@ -239,22 +238,27 @@ anon = Client()
 s, _, loc = anon.post("/Account/Registro", "/Account/Registro", {**persona("R" + doc, nuevo), "Password": "Registro-Prueba-1!", "Confirmacion": "Registro-Prueba-1!", "Cargo": "admin", "Persona.CargoId": 1})
 check("registro crea cuenta e inicia sesión", s == 302 and "Portal" in loc, f"{s} {loc}")
 check("registrado queda como huésped", "AccessDenied" in anon.get("/Reservas")[2])
-s, body, _ = anon.get(f"/Portal/Reservar?Q=vip&Inicio={d(70)}&Noches=2")
+s, body, _ = anon.get(f"/Portal/Reservar?handler=Disponibles&q=vip&inicio={d(70)}&noches=2")
 tipos = admin.get("/TiposVip")[1]
 check("los tipos iniciales son ESTANDAR y VIP", "ESTANDAR" in tipos and "VIP" in tipos and not any(x in tipos for x in ("SUPERIOR", "SUITE", "PRESIDENCIAL")))
-check("portal busca habitaciones", s == 200 and "VIP" in body and "ESTANDAR" not in body)
+datos = json.loads(body) if s == 200 else {"habitaciones": []}
+coinciden = [h for h in datos["habitaciones"] if h["coincide"]]
+check("portal busca habitaciones", bool(coinciden) and all(h["categoria"] == "VIP" for h in coinciden), body[:200])
+check("cada habitación indica su piso", all(h["ubicacion"].startswith("Piso ") for h in datos["habitaciones"]), body[:200])
+filtradas = json.loads(anon.get(f"/Portal/Reservar?handler=Disponibles&personas=2&inicio={d(70)}&noches=2")[1])["habitaciones"]
+check("personas filtra por número exacto de camas", any(h["coincide"] for h in filtradas) and all(h["camas"] == 2 for h in filtradas if h["coincide"]))
 s, _, _ = anon.post(f"/Portal/Reservar?Inicio={d(70)}&Noches=2", f"/Portal/Reservar", {"Inicio": d(70), "Noches": 2, "HabitacionIds": 303})
 check("huésped reserva desde el portal", s == 302, str(s))
 portal = anon.get("/Portal")[1]
 mia = re.search(r"handler=Cancelar&amp;id=(\d+)|id=(\d+)&amp;handler=Cancelar|Cancelar\?id=(\d+)", portal)
 mid = next(g for g in mia.groups() if g) if mia else None
-check("reserva visible en el portal", mid is not None and "Pendiente" in portal)
+check("reserva visible en el portal y ya confirmada", mid is not None and "Confirmada" in portal and "Pendiente" not in portal)
 s, detalle, _ = anon.get(f"/Portal/Detalle/{mid}")
 check("detalle propio muestra la habitación elegida", s == 200 and "303" in detalle and "VIP" in detalle and "Segundo Piso" in detalle, str(s))
 check("detalle ajeno no disponible", guest.get(f"/Portal/Detalle/{mid}")[0] == 404)
 _, f, _ = worker.get("/Reservas")
 guest.req(f"/Portal?handler=Cancelar&id={mid}", {"__RequestVerificationToken": token(guest.get("/Account/CambiarContrasena")[1])})
-check("otro huésped no cancela reservas ajenas", "Pendiente" in anon.get("/Portal")[1])
+check("otro huésped no cancela reservas ajenas", "Confirmada" in anon.get("/Portal")[1])
 _, f, _ = anon.get("/Portal")
 anon.req(f"/Portal?handler=Cancelar&id={mid}", {"__RequestVerificationToken": token(f)})
 check("huésped cancela su reserva", "Cancelada" in anon.get("/Portal")[1])
@@ -379,10 +383,14 @@ txt = "".join(recibido)
 check("SignalR entrega el aviso de reserva en vivo", "reservaActualizada" in txt, txt[:200])
 check("el aviso no lleva datos personales", "Prueba" not in txt and "@" not in txt)
 
-# --- Copiloto: el permiso se comprueba sin llamar al modelo.
-check("huésped no usa el copiloto", "AccessDenied" in guest.get("/Chat")[2])
+# --- Asistente: el permiso se comprueba sin llamar al modelo.
 check("huésped abre su asistente", guest.get("/Portal/Asistente")[0] == 200)
 check("personal no usa el asistente del huésped", "AccessDenied" in admin.get("/Portal/Asistente")[2])
+
+# --- Clima: permisos y validación, sin llamar al servicio externo.
+check("personal no consulta el clima del huésped", "AccessDenied" in admin.get("/Portal/Clima?lat=1&lon=1")[2])
+check("coordenadas fuera de rango rechazadas", guest.get("/Portal/Clima?lat=500&lon=1")[0] == 400)
+check("clima sin datos rechazado", guest.get("/Portal/Clima")[0] == 400)
 
 # Vistas restantes
 for ruta in ["/Habitaciones/PorPiso", "/Habitaciones/PorTipoVip", "/Privacy", "/Reservas/Crear", "/Portal/Perfil", "/Account/CambiarContrasena"]:

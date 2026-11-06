@@ -1,6 +1,6 @@
 // Abre los formularios y detalles en una ventana flotante, sin salir de la página actual.
 (() => {
-    const RUTAS_FLOTANTES = /^\/(reservas\/(crear|editar|detalles)|habitaciones\/(crear|editar|detalles)|usuarios\/(crear|editar|detalles)|empleados\/editar|portal\/(reservar|perfil|detalle|asistente)|account\/cambiarcontrasena|chat)(\/|$)/i;
+    const RUTAS_FLOTANTES = /^\/(reservas\/(crear|editar|detalles)|habitaciones\/(crear|editar|detalles)|usuarios\/(crear|editar|detalles)|empleados\/editar|portal\/(reservar|perfil|detalle|asistente)|account\/cambiarcontrasena)(\/|$)/i;
 
     let ventana = null;
     let huboCambios = false;
@@ -18,7 +18,7 @@
     // Cada ventana usa el ancho que necesita su contenido.
     function anchoPara(ruta) {
         if (/^\/portal\/asistente/i.test(ruta)) return 'max-w-lg vf-alto-fijo';
-        if (/^\/(chat|portal\/perfil|account\/cambiarcontrasena)/i.test(ruta)) return 'max-w-lg';
+        if (/^\/(portal\/perfil|account\/cambiarcontrasena)/i.test(ruta)) return 'max-w-lg';
         if (/^\/reservas\//i.test(ruta)) return 'max-w-4xl';
         return 'max-w-3xl';
     }
@@ -32,7 +32,7 @@
         foco = document.activeElement;
         ventana = document.createElement('div');
         ventana.id = 'ventana-flotante';
-        ventana.className = 'vf-fondo fixed inset-0 z-[60] flex ' + (/^\/(chat|portal\/asistente)/i.test(ruta) ? 'vf-izquierda' : 'vf-centro');
+        ventana.className = 'vf-fondo fixed inset-0 z-[60] flex ' + (/^\/portal\/asistente/i.test(ruta) ? 'vf-izquierda' : 'vf-centro');
         ventana.setAttribute('role', 'dialog');
         ventana.setAttribute('aria-modal', 'true');
         ventana.setAttribute('aria-labelledby', 'ventana-flotante-titulo');

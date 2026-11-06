@@ -22,7 +22,7 @@ Requisito: **Docker Desktop**.
 - **Administrador por defecto:** el sistema lo crea una sola vez con `ADMIN_EMAIL` y `ADMIN_PASSWORD`. Después, su nombre, correo y contraseña se cambian desde la app. No hay contraseñas en el código.
 - **Permisos por cargo:** administrador, trabajador, huésped y cargos personalizados. Cada huésped solo ve sus datos.
 - **Reservas con reglas reales:** estados con check-in y check-out, y PostgreSQL impide las reservas solapadas.
-- **Integraciones:** Redis (caché y SignalR), SignalR (avisos en vivo), Algolia (búsqueda), API REST `/api/v1` con OpenAPI y copiloto de IA para recepción.
+- **Integraciones:** Redis (caché y SignalR), SignalR (avisos en vivo), Algolia (búsqueda), API REST `/api/v1` con OpenAPI y asistente de reservas con IA para huéspedes.
 - **Despliegue:** `Dockerfile` y `render.yaml` para Render.
 
 Las reglas de configuración, negocio y despliegue están en [`AGENTS.md`](AGENTS.md).

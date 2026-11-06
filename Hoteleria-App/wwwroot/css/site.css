@@ -175,6 +175,58 @@ html.en-ventana::-webkit-scrollbar-thumb {
     background: #c6c6cd padding-box;
 }
 
+/* ==========================================================================
+   Panel del clima del huésped
+   ========================================================================== */
+.clima-boton,
+.clima-panel {
+    background: linear-gradient(150deg, #131b2e 0%, #2d3f6b 60%, #904d00 135%);
+}
+
+.clima-boton {
+    box-shadow: -6px 8px 24px -8px rgb(19 27 46 / 0.55);
+    transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease-out, padding 160ms ease-out;
+}
+
+.clima-boton:hover {
+    padding-right: 1.1rem;
+}
+
+.clima-boton.clima-oculto {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(100%);
+}
+
+.clima-panel {
+    visibility: hidden;
+    opacity: 0;
+    box-shadow: 0 24px 60px -16px rgb(19 27 46 / 0.6);
+    transform: translateX(calc(100% + 1.5rem));
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out, visibility 0s linear 280ms;
+}
+
+.clima-panel.clima-abierto {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out;
+}
+
+.clima-icono {
+    font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 48;
+    color: #ffb77d;
+    filter: drop-shadow(0 6px 16px rgb(255 183 125 / 0.35));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .clima-boton,
+    .clima-panel,
+    .clima-panel.clima-abierto {
+        transition: none;
+    }
+}
+
 /* Ligaduras de iconos Material Symbols Outlined */
 .material-symbols-outlined {
     font-variation-settings:

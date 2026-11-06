@@ -1,47 +1,25 @@
 @page
 @model Hoteleria_App.Pages.Portal.ReservarModel
+@using Hoteleria_App.Services
 @{
     ViewData["Title"] = "Reservar habitación";
-    var entrada = Model.Inicio?.ToString("yyyy-MM-dd");
 }
-<main class="flex flex-col gap-6 w-full max-w-5xl">
-    <section><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">GRANDSTAY · RESERVAS</span><h1 class="font-headline-lg text-headline-lg mt-1">Reservar habitación</h1><p class="text-on-surface-variant">Busque por categoría o piso, por ejemplo «VIP» o «estándar».</p></section>
-    <form method="get" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-        <label class="flex flex-col gap-1 md:col-span-2">Buscar<input asp-for="Q" name="Q" placeholder="VIP, estándar, planta baja…" class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
-        <label class="flex flex-col gap-1">Entrada<input type="date" name="Inicio" value="@entrada" min="@Model.Hoy.ToString("yyyy-MM-dd")" class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
-        <label class="flex flex-col gap-1">Noches<input type="number" name="Noches" value="@Model.Noches" min="1" max="365" class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
-        <div class="md:col-span-4 flex items-center justify-between gap-3">
-            <small class="text-outline">Búsqueda: @(Model.UsaAlgolia ? "Algolia" : "base de datos")</small>
-            <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Buscar</button>
-        </div>
-    </form>
-    <form method="post" class="flex flex-col gap-4">
-        <input type="hidden" name="Inicio" value="@entrada" />
-        <input type="hidden" name="Noches" value="@Model.Noches" />
-        <input type="hidden" name="Q" value="@Model.Q" />
+<main class="flex w-full max-w-5xl flex-col gap-6">
+    <section><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">GRANDSTAY · RESERVAS</span><h1 class="font-headline-lg text-headline-lg mt-1">Reservar habitación</h1><p class="text-on-surface-variant">Indique las fechas y cuántas personas viajan: le mostramos las habitaciones libres que encajan.</p></section>
+    <form method="post" class="flex flex-col gap-4 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-4">
         <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
-        @if (!Model.Resultados.Any())
-        {
-            <p class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-10 text-center text-outline">No hay habitaciones disponibles con esos criterios.</p>
-        }
-        else
-        {
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                @foreach (var h in Model.Resultados)
-                {
-                    <label class="flex items-center justify-between gap-3 bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 cursor-pointer has-[:checked]:border-primary">
-                        <span class="flex items-center gap-3">
-                            <input type="checkbox" name="HabitacionIds" value="@h.HabitacionId" class="h-4 w-4 accent-primary" />
-                            <span><strong class="block">Habitación @h.Codigo</strong><small class="text-on-surface-variant">@h.TipoVip · @h.NroCamas cama(s)</small></span>
-                        </span>
-                        <span class="text-right"><strong class="block">$@h.PrecioNoche.ToString("N0")</strong><small class="text-outline">por noche</small></span>
-                    </label>
-                }
-            </div>
-            <div class="flex justify-between gap-3">
-                <a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Volver</a>
-                <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Confirmar reserva</button>
-            </div>
-        }
+        <div class="grid grid-cols-2 gap-2">
+            <label class="flex flex-col gap-1 text-xs font-medium text-on-surface">Entrada
+                <input id="portal-inicio" type="date" name="Inicio" value="@Model.Inicio?.ToString("yyyy-MM-dd")" min="@Model.Hoy.ToString("yyyy-MM-dd")" required class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm font-normal" />
+            </label>
+            <label class="flex flex-col gap-1 text-xs font-medium text-on-surface">Noches
+                <input id="portal-noches" type="number" name="Noches" value="@Model.Noches" min="1" max="365" required class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm font-normal" />
+            </label>
+        </div>
+        <partial name="_SelectorHabitaciones" model='new SelectorHabitacionesVista("HabitacionIds", "#portal-inicio", "#portal-noches", Model.HabitacionIds)' />
+        <div class="flex items-center justify-between gap-3 border-t border-surface-container-high pt-3">
+            <span class="text-sm text-on-surface-variant"><span id="selected-room-count">0</span> habitación(es) · Total <strong id="reservation-estimate" class="text-on-surface">$0</strong></span>
+            <button type="submit" class="rounded-lg bg-primary px-5 py-2 font-semibold text-on-primary">Confirmar reserva</button>
+        </div>
     </form>
 </main>

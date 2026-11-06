@@ -7,23 +7,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hoteleria_App.Pages.Portal;
 
-/// <summary>
-/// Búsqueda y reserva para huéspedes. Algolia ordena el catálogo por relevancia y PostgreSQL
-/// decide la disponibilidad. El titular es siempre quien inició sesión.
-/// </summary>
+/// <summary>Reserva para huéspedes. El titular es siempre quien inició sesión.</summary>
 [Authorize(Roles = CargosSistema.Huesped)]
-public class ReservarModel(IReservaService reservas, IBuscadorHabitaciones buscador, RelojHotel reloj) : PageModel
+public class ReservarModel(IReservaService reservas, SelectorHabitaciones selector, RelojHotel reloj) : PageModel
 {
-    [BindProperty(SupportsGet = true)] public string? Q { get; set; }
-    [BindProperty(SupportsGet = true)] public DateTime? Inicio { get; set; }
-    [BindProperty(SupportsGet = true)] public int Noches { get; set; } = 1;
+    [BindProperty] public DateTime? Inicio { get; set; }
+    [BindProperty] public int Noches { get; set; } = 1;
     [BindProperty] public List<long> HabitacionIds { get; set; } = [];
 
-    public List<HabitacionDisponibleViewModel> Resultados { get; private set; } = [];
-    public bool UsaAlgolia => buscador.UsaAlgolia;
     public DateTime Hoy => reloj.Hoy;
 
-    public async Task OnGetAsync() => await CargarAsync();
+    public void OnGet() => Inicio = reloj.Hoy.AddDays(1);
+
+    public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1, int? personas = null, string? categoria = null, string? q = null) =>
+        await selector.BuscarAsync(inicio, noches, personas, categoria, q, HttpContext.RequestAborted) is { } resultado ? new JsonResult(resultado) : BadRequest();
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -32,33 +29,16 @@ public class ReservarModel(IReservaService reservas, IBuscadorHabitaciones busca
             UsuarioId = User.Id() ?? 0,
             InicioReserva = Inicio ?? default,
             TotalNoches = Noches,
-            EstadoReserva = EstadosReserva.Pendiente,
             HabitacionIds = HabitacionIds
         });
         if (resultado.Ok)
         {
-            TempData["MensajeExito"] = "Reserva registrada. El hotel la confirmará en breve.";
+            TempData["MensajeExito"] = "Su reserva está confirmada.";
             return RedirectToPage("Index");
         }
 
         ModelState.AddModelError(string.Empty, resultado.Error!);
-        await CargarAsync();
-        return Page();
-    }
-
-    private async Task CargarAsync()
-    {
         Inicio ??= reloj.Hoy.AddDays(1);
-        Noches = Math.Clamp(Noches, 1, 365);
-        var entrada = DateTime.SpecifyKind(Inicio.Value.Date, DateTimeKind.Unspecified);
-        if (entrada < reloj.Hoy) return;
-
-        var disponibles = (await reservas.GetHabitacionesDisponiblesAsync(entrada, entrada.AddDays(Noches)))
-            .ToDictionary(h => h.HabitacionId);
-        var catalogo = await buscador.BuscarAsync(Q);
-        Resultados = catalogo
-            .Where(c => disponibles.ContainsKey(c.HabitacionId))
-            .Select(c => disponibles[c.HabitacionId])
-            .ToList();
+        return Page();
     }
 }

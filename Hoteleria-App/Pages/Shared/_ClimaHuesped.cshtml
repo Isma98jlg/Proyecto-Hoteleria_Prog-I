@@ -1,0 +1,48 @@
+<div id="clima-huesped">
+    <button data-clima-abrir type="button" aria-expanded="false" aria-controls="clima-panel" aria-label="Ver el clima de su zona" title="Clima de su zona" class="clima-boton fixed right-0 top-24 z-30 flex items-center gap-1.5 rounded-l-2xl py-2.5 pl-3.5 pr-3 text-sm font-semibold text-white">
+        <span data-clima-boton-icono class="material-symbols-outlined text-[22px]" aria-hidden="true">partly_cloudy_day</span>
+        <span data-clima-boton-temperatura class="tabular-nums">Clima</span>
+    </button>
+
+    <aside id="clima-panel" data-clima-panel aria-label="Clima de su zona" class="clima-panel fixed right-3 top-20 z-30 flex max-h-[calc(100dvh-6rem)] w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-y-auto rounded-3xl text-white sm:right-5">
+        <header class="flex items-center justify-between gap-3 px-5 pt-4">
+            <h2 class="text-xs font-semibold uppercase tracking-[.16em] text-white/70">Clima en su zona</h2>
+            <button data-clima-cerrar type="button" aria-label="Cerrar" class="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </header>
+
+        <div data-clima-resultado class="hidden flex-col gap-4 px-5 pb-1 pt-3">
+            <div class="flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <p data-clima-lugar class="flex items-center gap-1 truncate text-sm text-white/80"></p>
+                    <strong data-clima-temperatura class="mt-1 block text-5xl font-semibold leading-none tracking-tight tabular-nums"></strong>
+                    <p data-clima-descripcion class="mt-2 text-sm font-medium"></p>
+                </div>
+                <span data-clima-icono class="clima-icono material-symbols-outlined shrink-0 text-[72px] leading-none" aria-hidden="true"></span>
+            </div>
+            <dl class="grid grid-cols-3 gap-2 text-center">
+                <div class="rounded-2xl bg-white/10 px-2 py-2.5"><dt class="text-[11px] text-white/70">Sensación</dt><dd data-clima-sensacion class="mt-0.5 font-semibold tabular-nums"></dd></div>
+                <div class="rounded-2xl bg-white/10 px-2 py-2.5"><dt class="text-[11px] text-white/70">Humedad</dt><dd data-clima-humedad class="mt-0.5 font-semibold tabular-nums"></dd></div>
+                <div class="rounded-2xl bg-white/10 px-2 py-2.5"><dt class="text-[11px] text-white/70">Viento</dt><dd data-clima-viento class="mt-0.5 font-semibold tabular-nums"></dd></div>
+            </dl>
+        </div>
+
+        <div data-clima-vacio class="px-5 pb-1 pt-3 text-sm text-white/80">Consulte el clima con su ubicación o escribiendo una ciudad.</div>
+        <p data-clima-aviso class="hidden px-5 pt-3 text-sm text-white/90" aria-live="polite"></p>
+
+        <div class="flex flex-col gap-2 p-5">
+            <button data-clima-ubicacion type="button" class="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-primary-container transition-colors hover:bg-white/90">
+                <span class="material-symbols-outlined text-[18px]">my_location</span>Usar mi ubicación
+            </button>
+            <form data-clima-formulario class="flex items-center gap-2">
+                <input data-clima-ciudad type="search" maxlength="60" aria-label="Ciudad" placeholder="O escriba su ciudad" class="clima-campo min-w-0 flex-1 rounded-xl border-0 bg-white/10 px-3 py-2.5 text-sm text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/50" />
+                <button type="submit" aria-label="Buscar ciudad" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 transition-colors hover:bg-white/25">
+                    <span class="material-symbols-outlined text-[20px]">search</span>
+                </button>
+            </form>
+            <small class="mt-1 text-[11px] leading-4 text-white/60">Su zona aproximada se consulta en <a href="https://open-meteo.com/" target="_blank" rel="noopener" class="underline">Open-Meteo</a> y no se guarda en su cuenta.</small>
+        </div>
+    </aside>
+</div>
+<script src="~/js/clima.js" asp-append-version="true" defer></script>

@@ -112,11 +112,11 @@
                             <legend class="px-1 font-label-sm text-label-sm text-on-surface-variant">Habitaciones de la reserva (las fechas se revisan al guardar)</legend>
                             @foreach (var h in Model.Detalle.Habitaciones)
                             {
-                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" checked class="h-4 w-4 accent-primary" />@h.CodigoHabitacion · @h.TipoVip · $@h.PrecioNochePactado.ToString("N0") / noche</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" checked class="h-4 w-4 accent-primary" />@h.CodigoHabitacion · @h.TipoVip · @h.Ubicacion · $@h.PrecioNochePactado.ToString("N0") / noche</label>
                             }
                             @foreach (var h in Model.OtrasHabitaciones)
                             {
-                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" class="h-4 w-4 accent-primary" />@h.Codigo · @h.TipoVip · $@h.PrecioNoche.ToString("N0") / noche</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" class="h-4 w-4 accent-primary" />@h.Codigo · @h.TipoVip · @h.Ubicacion · $@h.PrecioNoche.ToString("N0") / noche</label>
                             }
                         </fieldset>
                     }

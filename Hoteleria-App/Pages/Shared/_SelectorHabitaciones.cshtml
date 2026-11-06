@@ -1,0 +1,17 @@
+@model Hoteleria_App.Services.SelectorHabitacionesVista
+<div class="flex flex-col gap-3" data-selector-habitaciones data-campo="@Model.Campo" data-inicio="@Model.Inicio" data-noches="@Model.Noches" data-seleccionadas="@string.Join(",", Model.Seleccionadas)">
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <label class="flex flex-col gap-1 text-xs font-medium text-on-surface">Personas
+            <input data-filtro-personas type="number" min="1" max="50" value="1" class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm font-normal" />
+        </label>
+        <label class="flex flex-col gap-1 text-xs font-medium text-on-surface">Categoría
+            <select data-filtro-categoria class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm font-normal"><option value="">Todas</option></select>
+        </label>
+        <label class="col-span-2 flex flex-col gap-1 text-xs font-medium text-on-surface">Buscar
+            <input data-filtro-texto type="search" maxlength="60" placeholder="Planta baja, piso 2, VIP…" class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm font-normal" />
+        </label>
+    </div>
+    <div data-lista class="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-xl border border-surface-container-high bg-surface-container-low/60 p-2.5" aria-live="polite"></div>
+    <small data-motor class="text-[11px] text-outline"></small>
+</div>
+<script src="~/js/selector-habitaciones.js" asp-append-version="true"></script>

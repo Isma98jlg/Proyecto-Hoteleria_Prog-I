@@ -151,7 +151,6 @@
                         </div>
                         <span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
                     </button>
-                    @if (canManageReservations) { <a class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors" asp-page="/Chat/Index"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-outline">auto_awesome</span><span>Copiloto de reservas</span></div></a> }
                 </div>
             </div>
         </aside>
@@ -243,15 +242,9 @@
         </div>
     </main>
 
-    @if (canManageReservations)
-    {
-        <a asp-page="/Chat/Index" aria-label="Copiloto de reservas" title="Copiloto de reservas" class="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-xl transition duration-200 hover:-translate-y-0.5 hover:bg-on-surface-variant hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/15">
-            <span class="material-symbols-outlined text-[25px]">auto_awesome</span>
-        </a>
-    }
-
     @if (User.IsInRole(CargosSistema.Huesped))
     {
+        <partial name="_ClimaHuesped" />
         <a asp-page="/Portal/Asistente" aria-label="Asistente de reservas" title="Asistente de reservas" class="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-xl transition duration-200 hover:-translate-y-0.5 hover:bg-on-surface-variant hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/15">
             <span class="material-symbols-outlined text-[25px]">auto_awesome</span>
         </a>

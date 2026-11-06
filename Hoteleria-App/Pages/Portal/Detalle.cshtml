@@ -20,7 +20,7 @@
         @foreach (var h in r.Habitaciones)
         {
             <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div><span class="text-sm text-outline">Habitación</span><strong class="block mt-1 font-mono">@h.CodigoHabitacion</strong></div>
+                <div><span class="text-sm text-outline">Habitación</span><strong class="block mt-1 font-mono">@h.CodigoHabitacion</strong><small class="block text-on-surface-variant">@h.Ubicacion</small></div>
                 <div><span class="text-sm text-outline">Categoría</span><strong class="block mt-1">@h.TipoVip</strong></div>
                 <div><span class="text-sm text-outline">Ubicación</span><strong class="block mt-1">@h.ReferenciaPiso</strong></div>
                 <div><span class="text-sm text-outline">Camas</span><strong class="block mt-1">@h.NroCamas</strong></div>

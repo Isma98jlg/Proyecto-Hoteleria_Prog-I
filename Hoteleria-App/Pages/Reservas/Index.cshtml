@@ -19,7 +19,7 @@
                     </span>
                 </div>
                 <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Gestión de Reservas</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Crear, editar y consultar reservas de huéspedes, asignar habitaciones y gestionar estados de estancia (Pendiente, Confirmada, En curso, Finalizada, Cancelada).</p>
+                <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Crear, editar y consultar reservas de huéspedes, asignar habitaciones y gestionar estados de estancia (Confirmada, En curso, Finalizada, Cancelada).</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <button type="button" onclick="abrirModalReserva()" class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-on-surface-variant text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-md group">
@@ -204,31 +204,8 @@
                         <div class="flex items-center gap-2.5"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">3</span><div><h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Habitaciones asignadas</h3><p class="text-xs text-outline">Elija una o más habitaciones libres para las fechas seleccionadas.</p></div></div>
                         <span class="rounded-md border border-surface-container-high bg-surface-container px-2 py-1 text-[11px] font-mono text-on-surface-variant">1 reserva → varias habitaciones</span>
                     </div>
-                    <div id="available-rooms" class="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-xl border border-surface-container-high bg-surface-container-low/60 p-2.5">
-                        @if (!Model.Habitaciones.Any())
-                        {
-                            <p class="py-8 text-center text-sm text-outline">No hay habitaciones disponibles para esas fechas.</p>
-                        }
-                        @foreach (var room in Model.Habitaciones)
-                        {
-                            <label class="room-option flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-surface-container-high bg-surface-container-lowest p-3 transition-colors hover:border-primary/40">
-                                <span class="flex min-w-0 items-center gap-3">
-                                    <input type="checkbox" name="Reserva.HabitacionIds" value="@room.HabitacionId" data-rate="@(room.PrecioCama * room.NroCamas)" class="room-checkbox h-4 w-4 rounded border-outline accent-primary" />
-                                    <span class="flex min-w-0 flex-col"><strong class="truncate text-sm font-semibold text-on-surface">Habitación @room.Codigo</strong><small class="text-xs text-on-surface-variant">@room.TipoVip · @room.NroCamas cama(s)</small></span>
-                                </span>
-                                <span class="shrink-0 text-right"><strong class="block text-sm font-bold tabular-nums text-primary">$@((room.PrecioCama * room.NroCamas).ToString("N0"))</strong><small class="text-[11px] text-outline">por noche</small></span>
-                            </label>
-                        }
-                    </div>
+                    <partial name="_SelectorHabitaciones" model='new SelectorHabitacionesVista("Reserva.HabitacionIds", "#reservation-start", "#reservation-nights", Model.Reserva.HabitacionIds)' />
                     <span asp-validation-for="Reserva.HabitacionIds" class="text-xs text-error"></span>
-                </section>
-
-                <section class="flex flex-col gap-3 rounded-xl border border-surface-container-high bg-surface-container-low/50 p-4">
-                    <div class="flex items-center gap-2.5"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">4</span><div><h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Estado inicial</h3><p class="text-xs text-outline">Puede actualizarse después desde la reserva.</p></div></div>
-                    <select asp-for="Reserva.EstadoReserva" class="w-full rounded-lg border border-surface-container-high bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:max-w-xs">
-                        <option value="PENDIENTE">Pendiente</option>
-                        <option value="CONFIRMADA">Confirmada</option>
-                    </select>
                 </section>
             </div>
             <footer class="flex shrink-0 flex-col gap-3 border-t border-surface-container-high bg-surface-container-lowest px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
@@ -254,10 +231,7 @@
             const modal = document.getElementById('reservationModal');
             const start = document.getElementById('reservation-start');
             const nights = document.getElementById('reservation-nights');
-            const list = document.getElementById('available-rooms');
             const userSelect = document.getElementById('reservation-user');
-            const currency = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
-            const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
             window.abrirModalReserva = () => { modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('overflow-hidden'); };
             window.cerrarModalReserva = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); };
             function updateSelectedUser() {
@@ -280,37 +254,12 @@
                 checkout.setDate(checkout.getDate() + Number(nights.value));
                 document.getElementById('reservation-checkout').textContent = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }).format(checkout);
             }
-            function updateEstimate() {
-                const selected = [...list.querySelectorAll('.room-checkbox:checked')];
-                const total = selected.reduce((sum, item) => sum + Number(item.dataset.rate || 0), 0) * Math.max(1, Number(nights.value || 1));
-                document.getElementById('selected-room-count').textContent = selected.length;
-                document.getElementById('reservation-estimate').textContent = '$' + currency.format(total);
-                list.querySelectorAll('.room-checkbox').forEach(input => {
-                    input.closest('.room-option')?.classList.toggle('border-primary', input.checked);
-                    input.closest('.room-option')?.classList.toggle('bg-primary/5', input.checked);
-                });
-            }
-            async function loadRooms() {
-                if (!start.value || !nights.value || Number(nights.value) < 1) return;
-                list.innerHTML = '<p class="py-5 text-center text-outline">Buscando disponibilidad…</p>';
-                const url = new URL(window.location.href);
-                url.search = new URLSearchParams({ handler: 'Disponibles', inicio: start.value, noches: nights.value });
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error();
-                    const rooms = await response.json();
-                    list.innerHTML = rooms.length ? rooms.map(room => `<label class="room-option flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-surface-container-high bg-surface-container-lowest p-3 transition-colors hover:border-primary/40"><span class="flex min-w-0 items-center gap-3"><input type="checkbox" name="Reserva.HabitacionIds" value="${Number(room.habitacionId)}" data-rate="${Number(room.precioCama) * Number(room.nroCamas)}" class="room-checkbox h-4 w-4 rounded accent-primary" /><span class="flex min-w-0 flex-col"><strong class="truncate text-sm font-semibold text-on-surface">Habitación ${escapeHtml(room.codigo)}</strong><small class="text-xs text-on-surface-variant">${escapeHtml(room.tipoVip)} · ${Number(room.nroCamas)} cama(s)</small></span></span><span class="shrink-0 text-right"><strong class="block text-sm font-bold tabular-nums text-primary">$${currency.format(Number(room.precioCama) * Number(room.nroCamas))}</strong><small class="text-[11px] text-outline">por noche</small></span></label>`).join('') : '<p class="py-5 text-center text-sm text-outline">No hay habitaciones libres para esas fechas.</p>';
-                    updateEstimate();
-                } catch { list.innerHTML = '<p class="py-5 text-center text-error">Error al consultar habitaciones. Recargue la página e inténtelo de nuevo.</p>'; }
-            }
-            list.addEventListener('change', updateEstimate);
             userSelect.addEventListener('change', updateSelectedUser);
-            nights.addEventListener('change', () => { updateCheckout(); updateEstimate(); loadRooms(); });
-            start.addEventListener('change', () => { updateCheckout(); loadRooms(); });
+            nights.addEventListener('change', updateCheckout);
+            start.addEventListener('change', updateCheckout);
             document.addEventListener('keydown', event => { if (event.key === 'Escape') cerrarModalReserva(); });
             updateSelectedUser();
             updateCheckout();
-            updateEstimate();
             @if (Model.AbrirModalReserva) { <text>abrirModalReserva();</text> }
         })();
     </script>

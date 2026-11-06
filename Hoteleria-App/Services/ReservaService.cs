@@ -66,6 +66,7 @@ public class ReservaHabitacionDetalle
     public int NroCamas { get; set; }
     public string TipoVip { get; set; } = "";
     public string ReferenciaPiso { get; set; } = "";
+    public string Ubicacion { get; set; } = "";
     public decimal PrecioNochePactado { get; set; }
 }
 
@@ -84,6 +85,8 @@ public class HabitacionDisponibleViewModel
     public string TipoVip { get; set; } = "";
     public decimal PrecioCama { get; set; }
     public decimal PrecioNoche => NroCamas * PrecioCama;
+    public long NroPiso { get; set; }
+    public string Ubicacion { get; set; } = "";
 }
 
 public class ReservaCreateModel
@@ -94,7 +97,6 @@ public class ReservaCreateModel
     public DateTime InicioReserva { get; set; }
     [Range(1, 365, ErrorMessage = "El número de noches debe estar entre 1 y 365.")]
     public int TotalNoches { get; set; }
-    public string EstadoReserva { get; set; } = EstadosReserva.Pendiente;
     public List<long> HabitacionIds { get; set; } = new();
 }
 
@@ -183,6 +185,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
                 NroCamas = rh.Habitacion.NroCamas,
                 TipoVip = rh.Habitacion.TipoVipNombre,
                 ReferenciaPiso = rh.Habitacion.Piso.RefPiso ?? $"Piso {rh.Habitacion.NroPiso}",
+                Ubicacion = UbicacionHabitacion.Formatear(rh.Habitacion.NroPiso, rh.Habitacion.Piso.RefPiso),
                 PrecioNochePactado = rh.PrecioNochePactado
             }).ToList()
         };
@@ -208,7 +211,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
         var habitaciones = await HabitacionesLibresEn(inicio.Date, fin.Date, excluirReservaId, hoy)
             .AsNoTracking()
             .OrderBy(h => h.NroPiso).ThenBy(h => h.HabitacionId)
-            .Select(h => new { h.HabitacionId, h.NroPiso, h.TipoVip.Sigla, h.NroCamas, h.TipoVipNombre, h.TipoVip.PrecioCama })
+            .Select(h => new { h.HabitacionId, h.NroPiso, h.Piso.RefPiso, h.TipoVip.Sigla, h.NroCamas, h.TipoVipNombre, h.TipoVip.PrecioCama })
             .ToListAsync();
 
         return habitaciones.Select(h => new HabitacionDisponibleViewModel
@@ -217,7 +220,9 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
             Codigo = CodigoHabitacion.Formatear(h.NroPiso, h.Sigla, h.HabitacionId),
             NroCamas = h.NroCamas,
             TipoVip = h.TipoVipNombre,
-            PrecioCama = h.PrecioCama
+            PrecioCama = h.PrecioCama,
+            NroPiso = h.NroPiso,
+            Ubicacion = UbicacionHabitacion.Formatear(h.NroPiso, h.RefPiso)
         }).ToList();
     }
 
@@ -236,13 +241,12 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
             !ocupadas.Contains(h.HabitacionId) && (inicio > hoy || h.Estado == EstadosHabitacion.Libre));
     }
 
+    /// <summary>Toda reserva nueva nace confirmada: la habitación queda bloqueada y no hay nada más que validar.</summary>
     public async Task<ResultadoOperacion> CrearAsync(ReservaCreateModel model)
     {
         var inicio = DateTime.SpecifyKind(model.InicioReserva.Date, DateTimeKind.Unspecified);
         if (inicio < reloj.Hoy) return ResultadoOperacion.Fallo("La fecha de entrada no puede ser anterior a hoy.");
         if (model.TotalNoches is < 1 or > 365) return ResultadoOperacion.Fallo("El número de noches debe estar entre 1 y 365.");
-        if (model.EstadoReserva is not (EstadosReserva.Pendiente or EstadosReserva.Confirmada))
-            return ResultadoOperacion.Fallo("Seleccione un estado inicial válido.");
         if (model.HabitacionIds.Count == 0 || model.HabitacionIds.Distinct().Count() != model.HabitacionIds.Count)
             return ResultadoOperacion.Fallo("Seleccione al menos una habitación, sin repetirlas.");
 
@@ -262,7 +266,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
             var reserva = new Reserva
             {
                 UsuarioId = model.UsuarioId,
-                EstadoReserva = model.EstadoReserva,
+                EstadoReserva = EstadosReserva.Confirmada,
                 FechaReservaCreacion = DateTime.UtcNow,
                 InicioReserva = inicio,
                 TotalNoches = model.TotalNoches,
@@ -281,7 +285,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
             return ResultadoOperacion.Exito;
         });
 
-        if (resultado.Ok) await NotificarReservaAsync(reservaId, model.EstadoReserva, model.UsuarioId);
+        if (resultado.Ok) await NotificarReservaAsync(reservaId, EstadosReserva.Confirmada, model.UsuarioId);
         return resultado;
     }
 

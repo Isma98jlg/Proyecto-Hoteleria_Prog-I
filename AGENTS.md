@@ -30,11 +30,11 @@ Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
 - **Cargos:** `Usuarios.cargo_id` y los roles de Identity solo se cambian con `CuentaService.AsignarCargoAsync`.
 - **Huésped:** solo crea y consulta sus reservas en `/Portal`, y ve sus datos. No accede a Habitaciones ni a la API; solo ve las habitaciones disponibles al reservar y las suyas en el detalle.
 - **Datos personales:** el directorio y las fichas exigen `crud_usuarios`. Los avisos de SignalR y el índice de Algolia no llevan datos personales.
-- **Estados de reserva:** `PENDIENTE → CONFIRMADA → EN_CURSO → FINALIZADA`; se puede cancelar antes del check-in. No hay transiciones hacia atrás.
+- **Estados de reserva:** toda reserva nueva nace `CONFIRMADA`, porque bloquear la habitación es lo único que hay que validar (no hay pagos). Después: `CONFIRMADA → EN_CURSO → FINALIZADA`; se puede cancelar antes del check-in. No hay transiciones hacia atrás. `PENDIENTE` queda solo para reservas antiguas.
 - **Disponibilidad:** la decide PostgreSQL. La restricción `ex_habitacion_sin_solapes` impide solapes; las columnas `inicio`, `fin` y `activa` de `Reserva Habitaciones` deben coincidir siempre con la reserva.
+- **Elegir habitación:** usa siempre `_SelectorHabitaciones` y `SelectorHabitaciones`. Personas equivale a camas (coincidencia exacta), aunque una reserva puede combinar habitaciones. Algolia filtra y PostgreSQL decide qué está libre.
 - **Estado de la habitación:** `OCUPADO` solo lo cambian el check-in y el check-out.
-- **IA:** el copiloto solo extrae datos del mensaje. Disponibilidad y precios salen de `ReservaService`, y una persona confirma la reserva.
-- **Asistente del huésped (`/Portal/Asistente`):** el modelo no crea reservas. `preparar_reserva` deja una propuesta validada en el servidor, y solo el botón «Confirmar reserva» la crea, a nombre de quien inició sesión. Solo atiende reservas y dudas del sistema: otros temas reciben una respuesta fija del servidor (`fuera_de_tema`) y no se reenvían al modelo. El saldo de la API es escaso: cuida los tokens en cada cambio (instrucciones cortas, resultados compactos, sin llamadas innecesarias) y mantén los límites `ASISTENTE_LIMITE_USUARIO` y `ASISTENTE_LIMITE_DIARIO`. La conversación vive en Redis 30 minutos y nunca se registra su contenido.
+- **IA (asistente del huésped, `/Portal/Asistente`; el personal no tiene chat):** disponibilidad y precios salen de `ReservaService`, y el modelo no crea reservas. `preparar_reserva` deja una propuesta validada en el servidor, y solo el botón «Confirmar reserva» la crea, a nombre de quien inició sesión. Solo atiende reservas y dudas del sistema: otros temas reciben una respuesta fija del servidor (`fuera_de_tema`) y no se reenvían al modelo. El saldo de la API es escaso: cuida los tokens en cada cambio (instrucciones cortas, resultados compactos, sin llamadas innecesarias) y mantén los límites `ASISTENTE_LIMITE_USUARIO` y `ASISTENTE_LIMITE_DIARIO`. La conversación vive en Redis 30 minutos y nunca se registra su contenido.
 
 ## Ventanas flotantes
 
@@ -61,7 +61,9 @@ Sin sus variables, la app sigue funcionando:
 |---|---|
 | `REDIS_URL` | Caché en memoria y SignalR en una sola instancia |
 | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_KEY` | La búsqueda usa PostgreSQL |
-| `ANTHROPIC_API_KEY` | El copiloto y el asistente del huésped quedan desactivados |
+| `ANTHROPIC_API_KEY` | El asistente del huésped queda desactivado |
+
+El clima del huésped (`/Portal/Clima`) usa Open-Meteo, sin clave. La ubicación solo se pide al pulsar el botón, se redondea a unos 11 km y no se asocia al usuario ni se registra.
 
 `/health` informa del estado de Redis (`conectado`, `sin_conexion` o `no_configurado`). Solo la base de datos hace que devuelva 503, porque Redis es opcional.
 

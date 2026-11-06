@@ -36,7 +36,8 @@ builder.Services.AddScoped<IHabitacionService, HabitacionService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<CuentaService>();
 builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
-builder.Services.AddScoped<CopilotoService>();
+builder.Services.AddScoped<SelectorHabitaciones>();
+builder.Services.AddHttpClient<ClimaService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(5));
 builder.Services.AddScoped<AsistenteHuespedService>();
 
 // Redis es opcional: da caché compartida y conecta SignalR entre instancias.
@@ -109,7 +110,6 @@ builder.Services.AddRateLimiter(options =>
              || path.StartsWith("/Account/Registro", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Account/Invitacion", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Account/Restablecer", StringComparison.OrdinalIgnoreCase)
-             || path.StartsWith("/Chat", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Portal/Asistente", StringComparison.OrdinalIgnoreCase));
         if (!esEnvioSensible) return RateLimitPartition.GetNoLimiter("sin-limite");
 

@@ -13,7 +13,7 @@
             <div class="flex flex-col gap-1.5">
                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold bg-secondary-fixed/50 px-2.5 py-0.5 rounded-full">• MÓDULO RESERVAS · CREAR</span>
                 <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Nueva Reserva</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant">Registre una reserva para un huésped, asigne habitaciones y defina el estado inicial de la estancia.</p>
+                <p class="font-body-md text-body-md text-on-surface-variant">Registre una reserva para un huésped y asigne sus habitaciones. Quedará confirmada al guardar.</p>
             </div>
             <div class="flex items-center gap-2">
                 <a class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page="Index">
@@ -69,14 +69,6 @@
                            class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none" />
                     <span asp-validation-for="Reserva.TotalNoches" class="text-label-sm text-error"></span>
                 </div>
-
-                <div class="flex flex-col gap-3">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant">Estado inicial</label>
-                    <select asp-for="Reserva.EstadoReserva" asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(Model.Estados))"
-                            class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none">
-                    </select>
-                    <span asp-validation-for="Reserva.EstadoReserva" class="text-label-sm text-error"></span>
-                </div>
             </div>
 
             <!-- Habitaciones -->
@@ -93,22 +85,7 @@
                     </div>
                 </div>
 
-                <div id="available-rooms" class="flex flex-col gap-2 max-h-[400px] overflow-y-auto p-3 rounded-xl bg-surface-container-low border border-surface-container">
-                    @if (!Model.Habitaciones.Any())
-                    {
-                        <div class="text-center text-[11px] text-outline py-8">No hay habitaciones disponibles para esas fechas.</div>
-                    }
-                    @foreach (var room in Model.Habitaciones)
-                    {
-                        <label class="room-option flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-container-lowest border border-surface-container cursor-pointer hover:border-secondary">
-                            <span class="flex items-center gap-3">
-                                <input type="checkbox" name="Reserva.HabitacionIds" value="@room.HabitacionId" checked="@Model.Reserva.HabitacionIds.Contains(room.HabitacionId)" data-rate="@(room.PrecioCama * room.NroCamas)" class="room-checkbox rounded border-outline text-secondary focus:ring-secondary" />
-                                <span><strong class="block text-on-surface">@room.Codigo · @room.TipoVip</strong><small class="text-outline">@room.NroCamas cama(s)</small></span>
-                            </span>
-                            <span class="text-right"><strong class="block">$@((room.PrecioCama * room.NroCamas).ToString("N0"))</strong><small class="text-outline">por noche</small></span>
-                        </label>
-                    }
-                </div>
+                <partial name="_SelectorHabitaciones" model='new SelectorHabitacionesVista("Reserva.HabitacionIds", "#reservation-start", "#reservation-nights", Model.Reserva.HabitacionIds)' />
                 <span asp-validation-for="Reserva.HabitacionIds" class="text-label-sm text-error"></span>
                 <div class="rounded-xl bg-secondary-fixed/40 p-3 flex items-center justify-between">
                     <span class="font-body-sm text-body-sm text-on-surface-variant"><span id="selected-room-count">0</span> habitación(es) · estimado por estancia</span>
@@ -134,36 +111,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        (() => {
-            const start = document.getElementById('reservation-start');
-            const nights = document.getElementById('reservation-nights');
-            const list = document.getElementById('available-rooms');
-            const currency = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
-            const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-            function updateEstimate() {
-                const selected = [...list.querySelectorAll('.room-checkbox:checked')];
-                const total = selected.reduce((sum, item) => sum + Number(item.dataset.rate || 0), 0) * Math.max(1, Number(nights.value || 1));
-                document.getElementById('selected-room-count').textContent = selected.length;
-                document.getElementById('reservation-estimate').textContent = '$' + currency.format(total);
-            }
-            async function loadRooms() {
-                if (!start.value || !nights.value || Number(nights.value) < 1) return;
-                list.innerHTML = '<p class="text-center text-outline py-5">Buscando disponibilidad…</p>';
-                const url = new URL(window.location.href);
-                url.search = new URLSearchParams({ handler: 'Disponibles', inicio: start.value, noches: nights.value });
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('No se pudo consultar la disponibilidad.');
-                    const rooms = await response.json();
-                    list.innerHTML = rooms.length ? rooms.map(room => `<label class="room-option flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-container-lowest border border-surface-container cursor-pointer hover:border-secondary"><span class="flex items-center gap-3"><input type="checkbox" name="Reserva.HabitacionIds" value="${Number(room.habitacionId)}" data-rate="${Number(room.precioCama) * Number(room.nroCamas)}" class="room-checkbox rounded border-outline text-secondary focus:ring-secondary" /><span><strong class="block text-on-surface">${escapeHtml(room.codigo)} · ${escapeHtml(room.tipoVip)}</strong><small class="text-outline">${Number(room.nroCamas)} cama(s)</small></span></span><span class="text-right"><strong class="block">$${currency.format(Number(room.precioCama) * Number(room.nroCamas))}</strong><small class="text-outline">por noche</small></span></label>`).join('') : '<p class="text-center text-outline py-5">No hay habitaciones libres para esas fechas.</p>';
-                    updateEstimate();
-                } catch { list.innerHTML = '<p class="text-center text-error py-5">Error al consultar habitaciones. Recargue la página e inténtelo de nuevo.</p>'; }
-            }
-            list.addEventListener('change', updateEstimate);
-            nights.addEventListener('change', () => { updateEstimate(); loadRooms(); });
-            start.addEventListener('change', loadRooms);
-            updateEstimate();
-        })();
-    </script>
 }

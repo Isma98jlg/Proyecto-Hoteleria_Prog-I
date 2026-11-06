@@ -46,7 +46,7 @@
             dato('Salida', `${propuesta.salida} · ${propuesta.noches} noche(s)`),
             dato('Personas', String(propuesta.personas)));
         propuesta.habitaciones.forEach(h =>
-            datos.append(dato(`Habitación ${h.codigo}`, `${h.categoria} · ${h.camas} cama(s) · $${h.precio}/noche`)));
+            datos.append(dato(`Habitación ${h.codigo}`, `${h.categoria} · ${h.camas} cama(s) · $${h.precio}/noche${h.ubicacion ? ` · ${h.ubicacion}` : ''}`)));
         caja.append(datos);
 
         const pie = elemento('div', 'flex items-center justify-between gap-3 border-t border-surface-container-high pt-3');

@@ -8,23 +8,18 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Hoteleria_App.Pages.Reservas;
 
 [Authorize(Policy = HotelPermissionPolicies.CrudRequerimientos)]
-public class CrearModel(IReservaService reservaService, RelojHotel reloj) : PageModel
+public class CrearModel(IReservaService reservaService, SelectorHabitaciones selector, RelojHotel reloj) : PageModel
 {
     [BindProperty]
     public ReservaCreateModel Reserva { get; set; } = new();
 
     public List<UsuarioComboViewModel> Usuarios { get; set; } = new();
-    public List<string> Estados { get; } = [EstadosReserva.Pendiente, EstadosReserva.Confirmada];
-    public List<HabitacionDisponibleViewModel> Habitaciones { get; set; } = new();
     public DateTime Hoy => reloj.Hoy;
 
-    /// <summary>Los parámetros permiten abrir el formulario con la propuesta del copiloto.</summary>
-    public async Task OnGetAsync(DateTime? inicio, int? noches, long? habitacion)
+    public async Task OnGetAsync()
     {
-        Reserva.InicioReserva = inicio?.Date ?? reloj.Hoy.AddDays(1);
-        Reserva.TotalNoches = Math.Clamp(noches ?? 1, 1, 365);
-        Reserva.EstadoReserva = EstadosReserva.Pendiente;
-        if (habitacion is long id) Reserva.HabitacionIds.Add(id);
+        Reserva.InicioReserva = reloj.Hoy.AddDays(1);
+        Reserva.TotalNoches = 1;
         await CargarAsync();
     }
 
@@ -45,18 +40,8 @@ public class CrearModel(IReservaService reservaService, RelojHotel reloj) : Page
         return Page();
     }
 
-    public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1)
-    {
-        if (noches < 1 || noches > 365) return BadRequest();
-        var entrada = DateTime.SpecifyKind(inicio.Date, DateTimeKind.Unspecified);
-        return new JsonResult(await reservaService.GetHabitacionesDisponiblesAsync(entrada, entrada.AddDays(noches)));
-    }
+    public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1, int? personas = null, string? categoria = null, string? q = null) =>
+        await selector.BuscarAsync(inicio, noches, personas, categoria, q, HttpContext.RequestAborted) is { } resultado ? new JsonResult(resultado) : BadRequest();
 
-    private async Task CargarAsync()
-    {
-        Usuarios = await reservaService.GetHuespedesAsync();
-        var inicio = Reserva.InicioReserva == default ? reloj.Hoy.AddDays(1) : DateTime.SpecifyKind(Reserva.InicioReserva.Date, DateTimeKind.Unspecified);
-        var noches = Math.Clamp(Reserva.TotalNoches, 1, 365);
-        Habitaciones = await reservaService.GetHabitacionesDisponiblesAsync(inicio, inicio.AddDays(noches));
-    }
+    private async Task CargarAsync() => Usuarios = await reservaService.GetHuespedesAsync();
 }

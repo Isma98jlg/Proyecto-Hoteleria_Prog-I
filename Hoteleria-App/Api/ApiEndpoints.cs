@@ -11,7 +11,7 @@ public static class ApiEndpoints
         var api = app.MapGroup("/api/v1").RequireAuthorization(HotelPermissionPolicies.Ver).WithTags("Hotel");
 
         api.MapGet("/habitaciones", async (string? q, IBuscadorHabitaciones buscador, CancellationToken ct) =>
-            Results.Ok(new { motor = buscador.UsaAlgolia ? "algolia" : "postgresql", resultados = await buscador.BuscarAsync(q, ct) }))
+            Results.Ok(new { motor = buscador.UsaAlgolia ? "algolia" : "postgresql", resultados = await buscador.BuscarAsync(q, ct: ct) }))
             .WithName("BuscarHabitaciones")
             .WithSummary("Busca en el catálogo de habitaciones.");
 

@@ -39,7 +39,7 @@ public class AsistenteModel(AsistenteHuespedService asistente) : PageModel
                 noches = p.Noches,
                 personas = p.Personas,
                 total = p.Total.ToString("N0"),
-                habitaciones = p.Lineas.Select(l => new { codigo = l.Codigo, categoria = l.Categoria, camas = l.Camas, precio = l.PrecioNoche.ToString("N0") })
+                habitaciones = p.Lineas.Select(l => new { codigo = l.Codigo, categoria = l.Categoria, camas = l.Camas, precio = l.PrecioNoche.ToString("N0"), ubicacion = l.Ubicacion })
             }
             : null,
         error = r.Error,

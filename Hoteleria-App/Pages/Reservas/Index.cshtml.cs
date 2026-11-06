@@ -8,12 +8,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Hoteleria_App.Pages.Reservas;
 
 [Authorize(Policy = HotelPermissionPolicies.CrudRequerimientos)]
-public class IndexModel(IReservaService reservaService, RelojHotel reloj) : PageModel
+public class IndexModel(IReservaService reservaService, SelectorHabitaciones selector, RelojHotel reloj) : PageModel
 {
     public List<ReservaViewModel> Reservas { get; set; } = new();
     public List<UsuarioComboViewModel> Usuarios { get; set; } = new();
     public IReadOnlyList<string> Estados => EstadosReserva.Todos;
-    public List<HabitacionDisponibleViewModel> Habitaciones { get; set; } = new();
     public DateTime Hoy => reloj.Hoy;
 
     [BindProperty]
@@ -35,8 +34,6 @@ public class IndexModel(IReservaService reservaService, RelojHotel reloj) : Page
         await CargarPaginaAsync();
         Reserva.InicioReserva = reloj.Hoy.AddDays(1);
         Reserva.TotalNoches = 1;
-        Reserva.EstadoReserva = EstadosReserva.Pendiente;
-        await CargarHabitacionesAsync();
     }
 
     public async Task<IActionResult> OnPostCrearAsync()
@@ -54,16 +51,11 @@ public class IndexModel(IReservaService reservaService, RelojHotel reloj) : Page
 
         AbrirModalReserva = true;
         await CargarPaginaAsync();
-        await CargarHabitacionesAsync();
         return Page();
     }
 
-    public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1)
-    {
-        if (noches < 1 || noches > 365) return BadRequest();
-        var entrada = DateTime.SpecifyKind(inicio.Date, DateTimeKind.Unspecified);
-        return new JsonResult(await reservaService.GetHabitacionesDisponiblesAsync(entrada, entrada.AddDays(noches)));
-    }
+    public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1, int? personas = null, string? categoria = null, string? q = null) =>
+        await selector.BuscarAsync(inicio, noches, personas, categoria, q, HttpContext.RequestAborted) is { } resultado ? new JsonResult(resultado) : BadRequest();
 
     public async Task<IActionResult> OnPostEliminarAsync(long id)
     {
@@ -76,12 +68,5 @@ public class IndexModel(IReservaService reservaService, RelojHotel reloj) : Page
     {
         Reservas = await reservaService.GetAllAsync(Buscar, Estado, UsuarioId);
         Usuarios = await reservaService.GetHuespedesAsync();
-    }
-
-    private async Task CargarHabitacionesAsync()
-    {
-        var inicio = Reserva.InicioReserva == default ? reloj.Hoy.AddDays(1) : DateTime.SpecifyKind(Reserva.InicioReserva.Date, DateTimeKind.Unspecified);
-        var noches = Math.Clamp(Reserva.TotalNoches, 1, 365);
-        Habitaciones = await reservaService.GetHabitacionesDisponiblesAsync(inicio, inicio.AddDays(noches));
     }
 }

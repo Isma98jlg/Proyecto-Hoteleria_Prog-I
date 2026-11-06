@@ -15,7 +15,6 @@ public class IndexModel(IHabitacionService habitacionService, HoteleriaDbContext
     public int HabitacionesOcupadas { get; set; }
     public int HabitacionesMantenimiento { get; set; }
     public int TotalReservas { get; set; }
-    public int ReservasPendientes { get; set; }
     public int ReservasConfirmadas { get; set; }
     public int TotalClientes { get; set; }
     public Dictionary<long, List<Habitacion>> HabitacionesPorPiso { get; set; } = new();
@@ -33,7 +32,6 @@ public class IndexModel(IHabitacionService habitacionService, HoteleriaDbContext
             .Select(g => new { Estado = g.Key, Total = g.Count() })
             .ToDictionaryAsync(x => x.Estado, x => x.Total);
         TotalReservas = porEstado.Values.Sum();
-        ReservasPendientes = porEstado.GetValueOrDefault(EstadosReserva.Pendiente);
         ReservasConfirmadas = porEstado.GetValueOrDefault(EstadosReserva.Confirmada);
         TotalClientes = await context.Usuarios.CountAsync(u => u.Cargo.Name == CargosSistema.Huesped);
 

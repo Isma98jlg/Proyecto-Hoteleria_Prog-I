@@ -16,14 +16,24 @@ public sealed class HabitacionCatalogo
     [JsonPropertyName("categoria")] public string Categoria { get; set; } = "";
     [JsonPropertyName("piso")] public long Piso { get; set; }
     [JsonPropertyName("referenciaPiso")] public string ReferenciaPiso { get; set; } = "";
+    /// <summary>Permite encontrarla escribiendo, por ejemplo, «piso 2».</summary>
+    [JsonPropertyName("ubicacion")] public string Ubicacion { get; set; } = "";
     [JsonPropertyName("camas")] public int Camas { get; set; }
     [JsonPropertyName("precioNoche")] public decimal PrecioNoche { get; set; }
+}
+
+public static class UbicacionHabitacion
+{
+    public static string Formatear(long piso, string? referencia) =>
+        string.IsNullOrWhiteSpace(referencia) ? $"Piso {piso}" : $"Piso {piso} · {referencia}";
 }
 
 public interface IBuscadorHabitaciones
 {
     bool UsaAlgolia { get; }
-    Task<List<HabitacionCatalogo>> BuscarAsync(string? texto, CancellationToken ct = default);
+    /// <param name="camas">Si se indica, solo habitaciones con exactamente ese número de camas.</param>
+    /// <param name="categoria">Si se indica, solo habitaciones de esa categoría.</param>
+    Task<List<HabitacionCatalogo>> BuscarAsync(string? texto, int? camas = null, string? categoria = null, CancellationToken ct = default);
     /// <summary>Reenvía el catálogo completo al índice. Sin Algolia, no hace nada.</summary>
     Task SincronizarAsync(CancellationToken ct = default);
 }
@@ -42,15 +52,19 @@ public sealed class BuscadorHabitaciones(HoteleriaDbContext db, IConfiguration c
 
     private SearchClient CrearCliente() => new(new SearchConfig(_appId!, _clave!));
 
-    public async Task<List<HabitacionCatalogo>> BuscarAsync(string? texto, CancellationToken ct = default)
+    public async Task<List<HabitacionCatalogo>> BuscarAsync(string? texto, int? camas = null, string? categoria = null, CancellationToken ct = default)
     {
+        var filtros = new List<string>();
+        if (camas is int cantidad) filtros.Add($"camas={cantidad}");
+        if (!string.IsNullOrWhiteSpace(categoria)) filtros.Add($"categoria:\"{categoria.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"");
+
         if (UsaAlgolia)
         {
             try
             {
                 var respuesta = await CrearCliente().SearchSingleIndexAsync<HabitacionCatalogo>(
                     _indice,
-                    new SearchParams(new SearchParamsObject { Query = texto ?? "", HitsPerPage = 100 }),
+                    new SearchParams(new SearchParamsObject { Query = texto ?? "", HitsPerPage = 100, Filters = string.Join(" AND ", filtros) }),
                     cancellationToken: ct);
                 return respuesta.Hits;
             }
@@ -60,7 +74,7 @@ public sealed class BuscadorHabitaciones(HoteleriaDbContext db, IConfiguration c
             }
         }
 
-        return await BuscarEnBaseDeDatosAsync(texto, ct);
+        return await BuscarEnBaseDeDatosAsync(texto, camas, categoria, ct);
     }
 
     public async Task SincronizarAsync(CancellationToken ct = default)
@@ -73,7 +87,7 @@ public sealed class BuscadorHabitaciones(HoteleriaDbContext db, IConfiguration c
             var cliente = CrearCliente();
             await cliente.SetSettingsAsync(_indice, new IndexSettings
             {
-                SearchableAttributes = ["categoria", "codigo", "referenciaPiso", "camas", "piso"],
+                SearchableAttributes = ["categoria", "codigo", "ubicacion", "referenciaPiso", "camas", "piso"],
                 AttributesForFaceting = ["categoria", "camas", "piso"]
             }, cancellationToken: ct);
             await cliente.ReplaceAllObjectsAsync(_indice, documentos, cancellationToken: ct);
@@ -84,15 +98,18 @@ public sealed class BuscadorHabitaciones(HoteleriaDbContext db, IConfiguration c
         }
     }
 
-    private async Task<List<HabitacionCatalogo>> BuscarEnBaseDeDatosAsync(string? texto, CancellationToken ct)
+    private async Task<List<HabitacionCatalogo>> BuscarEnBaseDeDatosAsync(string? texto, int? camas, string? categoria, CancellationToken ct)
     {
         var consulta = LeerCatalogo();
+        if (camas is int cantidad) consulta = consulta.Where(h => h.NroCamas == cantidad);
+        if (!string.IsNullOrWhiteSpace(categoria)) consulta = consulta.Where(h => h.TipoVipNombre == categoria);
         if (!string.IsNullOrWhiteSpace(texto))
         {
             var patron = $"%{texto.Trim()}%";
             consulta = consulta.Where(h =>
                 EF.Functions.ILike(h.TipoVipNombre, patron) ||
                 EF.Functions.ILike(h.Piso.RefPiso ?? "", patron) ||
+                EF.Functions.ILike("Piso " + h.NroPiso.ToString(), patron) ||
                 EF.Functions.ILike(h.HabitacionId.ToString(), patron));
         }
         return (await consulta.ToListAsync(ct)).Select(Proyectar).ToList();
@@ -110,6 +127,7 @@ public sealed class BuscadorHabitaciones(HoteleriaDbContext db, IConfiguration c
         Categoria = h.TipoVipNombre,
         Piso = h.NroPiso,
         ReferenciaPiso = h.Piso.RefPiso ?? "",
+        Ubicacion = UbicacionHabitacion.Formatear(h.NroPiso, h.Piso.RefPiso),
         Camas = h.NroCamas,
         PrecioNoche = h.NroCamas * h.TipoVip.PrecioCama
     };
