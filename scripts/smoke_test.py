@@ -381,6 +381,8 @@ check("el aviso no lleva datos personales", "Prueba" not in txt and "@" not in t
 
 # --- Copiloto: el permiso se comprueba sin llamar al modelo.
 check("huésped no usa el copiloto", "AccessDenied" in guest.get("/Chat")[2])
+check("huésped abre su asistente", guest.get("/Portal/Asistente")[0] == 200)
+check("personal no usa el asistente del huésped", "AccessDenied" in admin.get("/Portal/Asistente")[2])
 
 # Vistas restantes
 for ruta in ["/Habitaciones/PorPiso", "/Habitaciones/PorTipoVip", "/Privacy", "/Reservas/Crear", "/Portal/Perfil", "/Account/CambiarContrasena"]:

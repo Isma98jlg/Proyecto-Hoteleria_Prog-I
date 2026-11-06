@@ -63,6 +63,16 @@
     animation: vf-panel-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* El chat ocupa siempre el mismo alto: sus mensajes se desplazan por dentro. */
+.vf-panel.vf-alto-fijo {
+    height: 100%;
+}
+
+html.en-ventana .chat-huesped {
+    height: calc(100dvh - 2.5rem);
+    max-width: none;
+}
+
 .vf-cabecera {
     box-shadow: 0 1px 0 rgb(19 27 46 / 0.07);
 }

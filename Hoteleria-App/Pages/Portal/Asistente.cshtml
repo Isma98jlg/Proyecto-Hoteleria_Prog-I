@@ -1,0 +1,25 @@
+@page
+@model Hoteleria_App.Pages.Portal.AsistenteModel
+@{
+    ViewData["Title"] = "Asistente de reservas";
+}
+<section id="chat-huesped" class="chat-huesped flex h-[70vh] w-full max-w-2xl flex-col gap-3" data-disponible="@(Model.Disponible ? "1" : "0")">
+    @Html.AntiForgeryToken()
+    <div id="chat-mensajes" class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" aria-live="polite"></div>
+    <p id="chat-error" class="hidden rounded-xl bg-error-container p-3 text-body-sm text-on-error-container" role="alert"></p>
+    <form id="chat-formulario" class="flex items-end gap-2">
+        <textarea id="chat-entrada" rows="1" maxlength="1000" required aria-label="Su mensaje" placeholder="Escriba lo que necesita…" class="max-h-32 min-h-[2.75rem] flex-1 resize-none rounded-xl border-outline-variant bg-surface-container-low px-3 py-2.5 text-body-md focus:border-primary focus:ring-0"></textarea>
+        <button id="chat-enviar" type="submit" aria-label="Enviar" title="Enviar" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary transition-opacity disabled:opacity-40">
+            <span class="material-symbols-outlined text-[20px]">send</span>
+        </button>
+    </form>
+    <div class="flex items-center justify-between gap-3 text-[11px] leading-4 text-outline">
+        <span>Sus mensajes se envían a Anthropic para responderle. No incluya documentos ni datos de pago.</span>
+        <button id="chat-reiniciar" type="button" class="shrink-0 font-semibold hover:text-on-surface">Empezar de nuevo</button>
+    </div>
+</section>
+<script id="chat-inicial" type="application/json">@Html.Raw(Json.Serialize(Model.Inicial))</script>
+
+@section Scripts {
+    <script src="~/js/asistente.js" asp-append-version="true"></script>
+}

@@ -1,6 +1,6 @@
 // Abre los formularios y detalles en una ventana flotante, sin salir de la página actual.
 (() => {
-    const RUTAS_FLOTANTES = /^\/(reservas\/(crear|editar|detalles)|habitaciones\/(crear|editar|detalles)|usuarios\/(crear|editar|detalles)|empleados\/editar|portal\/(reservar|perfil|detalle)|account\/cambiarcontrasena|chat)(\/|$)/i;
+    const RUTAS_FLOTANTES = /^\/(reservas\/(crear|editar|detalles)|habitaciones\/(crear|editar|detalles)|usuarios\/(crear|editar|detalles)|empleados\/editar|portal\/(reservar|perfil|detalle|asistente)|account\/cambiarcontrasena|chat)(\/|$)/i;
 
     let ventana = null;
     let huboCambios = false;
@@ -17,6 +17,7 @@
 
     // Cada ventana usa el ancho que necesita su contenido.
     function anchoPara(ruta) {
+        if (/^\/portal\/asistente/i.test(ruta)) return 'max-w-lg vf-alto-fijo';
         if (/^\/(chat|portal\/perfil|account\/cambiarcontrasena)/i.test(ruta)) return 'max-w-lg';
         if (/^\/reservas\//i.test(ruta)) return 'max-w-4xl';
         return 'max-w-3xl';
@@ -31,7 +32,7 @@
         foco = document.activeElement;
         ventana = document.createElement('div');
         ventana.id = 'ventana-flotante';
-        ventana.className = 'vf-fondo fixed inset-0 z-[60] flex ' + (/^\/chat/i.test(ruta) ? 'vf-izquierda' : 'vf-centro');
+        ventana.className = 'vf-fondo fixed inset-0 z-[60] flex ' + (/^\/(chat|portal\/asistente)/i.test(ruta) ? 'vf-izquierda' : 'vf-centro');
         ventana.setAttribute('role', 'dialog');
         ventana.setAttribute('aria-modal', 'true');
         ventana.setAttribute('aria-labelledby', 'ventana-flotante-titulo');
@@ -89,6 +90,7 @@
     // La página interna informa de su altura: la ventana se ajusta sin pasar del máximo de la pantalla.
     function ajustarAltura(alto) {
         const panel = ventana.querySelector('.vf-panel');
+        if (panel.classList.contains('vf-alto-fijo')) return;
         panel.style.height = `${Math.ceil(alto) + panel.querySelector('header').offsetHeight}px`;
     }
 
@@ -120,6 +122,7 @@
         if (evento.origin !== location.origin || !ventana) return;
         const { tipo, url, alto } = evento.data || {};
         if (tipo === 'altura' && typeof alto === 'number') ajustarAltura(alto);
+        else if (tipo === 'cambios') huboCambios = true;
         else if (tipo === 'listo' && typeof url === 'string') seguir(url, true);
         else if (tipo === 'navegar' && typeof url === 'string') seguir(url, false);
         else if (tipo === 'cerrar') cerrar();

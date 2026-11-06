@@ -37,6 +37,7 @@ builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<CuentaService>();
 builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
 builder.Services.AddScoped<CopilotoService>();
+builder.Services.AddScoped<AsistenteHuespedService>();
 
 // Redis es opcional: da caché compartida y conecta SignalR entre instancias.
 var redis = BuildRedisOptions(config["REDIS_URL"]);
@@ -108,7 +109,8 @@ builder.Services.AddRateLimiter(options =>
              || path.StartsWith("/Account/Registro", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Account/Invitacion", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Account/Restablecer", StringComparison.OrdinalIgnoreCase)
-             || path.StartsWith("/Chat", StringComparison.OrdinalIgnoreCase));
+             || path.StartsWith("/Chat", StringComparison.OrdinalIgnoreCase)
+             || path.StartsWith("/Portal/Asistente", StringComparison.OrdinalIgnoreCase));
         if (!esEnvioSensible) return RateLimitPartition.GetNoLimiter("sin-limite");
 
         var ip = context.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
