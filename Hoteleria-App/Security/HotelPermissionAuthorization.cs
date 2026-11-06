@@ -30,7 +30,7 @@ public sealed class PermisosService(HoteleriaDbContext db, IDistributedCache cac
     private static readonly DistributedCacheEntryOptions Ttl = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) };
     private readonly Dictionary<long, PermisosCargo?> _peticion = [];
 
-    private static string Clave(long usuarioId) => $"hoteleria:permisos:{usuarioId}";
+    private static string Clave(long usuarioId) => $"permisos:{usuarioId}";
 
     public async Task<PermisosCargo?> ObtenerAsync(long usuarioId)
     {

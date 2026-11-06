@@ -41,11 +41,13 @@ builder.Services.AddScoped<CopilotoService>();
 // Redis es opcional: da caché compartida y conecta SignalR entre instancias.
 var redis = BuildRedisOptions(config["REDIS_URL"]);
 var signalR = builder.Services.AddSignalR();
-if (redis is not null)
+// Con AbortOnConnectFail = false, esta llamada no falla si Redis no responde: sigue reintentando.
+IConnectionMultiplexer? conexionRedis = redis is null ? null : await ConnectionMultiplexer.ConnectAsync(redis);
+if (redis is not null && conexionRedis is not null)
 {
     builder.Services.AddStackExchangeRedisCache(options =>
     {
-        options.ConfigurationOptions = redis;
+        options.ConnectionMultiplexerFactory = () => Task.FromResult(conexionRedis);
         options.InstanceName = "hoteleria:";
     });
     signalR.AddStackExchangeRedis(redis.ToString(), options =>
@@ -153,9 +155,10 @@ app.MapRazorPages();
 app.MapHub<HotelHub>("/hubs/hotel");
 app.MapApiV1();
 app.MapOpenApi().AllowAnonymous();
+// Redis es opcional: si falla se informa aquí, pero solo la base de datos marca el servicio como caído.
 app.MapGet("/health", async (HoteleriaDbContext db, CancellationToken ct) =>
     await db.Database.CanConnectAsync(ct)
-        ? Results.Ok(new { estado = "ok" })
+        ? Results.Ok(new { estado = "ok", redis = await EstadoRedisAsync(conexionRedis) })
         : Results.StatusCode(StatusCodes.Status503ServiceUnavailable)).AllowAnonymous();
 
 if (GetBool(config, "DB_AUTO_MIGRATE", true))
@@ -201,6 +204,21 @@ _ = Task.Run(async () =>
 });
 
 app.Run();
+
+static async Task<object> EstadoRedisAsync(IConnectionMultiplexer? conexion)
+{
+    if (conexion is null) return new { estado = "no_configurado" };
+    if (!conexion.IsConnected) return new { estado = "sin_conexion" };
+    try
+    {
+        var latencia = await conexion.GetDatabase().PingAsync().WaitAsync(TimeSpan.FromSeconds(2));
+        return new { estado = "conectado", latenciaMs = Math.Round(latencia.TotalMilliseconds, 1) };
+    }
+    catch (Exception ex) when (ex is RedisException or TimeoutException)
+    {
+        return new { estado = "sin_conexion" };
+    }
+}
 
 static void AddPermissionPolicy(AuthorizationOptions options, string policy, string permission) =>
     options.AddPolicy(policy, p => p.RequireAuthenticatedUser().AddRequirements(new HotelPermissionRequirement(permission)));
@@ -310,7 +328,10 @@ static ConfigurationOptions? BuildRedisOptions(string? url)
     var options = new ConfigurationOptions
     {
         Ssl = uri.Scheme.Equals("rediss", StringComparison.OrdinalIgnoreCase),
-        AbortOnConnectFail = false
+        AbortOnConnectFail = false,
+        // Sin conexión, los comandos fallan al instante y se consulta la base de datos.
+        // Si esperasen en cola, cada página tardaría más de 10 segundos con Redis caído.
+        BacklogPolicy = BacklogPolicy.FailFast
     };
     options.EndPoints.Add(uri.Host, uri.Port > 0 ? uri.Port : 6379);
     if (!string.IsNullOrEmpty(uri.UserInfo))

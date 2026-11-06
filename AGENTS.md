@@ -62,6 +62,8 @@ Sin sus variables, la app sigue funcionando:
 | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_KEY` | La búsqueda usa PostgreSQL |
 | `ANTHROPIC_API_KEY` | El copiloto queda desactivado |
 
+`/health` informa del estado de Redis (`conectado`, `sin_conexion` o `no_configurado`). Solo la base de datos hace que devuelva 503, porque Redis es opcional.
+
 ## Verificación
 
 ```powershell
@@ -78,7 +80,7 @@ python .\scripts\smoke_test.py
 
 1. Sube la rama a GitHub.
 2. En Render: **New > Blueprint**, elige el repositorio y usa `render.yaml`.
-3. Completa `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `HOTEL_TIMEZONE`, y las claves opcionales de Algolia y Anthropic.
+3. Completa `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `HOTEL_TIMEZONE`, y las claves opcionales de Algolia y Anthropic. `ADMIN_EMAIL` debe usar el dominio de `DOMINIO_CORREO` (por ejemplo, `admin@grandstay.com`); con otro dominio, la app se detiene al crear el administrador. El correo real se añade después, en la app.
 4. Comprueba `/health` y entra con el administrador.
 
 En el plan gratuito el servicio se duerme tras 15 minutos, Postgres expira a los 30 días y Key Value pierde sus datos al reiniciarse.
