@@ -1,24 +1,71 @@
+# Entorno local completo: app, PostgreSQL y Redis en una red propia de Docker.
+# Dentro de la red, la app los encuentra por el nombre del servicio. Las credenciales salen de .env.
 services:
-  mssql:
-    build:
-      context: ./Resources/DDBB
-      dockerfile: Dockerfile
-    image: hoteleria-sql:${MSSQL_IMAGE_TAG:-local}
-    container_name: hoteleria-mssql
+  app:
+    build: .
+    container_name: hoteleria-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD_requerido_en_.env}
-      MSSQL_PID: ${MSSQL_PID:-Developer}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      HOTEL_TIMEZONE: ${HOTEL_TIMEZONE:-}
+      DOMINIO_CORREO: ${DOMINIO_CORREO:-grandstay.com}
+      # Solo se usan para crear el administrador inicial si no existe ninguno.
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      DEMO_ACCOUNTS: ${DEMO_ACCOUNTS:-false}
+      DEMO_WORKER_EMAIL: ${DEMO_WORKER_EMAIL:-}
+      DEMO_WORKER_PASSWORD: ${DEMO_WORKER_PASSWORD:-}
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-}
+      ALGOLIA_APP_ID: ${ALGOLIA_APP_ID:-}
+      ALGOLIA_ADMIN_KEY: ${ALGOLIA_ADMIN_KEY:-}
+      ALGOLIA_INDEX: ${ALGOLIA_INDEX:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports:
-      - "${MSSQL_PORT:-1433}:1433"
+      - "${APP_PORT:-5003}:10000"
+    networks:
+      - hoteleria-red
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: hoteleria-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Define_POSTGRES_USER_en_.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define_POSTGRES_PASSWORD_en_.env}
+      POSTGRES_DB: ${POSTGRES_DB:?Define_POSTGRES_DB_en_.env}
+    # Publicado solo en este equipo, para herramientas de base de datos o `dotnet run`.
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - hoteleria-auth-data:/var/opt/mssql
+      - hoteleria-pg-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U '${DB_USER:-sa}' -P '${DB_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
       timeout: 5s
       retries: 12
-      start_period: 30s
+    networks:
+      - hoteleria-red
+
+  redis:
+    image: redis:7-alpine
+    container_name: hoteleria-redis
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - hoteleria-red
+
+networks:
+  hoteleria-red:
 
 volumes:
-  hoteleria-auth-data:
+  hoteleria-pg-data:
