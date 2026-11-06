@@ -3,44 +3,29 @@ En este archi se detalla todo acerca de las dependencias informativas para el eq
 
 ## 🚀 Primeros pasos para ejecutar (equipo nuevo)
 
-Requisitos:
-- **.NET SDK 10** (verifica con `dotnet --list-sdks`)
-- **Docker Desktop** (para la base de datos SQL Server)
+Requisito: **Docker Desktop**.
 
-Pasos:
-1. Clonar el repositorio.
-2. Copiar el archivo de entorno en la raíz:
+1. Clona el repositorio y crea tu configuración local (cambia todos los valores):
    ```bash
    cp .env.example .env     # Windows: copy .env.example .env
    ```
-   `.env` **no se versiona**; ahí viven las credenciales locales (contraseña SA, host, BD).
-3. Levantar SQL Server (lee `.env` automáticamente):
+2. Levanta la app, PostgreSQL y Redis en su red de Docker (aplica migraciones y crea el administrador):
    ```bash
-   docker compose up -d
+   docker compose up -d --build
    ```
-4. Ejecutar la app (el arranque aplica las migraciones EF Core + datos semilla):
-   ```bash
-   cd Hoteleria-App
-   dotnet run
-   ```
-5. Abrir `http://localhost:5003` (o `https://localhost:7097`).
+3. Abre `http://localhost:5003`.
 
-### ⚡ Nuevas funcionalidades de autenticación
+### Qué incluye
 
-A partir de esta versión, la aplicación incluye autenticación de personal con **ASP.NET Core Identity** en SQL Server y sesión mediante cookie segura. La cookie representa la sesión; las credenciales, roles y cuentas se guardan en la base de datos.
+- **Cuentas en la base de datos** con ASP.NET Core Identity: registro público de huéspedes, invitaciones para el personal y bloqueo tras 5 intentos fallidos.
+- **Dominio único:** el acceso usa siempre `@grandstay.com` (`DOMINIO_CORREO`); cada persona puede añadir un correo de contacto real.
+- **Administrador por defecto:** el sistema lo crea una sola vez con `ADMIN_EMAIL` y `ADMIN_PASSWORD`. Después, su nombre, correo y contraseña se cambian desde la app. No hay contraseñas en el código.
+- **Permisos por cargo:** administrador, trabajador, huésped y cargos personalizados. Cada huésped solo ve sus datos.
+- **Reservas con reglas reales:** estados con check-in y check-out, y PostgreSQL impide las reservas solapadas.
+- **Integraciones:** Redis (caché y SignalR), SignalR (avisos en vivo), Algolia (búsqueda), API REST `/api/v1` con OpenAPI y copiloto de IA para recepción.
+- **Despliegue:** `Dockerfile` y `render.yaml` para Render.
 
-- **Cuenta admin por defecto:** Al primer arranque (si no existe), se crea automáticamente una cuenta con:
-  - Correo: `ADMIN_EMAIL` (por defecto `admin@hoteleria.com`, definible en `.env`)
-  - Contraseña: `ADMIN_PASSWORD` (por defecto `Admin123!`, definible en `.env`)
-- **Cuentas de prueba:** `DEMO_WORKER_EMAIL` / `DEMO_WORKER_PASSWORD` y `DEMO_USER_EMAIL` / `DEMO_USER_PASSWORD` crean cuentas para los cargos trabajador y usuario.
-- **Diagnóstico del login:** En Development, la consola del navegador muestra el usuario, cargo, roles Identity y permisos cargados después de iniciar sesión; nunca muestra la contraseña.
-- **Identificador compartido:** `Usuarios.usuario_id` es la clave compartida por el perfil laboral (`Empleados`) y la cuenta (`AspNetUsers.Id`).
-- **Cargos y permisos:** `Roles` es la entidad de cargos del diagrama y también la tabla de roles de Identity; conserva los permisos CRUD booleanos (`0`/`1`). `Usuarios.cargo_id` apunta al cargo asignado.
-- **Acceso a la app:** Todas las páginas ahora requieren sesión iniciada (política de fallback `RequireAuthenticatedUser`). La única página pública es `/Account/Login` (y `/Error`). El header muestra el nombre del usuario logueado y un botón "Cerrar sesión".
-- **Base de datos:** La migración añade las tablas `AspNet*`, `Empleados` y `Roles` a `HOTEL`. Se aplica al arrancar si `DB_AUTO_MIGRATE=true` (valor por defecto).
-
-Todo lo relacionado con la base de datos está en `Resources/DDBB/` (esquema, script
-SQL generado `hoteleria-schema.sql`, `Dockerfile` y `init-docker.sql`).
+Las reglas de configuración, negocio y despliegue están en [`AGENTS.md`](AGENTS.md).
 
 ---
 
