@@ -70,6 +70,8 @@
         try { return localStorage.getItem(CLAVE_CIUDAD); } catch { return null; }
     }
 
+    // Al pulsar el campo se selecciona la ciudad recordada: lo que se escriba la reemplaza.
+    ciudad.addEventListener('focus', () => ciudad.select());
     abrir.addEventListener('click', () => alternar(true));
     parte('cerrar').addEventListener('click', () => alternar(false));
     document.addEventListener('keydown', evento => {
