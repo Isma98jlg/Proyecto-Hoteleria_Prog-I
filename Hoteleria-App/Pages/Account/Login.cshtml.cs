@@ -1,27 +1,18 @@
 using System.ComponentModel.DataAnnotations;
+using Hoteleria_App.Data;
+using Hoteleria_App.Models;
+using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using Hoteleria_App.Data;
-using Hoteleria_App.Models;
 
 namespace Hoteleria_App.Pages.Account;
 
 [AllowAnonymous]
-public class LoginModel : PageModel
+public class LoginModel(SignInManager<HotelUser> signInManager, HoteleriaDbContext db) : PageModel
 {
-    private readonly SignInManager<HotelUser> _signInManager;
-    private readonly HoteleriaDbContext _db;
-
-    public LoginModel(SignInManager<HotelUser> signInManager, HoteleriaDbContext db)
-    {
-        _signInManager = signInManager;
-        _db = db;
-    }
-
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
@@ -31,6 +22,7 @@ public class LoginModel : PageModel
     {
         [Required(ErrorMessage = "El correo es obligatorio.")]
         [EmailAddress(ErrorMessage = "Correo no válido.")]
+        [CorreoDelDominio]
         public string Email { get; set; } = "";
 
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
@@ -48,69 +40,35 @@ public class LoginModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
     {
-        if (ModelState.IsValid)
+        ReturnUrl = returnUrl ?? Url.Content("~/");
+        if (!ModelState.IsValid) return Page();
+
+        var result = await signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+        if (result.IsLockedOut)
         {
-            var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
-            var employeeExists = user is not null && await _db.Employees.AnyAsync(e => e.UsuarioId == user.Id);
-            var result = employeeExists
-                ? await _signInManager.PasswordSignInAsync(user!, Input.Password, Input.RememberMe, lockoutOnFailure: false)
-                : Microsoft.AspNetCore.Identity.SignInResult.Failed;
-
-            if (result.Succeeded)
-            {
-                var person = await _db.Usuarios.SingleAsync(u => u.UsuarioId == user!.Id);
-                var cargo = person.CargoId.HasValue
-                    ? await _db.Roles.SingleOrDefaultAsync(r => r.Id == person.CargoId.Value)
-                    : null;
-                var identityRoles = await _signInManager.UserManager.GetRolesAsync(user!);
-                TempData["AuthLoginDebug"] = JsonSerializer.Serialize(new
-                {
-                    usuarioId = person.UsuarioId,
-                    nombre = $"{person.Nombres} {person.Apellidos}".Trim(),
-                    email = user!.Email,
-                    cargoId = cargo?.Id,
-                    cargo = cargo?.Name,
-                    rolesIdentity = identityRoles,
-                    permisos = cargo is null ? null : new
-                    {
-                        ver = cargo.Ver,
-                        crudRequerimientos = cargo.CrudRequerimientos,
-                        crudPisos = cargo.CrudPisos,
-                        crudUsuarios = cargo.CrudUsuarios,
-                        crudHabitaciones = cargo.CrudHabitaciones,
-                        crudTipoVip = cargo.CrudTipoVip
-                    }
-                });
-                var destinoPredeterminado = string.Equals(cargo?.Name, "admin", StringComparison.OrdinalIgnoreCase)
-                    ? Url.Content("~/")
-                    : cargo?.CrudRequerimientos == true
-                        ? Url.Page("/Reservas/Index")!
-                        : cargo?.Ver == true
-                            ? Url.Page("/Habitaciones/Index")!
-                            : Url.Content("~/Account/Login");
-                var destino = EsDestinoPermitido(returnUrl, cargo) ? returnUrl! : destinoPredeterminado;
-                return LocalRedirect(destino);
-            }
-
+            ModelState.AddModelError(string.Empty, "La cuenta está bloqueada temporalmente por varios intentos fallidos. Inténtelo en unos minutos.");
+            return Page();
+        }
+        if (!result.Succeeded)
+        {
             ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
+            return Page();
         }
 
-        ReturnUrl = returnUrl ?? Url.Content("~/");
-        return Page();
+        return LocalRedirect(await DestinoAsync(returnUrl));
     }
 
-    private bool EsDestinoPermitido(string? returnUrl, HotelRole? cargo)
+    private async Task<string> DestinoAsync(string? returnUrl)
     {
-        if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl)) return false;
-        var path = returnUrl.Split('?', '#')[0];
-        if (path.Equals("/", StringComparison.OrdinalIgnoreCase))
-            return string.Equals(cargo?.Name, "admin", StringComparison.OrdinalIgnoreCase);
-        if (path.StartsWith("/Reservas", StringComparison.OrdinalIgnoreCase))
-            return cargo?.CrudRequerimientos == true;
-        if (path.StartsWith("/Habitaciones", StringComparison.OrdinalIgnoreCase)
-            || path.StartsWith("/Usuarios", StringComparison.OrdinalIgnoreCase)
-            || path.StartsWith("/Chat", StringComparison.OrdinalIgnoreCase))
-            return cargo?.Ver == true;
-        return path.StartsWith("/Account", StringComparison.OrdinalIgnoreCase);
+        // «/» es el panel de administración: no es un destino pedido por la persona.
+        if (!string.IsNullOrWhiteSpace(returnUrl) && returnUrl != "/" && Url.IsLocalUrl(returnUrl)) return returnUrl;
+
+        var cargo = await db.Users.AsNoTracking()
+            .Where(u => u.NormalizedEmail == Input.Email.ToUpper())
+            .Select(u => new { u.Usuario.Cargo.Name, u.Usuario.Cargo.CrudRequerimientos })
+            .SingleAsync();
+
+        if (cargo.Name == CargosSistema.Admin) return Url.Content("~/");
+        return cargo.CrudRequerimientos ? Url.Page("/Reservas/Index")! : Url.Page("/Portal/Index")!;
     }
 }

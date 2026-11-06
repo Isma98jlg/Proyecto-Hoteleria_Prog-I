@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GrandStay HMS</title>
+    <partial name="_Head" />
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen">
+    <main class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-2xl">
+            <div class="bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-xl overflow-hidden">
+                <div class="px-6 pt-7 pb-6 flex flex-col items-center text-center border-b border-surface-container">
+                    <img alt="GrandStay HMS" class="h-12 w-auto object-contain mb-4" src="~/images/grandstay-logo.png" />
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">@ViewData["Title"]</h1>
+                    @if (ViewData["Subtitulo"] is string subtitulo) { <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5">@subtitulo</p> }
+                </div>
+                <div class="p-6">@RenderBody()</div>
+            </div>
+        </div>
+    </main>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -408,7 +408,7 @@
                             <span class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface">@p.NroPiso</span>
                             <span class="font-body-sm text-body-sm font-semibold text-on-surface">@(string.IsNullOrWhiteSpace(p.RefPiso) ? "Nivel " + p.NroPiso : p.RefPiso)</span>
                         </div>
-                        <span class="font-label-sm text-label-sm @(p.EsVipPiso ? "text-secondary font-bold" : "text-outline")">@p.Cantidad habs@(p.EsVipPiso ? " VIP" : "")</span>
+                        <span class="flex items-center gap-3"><span class="font-label-sm text-label-sm @(p.EsVipPiso ? "text-secondary font-bold" : "text-outline")">@p.Cantidad habs@(p.EsVipPiso ? " VIP" : "")</span>@if (Model.PuedeAdministrarPisos && p.Cantidad == 0) { <form method="post" asp-page-handler="EliminarPiso" asp-route-nroPiso="@p.NroPiso" onsubmit="return confirm('¿Eliminar este piso?')"><button type="submit" class="text-error text-xs font-semibold hover:underline">Eliminar</button></form> }</span>
                     </div>
                 }
             </div>

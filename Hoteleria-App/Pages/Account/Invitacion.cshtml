@@ -1,0 +1,32 @@
+@page
+@model Hoteleria_App.Pages.Account.InvitacionModel
+@{
+    Layout = "_LayoutPublico";
+    ViewData["Title"] = Model.Invitacion?.EsActivacion == true ? "Activar su cuenta" : "Completar su registro";
+    ViewData["Subtitulo"] = Model.Invitacion?.Email;
+}
+@if (Model.Invitacion is null)
+{
+    <div class="flex flex-col gap-4 text-center">
+        <p class="rounded-xl bg-error-container text-on-error-container p-3">El enlace no es válido, ya se usó o caducó. Solicite uno nuevo.</p>
+        <a asp-page="/Account/Login" class="text-secondary font-semibold hover:underline">Ir a iniciar sesión</a>
+    </div>
+}
+else
+{
+    <form method="post" class="flex flex-col gap-5">
+        <input type="hidden" asp-for="Token" />
+        <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
+        @if (!Model.Invitacion.EsActivacion)
+        {
+            <p class="text-on-surface-variant">Cargo asignado: <strong>@Model.Invitacion.Cargo</strong></p>
+            <partial name="_FormPersona" for="Persona" view-data='new ViewDataDictionary(ViewData) { ["CorreoFijo"] = true }' />
+        }
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1">Contraseña<input asp-for="Password" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Password" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Repita la contraseña<input asp-for="Confirmacion" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Confirmacion" class="text-error text-sm"></span></label>
+        </div>
+        <p class="text-sm text-outline">Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.</p>
+        <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold self-end">Crear mi cuenta</button>
+    </form>
+}

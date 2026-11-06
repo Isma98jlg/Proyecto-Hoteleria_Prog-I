@@ -1,0 +1,16 @@
+@page
+@model Hoteleria_App.Pages.Account.CambiarContrasenaModel
+@{
+    ViewData["Title"] = "Cambiar contraseña";
+}
+<main class="max-w-xl flex flex-col gap-6">
+    <section><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">MI CUENTA</span><h1 class="font-headline-lg text-headline-lg mt-1">Cambiar contraseña</h1></section>
+    <partial name="_Mensajes" />
+    <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+        <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
+        <label class="flex flex-col gap-1">Contraseña actual<input asp-for="Actual" autocomplete="current-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Actual" class="text-error text-sm"></span></label>
+        <label class="flex flex-col gap-1">Nueva contraseña<input asp-for="Nueva" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Nueva" class="text-error text-sm"></span></label>
+        <label class="flex flex-col gap-1">Repita la nueva contraseña<input asp-for="Confirmacion" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Confirmacion" class="text-error text-sm"></span></label>
+        <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold self-end">Guardar</button>
+    </form>
+</main>

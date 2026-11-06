@@ -8,7 +8,7 @@
     <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <span class="font-label-sm uppercase tracking-wider text-secondary font-bold">DIRECTORIO</span>
-            <h1 class="font-headline-lg text-headline-lg tracking-tight mt-1">Huéspedes y personas</h1>
+            <h1 class="font-headline-lg text-headline-lg tracking-tight mt-1">Huéspedes</h1>
             <p class="text-on-surface-variant mt-1">Consulta sus datos de contacto y el historial de reservas.</p>
         </div>
         @if (Model.PuedeAdministrar)
@@ -17,11 +17,10 @@
         }
     </section>
 
-    @if (TempData["MensajeExito"] is string success) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@success</div> }
-    @if (TempData["MensajeError"] is string error) { <div class="rounded-xl bg-error-container text-on-error-container p-3">@error</div> }
+    <partial name="_Mensajes" />
 
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Personas registradas</span><strong class="block text-3xl mt-2">@Model.TotalClientes</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Huéspedes registrados</span><strong class="block text-3xl mt-2">@Model.TotalClientes</strong></div>
         <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Con reservas</span><strong class="block text-3xl mt-2">@Model.ConReservas</strong></div>
         <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-outline text-sm">Sin reservas</span><strong class="block text-3xl mt-2">@Model.SinReservas</strong></div>
     </section>
@@ -34,7 +33,7 @@
 
     <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto"><table class="w-full text-left text-sm">
-            <thead class="bg-surface-container-low text-outline uppercase text-xs tracking-wider"><tr><th class="p-4">Persona</th><th class="p-4">Documento</th><th class="p-4">Contacto</th><th class="p-4">Reservas</th><th class="p-4">Tipo</th><th class="p-4 text-right">Acciones</th></tr></thead>
+            <thead class="bg-surface-container-low text-outline uppercase text-xs tracking-wider"><tr><th class="p-4">Persona</th><th class="p-4">Documento</th><th class="p-4">Contacto</th><th class="p-4">Reservas</th><th class="p-4">Acceso</th><th class="p-4 text-right">Acciones</th></tr></thead>
             <tbody class="divide-y divide-surface-container">
             @if (!Model.Personas.Any()) { <tr><td colspan="6" class="p-10 text-center text-outline">No hay personas que coincidan con la búsqueda.</td></tr> }
             @foreach (var p in Model.Personas)
@@ -44,7 +43,7 @@
                     <td class="p-4">@p.TipoDocumento · @p.NumeroDocumento</td>
                     <td class="p-4">@p.EMail<small class="block text-outline">@p.Telefono</small></td>
                     <td class="p-4">@p.TotalReservas</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs @(p.EsEmpleado ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-surface-container text-on-surface-variant")">@(p.EsEmpleado ? "Personal" : "Huésped")</span></td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs @(p.TieneCuenta ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-surface-container text-on-surface-variant")">@(p.TieneCuenta ? "Con cuenta" : "Sin cuenta")</span></td>
                     <td class="p-4"><div class="flex justify-end gap-1">
                         <a asp-page="Detalles" asp-route-id="@p.UsuarioId" title="Ver ficha" class="p-2 rounded-lg hover:bg-surface-container"><span class="material-symbols-outlined">visibility</span></a>
                         @if (Model.PuedeAdministrar && !p.EsEmpleado)

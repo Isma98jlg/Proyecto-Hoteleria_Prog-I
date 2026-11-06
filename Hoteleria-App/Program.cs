@@ -1,115 +1,229 @@
+using System.Threading.RateLimiting;
+using Hoteleria_App.Api;
 using Hoteleria_App.Data;
-using Hoteleria_App.Services;
+using Hoteleria_App.Hubs;
 using Hoteleria_App.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Hoteleria_App.Security;
+using Hoteleria_App.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Carga variables locales desde .env (si existe) como configuración de desarrollo.
-// Precedencia: variables de entorno del SO > .env > appsettings.
+// Carga variables locales desde .env (si existe). Precedencia: variables del sistema > .env > appsettings.
 LoadDotEnv(builder.Configuration, builder.Environment.ContentRootPath);
 
-// Add services to the container.
+var config = builder.Configuration;
+
 builder.Services.AddRazorPages();
+builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthorizationHandler, HotelPermissionAuthorizationHandler>();
 
-// Base de datos SQL Server (config en .env / variables de entorno).
-var connectionString = BuildConnectionString(builder.Configuration);
-
 builder.Services.AddDbContext<HoteleriaDbContext>(options =>
-    options.UseSqlServer(connectionString, sqlOptions =>
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
-            errorNumbersToAdd: null)));
+    options.UseNpgsql(BuildConnectionString(config), npgsql => npgsql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)));
 
+builder.Services.AddSingleton<RelojHotel>();
+builder.Services.AddSingleton<DominioCorreo>();
+builder.Services.AddSingleton<INotificadorHotel, NotificadorSignalR>();
+builder.Services.AddScoped<PermisosService>();
 builder.Services.AddScoped<IHabitacionService, HabitacionService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
+builder.Services.AddScoped<CuentaService>();
+builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
+builder.Services.AddScoped<CopilotoService>();
 
-// Identidad (cuentas de acceso del personal) persistida en SQL Server.
+// Redis es opcional: da caché compartida y conecta SignalR entre instancias.
+var redis = BuildRedisOptions(config["REDIS_URL"]);
+var signalR = builder.Services.AddSignalR();
+if (redis is not null)
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.ConfigurationOptions = redis;
+        options.InstanceName = "hoteleria:";
+    });
+    signalR.AddStackExchangeRedis(redis.ToString(), options =>
+        options.Configuration.ChannelPrefix = RedisChannel.Literal("hoteleria"));
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+}
+
+// Las claves viven en la base de datos: el disco de un contenedor se pierde en cada despliegue,
+// y con él las sesiones y los enlaces de restablecimiento.
+builder.Services.AddDataProtection()
+    .SetApplicationName("Hoteleria-App")
+    .PersistKeysToDbContext<HoteleriaDbContext>();
+
 builder.Services.AddIdentity<HotelUser, HotelRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequiredLength = 8;
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
     .AddEntityFrameworkStores<HoteleriaDbContext>()
     .AddDefaultTokenProviders();
+
+// Un cambio de cargo o de contraseña se aplica a las sesiones abiertas en menos de un minuto.
+builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromMinutes(1));
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
+builder.Services.AddAntiforgery(options => options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest);
+
+// Render termina TLS en su proxy y reenvía la petición por HTTP interno.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
 });
 
-// Todo requiere autenticación salvo las páginas marcadas [AllowAnonymous].
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var path = context.Request.Path.Value ?? "";
+        var esEnvioSensible = HttpMethods.IsPost(context.Request.Method) &&
+            (path.StartsWith("/Account/Login", StringComparison.OrdinalIgnoreCase)
+             || path.StartsWith("/Account/Registro", StringComparison.OrdinalIgnoreCase)
+             || path.StartsWith("/Account/Invitacion", StringComparison.OrdinalIgnoreCase)
+             || path.StartsWith("/Account/Restablecer", StringComparison.OrdinalIgnoreCase)
+             || path.StartsWith("/Chat", StringComparison.OrdinalIgnoreCase));
+        if (!esEnvioSensible) return RateLimitPartition.GetNoLimiter("sin-limite");
+
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
+        return RateLimitPartition.GetFixedWindowLimiter($"{ip}:{path.ToLowerInvariant()}", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = int.TryParse(config["RATE_LIMIT_POR_MINUTO"], out var limite) ? limite : 20,
+            Window = TimeSpan.FromMinutes(1)
+        });
+    });
+});
+
+// Todo requiere autenticación salvo lo marcado como anónimo.
 builder.Services.Configure<AuthorizationOptions>(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
-    options.AddPolicy(HotelPermissionPolicies.Ver, policy => policy.RequireAuthenticatedUser()
-        .AddRequirements(new HotelPermissionRequirement("ver")));
-    options.AddPolicy(HotelPermissionPolicies.CrudRequerimientos, policy => policy.RequireAuthenticatedUser()
-        .AddRequirements(new HotelPermissionRequirement("crud_requerimientos")));
-    options.AddPolicy(HotelPermissionPolicies.CrudPisos, policy => policy.RequireAuthenticatedUser()
-        .AddRequirements(new HotelPermissionRequirement("crud_pisos")));
-    options.AddPolicy(HotelPermissionPolicies.CrudUsuarios, policy => policy.RequireAuthenticatedUser()
-        .AddRequirements(new HotelPermissionRequirement("crud_usuarios")));
-    options.AddPolicy(HotelPermissionPolicies.CrudHabitaciones, policy => policy.RequireAuthenticatedUser()
-        .AddRequirements(new HotelPermissionRequirement("crud_habitaciones")));
-    options.AddPolicy(HotelPermissionPolicies.CrudTipoVip, policy => policy.RequireAuthenticatedUser()
-        .AddRequirements(new HotelPermissionRequirement("crud_tipo_vip")));
+    AddPermissionPolicy(options, HotelPermissionPolicies.Ver, "ver");
+    AddPermissionPolicy(options, HotelPermissionPolicies.CrudRequerimientos, "crud_requerimientos");
+    AddPermissionPolicy(options, HotelPermissionPolicies.CrudPisos, "crud_pisos");
+    AddPermissionPolicy(options, HotelPermissionPolicies.CrudUsuarios, "crud_usuarios");
+    AddPermissionPolicy(options, HotelPermissionPolicies.CrudHabitaciones, "crud_habitaciones");
+    AddPermissionPolicy(options, HotelPermissionPolicies.CrudTipoVip, "crud_tipo_vip");
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseVentanaFlotante();
 app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHub<HotelHub>("/hubs/hotel");
+app.MapApiV1();
+app.MapOpenApi().AllowAnonymous();
+app.MapGet("/health", async (HoteleriaDbContext db, CancellationToken ct) =>
+    await db.Database.CanConnectAsync(ct)
+        ? Results.Ok(new { estado = "ok" })
+        : Results.StatusCode(StatusCodes.Status503ServiceUnavailable)).AllowAnonymous();
 
-// Aplica migraciones pendientes + datos semilla al arrancar (salvo DB_AUTO_MIGRATE=false).
-if (GetAutoMigrateSetting(builder.Configuration))
+if (GetBool(config, "DB_AUTO_MIGRATE", true))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<HoteleriaDbContext>();
-    await db.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(db);
-
-    // Cuenta de acceso del administrador (Identity).
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<HotelUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<HotelRole>>();
-    await DbSeeder.SeedAccessAccountsAsync(
-        db,
-        userManager,
-        roleManager,
-        builder.Configuration["ADMIN_EMAIL"] ?? "admin@hoteleria.com",
-        builder.Configuration["ADMIN_PASSWORD"] ?? "Admin123!",
-        builder.Configuration["DEMO_WORKER_EMAIL"] ?? "trabajador@hoteleria.com",
-        builder.Configuration["DEMO_WORKER_PASSWORD"] ?? "Worker123!",
-        builder.Configuration["DEMO_USER_EMAIL"] ?? "usuario@hoteleria.com",
-        builder.Configuration["DEMO_USER_PASSWORD"] ?? "User123!");
+
+    await db.Database.MigrateAsync();
+    await DbSeeder.SeedAsync(db);
+    await DbSeeder.EnsureRolesAsync(roleManager);
+
+    var dominio = scope.ServiceProvider.GetRequiredService<DominioCorreo>();
+    await DbSeeder.ConvertirCorreosAsync(db, userManager, dominio, app.Logger);
+
+    // El administrador inicial solo se crea si no hay ninguno. Las variables no se vuelven a usar:
+    // después, su nombre, correo y contraseña se cambian desde la aplicación.
+    if (!await db.Usuarios.AnyAsync(u => u.Cargo.Name == CargosSistema.Admin))
+    {
+        await DbSeeder.EnsureAccountAsync(db, userManager, roleManager,
+            CorreoPermitido(config, "ADMIN_EMAIL", dominio), Requerida(config, "ADMIN_PASSWORD"),
+            "Administrador", "del Sistema", CargosSistema.Admin, esPersonal: true);
+    }
+
+    // Cuentas de demostración: solo si se piden de forma explícita.
+    if (GetBool(config, "DEMO_ACCOUNTS", false))
+    {
+        await DbSeeder.EnsureAccountAsync(db, userManager, roleManager,
+            CorreoPermitido(config, "DEMO_WORKER_EMAIL", dominio), Requerida(config, "DEMO_WORKER_PASSWORD"),
+            "Trabajador", "Demostracion", CargosSistema.Trabajador, esPersonal: true);
+        await DbSeeder.EnsureAccountAsync(db, userManager, roleManager,
+            CorreoPermitido(config, "DEMO_USER_EMAIL", dominio), Requerida(config, "DEMO_USER_PASSWORD"),
+            "Huesped", "Demostracion", CargosSistema.Huesped, esPersonal: false);
+    }
 }
+
+// Sin bloquear el arranque: si Algolia falla, la búsqueda usa PostgreSQL.
+_ = Task.Run(async () =>
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<IBuscadorHabitaciones>().SincronizarAsync();
+});
 
 app.Run();
 
+static void AddPermissionPolicy(AuthorizationOptions options, string policy, string permission) =>
+    options.AddPolicy(policy, p => p.RequireAuthenticatedUser().AddRequirements(new HotelPermissionRequirement(permission)));
+
+static string Requerida(IConfiguration config, string clave)
+{
+    var valor = config[clave];
+    return !string.IsNullOrWhiteSpace(valor)
+        ? valor
+        : throw new InvalidOperationException($"Falta la variable de entorno {clave} (ver .env.example).");
+}
+
+static string CorreoPermitido(IConfiguration config, string clave, DominioCorreo dominio)
+{
+    var correo = Requerida(config, clave);
+    return dominio.Admite(correo)
+        ? correo
+        : throw new InvalidOperationException($"{clave} debe ser un correo @{dominio.Dominio}.");
+}
+
 /// <summary>
-/// Carga un archivo .env (clave=valor) en la configuración, con MENOR precedencia
-/// que las variables reales del sistema (el SO gana sobre .env). Así Docker Compose
-/// y la app comparten el mismo .env sin exportar variables a mano.
+/// Carga un archivo .env (clave=valor) con menor precedencia que las variables del sistema.
+/// En producción no existe: la configuración llega por variables de entorno.
 /// </summary>
 static void LoadDotEnv(IConfigurationBuilder config, string contentRoot)
 {
@@ -129,7 +243,6 @@ static void LoadDotEnv(IConfigurationBuilder config, string contentRoot)
         var value = line[(eq + 1)..].Trim().Trim('"').Trim('\'');
         if (key.Length == 0) continue;
 
-        // Las variables de entorno del SO tienen prioridad sobre .env.
         if (Environment.GetEnvironmentVariable(key) is not null) continue;
 
         values[key] = value;
@@ -139,10 +252,7 @@ static void LoadDotEnv(IConfigurationBuilder config, string contentRoot)
         config.AddInMemoryCollection(values);
 }
 
-/// <summary>
-/// Localiza el archivo .env partiendo del content root y subiendo por los
-/// directorios padre (cubre el caso repositorio/.env con la app en una subcarpeta).
-/// </summary>
+/// <summary>Busca .env desde el content root hacia arriba (repositorio/.env con la app en una subcarpeta).</summary>
 static string? FindEnvFile(string contentRoot)
 {
     var dir = new DirectoryInfo(contentRoot);
@@ -154,14 +264,6 @@ static string? FindEnvFile(string contentRoot)
     return null;
 }
 
-/// <summary>
-/// Determina si se aplican migraciones + datos semilla al arrancar.
-/// Lee DB_AUTO_MIGRATE (entorno o .env); por defecto true.
-/// Desactívala (false) cuando la BD ya se aprovisiona con el Dockerfile.
-/// </summary>
-static bool GetAutoMigrateSetting(IConfiguration config) =>
-    GetBool(config, "DB_AUTO_MIGRATE", true);
-
 static bool GetBool(IConfiguration config, string key, bool defaultValue)
 {
     var value = config[key];
@@ -171,40 +273,58 @@ static bool GetBool(IConfiguration config, string key, bool defaultValue)
 }
 
 /// <summary>
-/// Construye la connection string a partir de variables de entorno / .env.
-/// Variables: DB_CONNECTION_STRING (override total), DB_SERVER, DB_NAME, DB_USER,
-/// DB_PASSWORD (obligatoria), DB_TRUST_CERT.
+/// Convierte DATABASE_URL (postgres://usuario:clave@host:puerto/base, el formato de Render)
+/// en una cadena de conexión de Npgsql. No hay valor por defecto: sin ella la app no arranca.
 /// </summary>
 static string BuildConnectionString(IConfiguration config)
 {
-    // 1. Override total (connection string completa).
-    var full = config["DB_CONNECTION_STRING"];
-    if (!string.IsNullOrWhiteSpace(full)) return full;
+    var url = Requerida(config, "DATABASE_URL");
+    if (!url.StartsWith("postgres", StringComparison.OrdinalIgnoreCase)) return url;
 
-    // 2. Construir desde partes.
-    var server   = config["DB_SERVER"]      ?? config["DbSettings:Server"]   ?? "localhost,1433";
-    var database = config["DB_NAME"]        ?? config["DbSettings:Database"] ?? "HOTEL";
-    var user     = config["DB_USER"]        ?? config["DbSettings:User"]     ?? "sa";
-    var password = config["DB_PASSWORD"]    ?? config["DbSettings:Password"];
-    var trust    = config["DB_TRUST_CERT"]  ?? config["DbSettings:TrustServerCertificate"] ?? "true";
-
-    if (string.IsNullOrWhiteSpace(password))
+    var uri = new Uri(url);
+    var credenciales = uri.UserInfo.Split(':', 2);
+    var builder = new NpgsqlConnectionStringBuilder
     {
-        throw new InvalidOperationException(
-            "DB_PASSWORD no está configurada. Define DB_PASSWORD en las variables " +
-            "de entorno o en el archivo .env (ver .env.example).");
-    }
-
-    var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder
-    {
-        DataSource = server,
-        InitialCatalog = database,
-        UserID = user,
-        Password = password,
-        TrustServerCertificate = bool.TryParse(trust, out var b) && b,
-        ConnectTimeout = 30,
-        Encrypt = false
+        Host = uri.Host,
+        Port = uri.Port > 0 ? uri.Port : 5432,
+        Database = uri.AbsolutePath.TrimStart('/'),
+        Username = Uri.UnescapeDataString(credenciales[0]),
+        Password = credenciales.Length > 1 ? Uri.UnescapeDataString(credenciales[1]) : null
     };
-
+    // La URL puede fijar el modo con ?sslmode=disable. Si no lo hace, las direcciones internas de
+    // Render (sin dominio) y las locales lo negocian, y cualquier otro servidor remoto exige TLS.
+    var sslmode = System.Web.HttpUtility.ParseQueryString(uri.Query)["sslmode"];
+    var esInterna = uri.Host is "localhost" or "127.0.0.1" || !uri.Host.Contains('.');
+    builder.SslMode = Enum.TryParse<SslMode>(sslmode, ignoreCase: true, out var modo)
+        ? modo
+        : esInterna ? SslMode.Prefer : SslMode.Require;
     return builder.ConnectionString;
+}
+
+/// <summary>Acepta redis://[:clave@]host:puerto y rediss:// (TLS), el formato de Render Key Value.</summary>
+static ConfigurationOptions? BuildRedisOptions(string? url)
+{
+    if (string.IsNullOrWhiteSpace(url)) return null;
+
+    var uri = new Uri(url);
+    var options = new ConfigurationOptions
+    {
+        Ssl = uri.Scheme.Equals("rediss", StringComparison.OrdinalIgnoreCase),
+        AbortOnConnectFail = false
+    };
+    options.EndPoints.Add(uri.Host, uri.Port > 0 ? uri.Port : 6379);
+    if (!string.IsNullOrEmpty(uri.UserInfo))
+    {
+        var partes = uri.UserInfo.Split(':', 2);
+        if (partes.Length == 2)
+        {
+            if (partes[0].Length > 0) options.User = Uri.UnescapeDataString(partes[0]);
+            options.Password = Uri.UnescapeDataString(partes[1]);
+        }
+        else
+        {
+            options.Password = Uri.UnescapeDataString(partes[0]);
+        }
+    }
+    return options;
 }

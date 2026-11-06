@@ -8,6 +8,7 @@
     @if (!ViewData.ModelState.IsValid) { <div asp-validation-summary="All" class="rounded-xl bg-error-container text-on-error-container p-3"></div> }
     <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1">Número de habitación<input asp-for="Habitacion.HabitacionId" type="number" min="1" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Habitacion.HabitacionId" class="text-error text-sm"></span></label>
             <label class="flex flex-col gap-1">Piso<select asp-for="Habitacion.NroPiso" asp-items="Model.PisosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="">Seleccione un piso</option></select><span asp-validation-for="Habitacion.NroPiso" class="text-error text-sm"></span></label>
             <label class="flex flex-col gap-1">Número de camas<input asp-for="Habitacion.NroCamas" type="number" min="1" max="20" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Habitacion.NroCamas" class="text-error text-sm"></span></label>
             <label class="flex flex-col gap-1">Categoría<select asp-for="Habitacion.TipoVipNombre" asp-items="Model.TiposVipDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="">Seleccione una categoría</option></select><span asp-validation-for="Habitacion.TipoVipNombre" class="text-error text-sm"></span></label>

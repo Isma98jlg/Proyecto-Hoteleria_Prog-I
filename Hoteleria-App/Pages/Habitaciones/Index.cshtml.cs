@@ -15,12 +15,10 @@ namespace Hoteleria_App.Pages.Habitaciones;
 /// Reproduce el diseño Stitch "gesti_n_de_habitaciones_y_pisos_hms_unificado" enlazando los
 /// datos reales del modelo (Habitacion, Piso, TipoVip) servidos por <see cref="IHabitacionService"/>.
 ///
-/// Nota de mapeo canónico: el diseño de Stitch habla de "2 categorías canónicas"
-/// (Estándar / VIP). El modelo real expone 4 niveles de TipoVip (ESTANDAR, SUPERIOR,
-/// SUITE, PRESIDENCIAL). Para la cinta de KPIs y el filtro de categoría conservamos la
-/// jerga visual del diseño reduciendo los niveles a dos grupos:
+/// Las categorías iniciales son ESTANDAR y VIP, y se pueden crear más. La cinta de KPIs y el
+/// filtro de categoría agrupan así:
 ///   · Estándar  → TipoVipNombre == "ESTANDAR"
-///   · VIP/Premium → el resto de niveles (SUPERIOR + SUITE + PRESIDENCIAL)
+///   · VIP/Premium → cualquier otra categoría
 /// Las tarjetas individuales muestran SIEMPRE el TipoVip y la tarifa reales de cada
 /// habitación (sin cifras hardcodeadas).
 /// </summary>
@@ -82,7 +80,7 @@ public class IndexModel : PageModel
     // ---------------------------------------------------------------
     // Helpers de presentación reutilizados en la vista
     // ---------------------------------------------------------------
-    public string Codigo(Habitacion h) => $"{h.TipoVip?.Sigla ?? 'E'}-{h.HabitacionId}";
+    public string Codigo(Habitacion h) => CodigoHabitacion.Formatear(h.NroPiso, h.TipoVip?.Sigla ?? 'E', h.HabitacionId);
 
     public bool EsVip(Habitacion h) =>
         !string.IsNullOrEmpty(h.TipoVipNombre) && h.TipoVipNombre != "ESTANDAR";
@@ -210,11 +208,7 @@ public class IndexModel : PageModel
     [BindProperty] public long? PisoNro { get; set; }
     [BindProperty] public string? PisoRef { get; set; }
 
-    /// <summary>
-    /// Recepción del formulario "Registrar Nivel". La persistencia de la entidad PISOS
-    /// se delega a un futuro IPisoService en la integración con BD; esta maqueta de
-    /// front-end conserva la interacción completa sin efectos laterales.
-    /// </summary>
+    /// <summary>Crea un piso o actualiza su referencia.</summary>
     public async Task<IActionResult> OnPostGuardarPisoAsync()
     {
         if (!(await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudPisos)).Succeeded)
@@ -232,6 +226,25 @@ public class IndexModel : PageModel
             piso.RefPiso = PisoRef.Trim();
         await _db.SaveChangesAsync();
         TempData["MensajeExito"] = piso is null ? "Piso registrado correctamente." : "Referencia del piso actualizada.";
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostEliminarPisoAsync(long nroPiso)
+    {
+        if (!(await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudPisos)).Succeeded)
+            return Forbid();
+
+        var piso = await _db.Pisos.SingleOrDefaultAsync(p => p.NroPiso == nroPiso);
+        if (piso is null) return NotFound();
+        if (await _db.Habitaciones.AnyAsync(h => h.NroPiso == nroPiso))
+        {
+            TempData["MensajeError"] = "No se puede eliminar un piso con habitaciones.";
+            return RedirectToPage();
+        }
+
+        _db.Pisos.Remove(piso);
+        await _db.SaveChangesAsync();
+        TempData["MensajeExito"] = "Piso eliminado.";
         return RedirectToPage();
     }
 }

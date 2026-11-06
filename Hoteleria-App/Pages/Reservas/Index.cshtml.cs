@@ -1,30 +1,20 @@
 using Hoteleria_App.Models;
+using Hoteleria_App.Security;
 using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Hoteleria_App.Data;
-using Hoteleria_App.Security;
 
 namespace Hoteleria_App.Pages.Reservas;
 
 [Authorize(Policy = HotelPermissionPolicies.CrudRequerimientos)]
-public class IndexModel : PageModel
+public class IndexModel(IReservaService reservaService, RelojHotel reloj) : PageModel
 {
-    private readonly IReservaService _reservaService;
-    private readonly HoteleriaDbContext _db;
-
-    public IndexModel(IReservaService reservaService, HoteleriaDbContext db)
-    {
-        _reservaService = reservaService;
-        _db = db;
-    }
-
     public List<ReservaViewModel> Reservas { get; set; } = new();
     public List<UsuarioComboViewModel> Usuarios { get; set; } = new();
-    public List<string> Estados { get; set; } = new();
+    public IReadOnlyList<string> Estados => EstadosReserva.Todos;
     public List<HabitacionDisponibleViewModel> Habitaciones { get; set; } = new();
+    public DateTime Hoy => reloj.Hoy;
 
     [BindProperty]
     public ReservaCreateModel Reserva { get; set; } = new();
@@ -38,79 +28,60 @@ public class IndexModel : PageModel
     public string? Estado { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    public string? UsuarioId { get; set; }
+    public long? UsuarioId { get; set; }
 
     public async Task OnGetAsync()
     {
-        Reservas = await _reservaService.GetAllAsync(Buscar, Estado, UsuarioId);
-        Usuarios = await _reservaService.GetUsuariosActivosAsync();
-        Estados = await _reservaService.GetEstadosDisponiblesAsync();
-        InicializarFormulario();
+        await CargarPaginaAsync();
+        Reserva.InicioReserva = reloj.Hoy.AddDays(1);
+        Reserva.TotalNoches = 1;
+        Reserva.EstadoReserva = EstadosReserva.Pendiente;
         await CargarHabitacionesAsync();
     }
 
     public async Task<IActionResult> OnPostCrearAsync()
     {
-        if (Reserva.InicioReserva.Date < DateTime.Today)
-            ModelState.AddModelError("Reserva.InicioReserva", "La fecha de entrada no puede ser anterior a hoy.");
-        if (Reserva.HabitacionIds is null || Reserva.HabitacionIds.Count == 0)
-            ModelState.AddModelError("Reserva.HabitacionIds", "Seleccione al menos una habitación.");
-        if (!new[] { "PENDIENTE", "CONFIRMADA" }.Contains(Reserva.EstadoReserva))
-            ModelState.AddModelError("Reserva.EstadoReserva", "Seleccione un estado inicial válido.");
-
-        if (!ModelState.IsValid || !await _reservaService.CrearAsync(Reserva))
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
-                ModelState.AddModelError(string.Empty, "No se pudo crear la reserva. Verifique el usuario y que las habitaciones sigan disponibles.");
-            AbrirModalReserva = true;
-            await CargarPaginaAsync();
-            await CargarHabitacionesAsync();
-            return Page();
+            var resultado = await reservaService.CrearAsync(Reserva);
+            if (resultado.Ok)
+            {
+                TempData["MensajeExito"] = "Reserva creada correctamente.";
+                return RedirectToPage("Index", new { Buscar, Estado, UsuarioId });
+            }
+            ModelState.AddModelError(string.Empty, resultado.Error!);
         }
 
-        TempData["MensajeExito"] = "Reserva creada correctamente.";
-        return RedirectToPage("Index", new { Buscar, Estado, UsuarioId });
+        AbrirModalReserva = true;
+        await CargarPaginaAsync();
+        await CargarHabitacionesAsync();
+        return Page();
     }
 
     public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1)
     {
         if (noches < 1 || noches > 365) return BadRequest();
-        var habitaciones = await _reservaService.GetHabitacionesDisponiblesAsync(inicio.Date, inicio.Date.AddDays(noches));
-        return new JsonResult(habitaciones);
+        var entrada = DateTime.SpecifyKind(inicio.Date, DateTimeKind.Unspecified);
+        return new JsonResult(await reservaService.GetHabitacionesDisponiblesAsync(entrada, entrada.AddDays(noches)));
     }
 
     public async Task<IActionResult> OnPostEliminarAsync(long id)
     {
-        var ok = await _reservaService.EliminarAsync(id);
-        if (!ok)
-        {
-            TempData["MensajeError"] = "No se pudo eliminar la reserva.";
-        }
-        else
-        {
-            TempData["MensajeExito"] = "Reserva eliminada correctamente.";
-        }
+        var resultado = await reservaService.EliminarAsync(id);
+        TempData[resultado.Ok ? "MensajeExito" : "MensajeError"] = resultado.Ok ? "Reserva eliminada correctamente." : resultado.Error;
         return RedirectToPage("Index");
     }
 
     private async Task CargarPaginaAsync()
     {
-        Reservas = await _reservaService.GetAllAsync(Buscar, Estado, UsuarioId);
-        Usuarios = await _reservaService.GetUsuariosActivosAsync();
-        Estados = await _reservaService.GetEstadosDisponiblesAsync();
-    }
-
-    private void InicializarFormulario()
-    {
-        Reserva.InicioReserva = DateTime.Today.AddDays(1);
-        Reserva.TotalNoches = 1;
-        Reserva.EstadoReserva = "PENDIENTE";
+        Reservas = await reservaService.GetAllAsync(Buscar, Estado, UsuarioId);
+        Usuarios = await reservaService.GetHuespedesAsync();
     }
 
     private async Task CargarHabitacionesAsync()
     {
-        var inicio = Reserva.InicioReserva == default ? DateTime.Today.AddDays(1) : Reserva.InicioReserva.Date;
+        var inicio = Reserva.InicioReserva == default ? reloj.Hoy.AddDays(1) : DateTime.SpecifyKind(Reserva.InicioReserva.Date, DateTimeKind.Unspecified);
         var noches = Math.Clamp(Reserva.TotalNoches, 1, 365);
-        Habitaciones = await _reservaService.GetHabitacionesDisponiblesAsync(inicio, inicio.AddDays(noches));
+        Habitaciones = await reservaService.GetHabitacionesDisponiblesAsync(inicio, inicio.AddDays(noches));
     }
 }

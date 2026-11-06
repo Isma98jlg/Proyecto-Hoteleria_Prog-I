@@ -1,0 +1,20 @@
+@page "{id:long}"
+@model Hoteleria_App.Pages.Empleados.EditarModel
+@{
+    ViewData["Title"] = "Editar empleado";
+}
+<main class="max-w-4xl flex flex-col gap-6">
+    <section><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">ADMINISTRACIÓN · PERSONAL</span><h1 class="font-headline-lg text-headline-lg mt-1">Editar empleado</h1></section>
+    <partial name="_Mensajes" />
+    <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-5">
+        <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
+        <partial name="_FormPersona" for="Persona" />
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-surface-container-high pt-4">
+            <label class="flex flex-col gap-1">Cargo<select asp-for="CargoId" asp-items="Model.CargosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"></select></label>
+            <label class="flex flex-col gap-1">Contratación<input asp-for="FechaContratacion" class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
+            <label class="flex flex-col gap-1">Sueldo<input asp-for="Sueldo" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Sueldo" class="text-error text-sm"></span></label>
+        </div>
+        <div class="flex justify-between gap-3"><a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Volver</a><button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Guardar cambios</button></div>
+    </form>
+    <form method="post" asp-page-handler="Enlace" asp-route-id="@Model.UsuarioId" class="flex justify-end"><button type="submit" class="px-4 py-2 rounded-lg bg-surface-container">Generar enlace para restablecer contraseña</button></form>
+</main>
