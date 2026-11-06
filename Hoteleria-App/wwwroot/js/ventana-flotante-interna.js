@@ -3,6 +3,25 @@
 (() => {
     if (window.parent === window) return;
 
+    const contenido = document.querySelector('.contenido-ventana');
+
+    // La cabecera de la ventana ya muestra el título y permite cerrar: se quita lo que lo repite.
+    document.querySelectorAll('a').forEach(enlace => {
+        if (/(^|\s)Volver(\s|$)/.test(enlace.textContent)) enlace.remove();
+    });
+    const titulo = contenido.querySelector('h1');
+    if (titulo) {
+        document.title = titulo.textContent.trim();
+        if (titulo.previousElementSibling?.tagName === 'SPAN') titulo.previousElementSibling.remove();
+        titulo.remove();
+    }
+    contenido.querySelectorAll('section').forEach(seccion => {
+        if (!seccion.textContent.trim() && !seccion.querySelector('a, button, input, img')) seccion.remove();
+    });
+
+    const informarAltura = () => parent.postMessage({ tipo: 'altura', alto: contenido.offsetHeight }, location.origin);
+    new ResizeObserver(informarAltura).observe(contenido);
+
     document.addEventListener('submit', evento => {
         const form = evento.target;
         if ((form.getAttribute('method') || 'get').toLowerCase() === 'post') {

@@ -4,6 +4,8 @@
 
     let ventana = null;
     let huboCambios = false;
+    let foco = null;
+    const DURACION_CIERRE_MS = 170;
 
     const esFlotante = url => RUTAS_FLOTANTES.test(new URL(url, location.origin).pathname);
 
@@ -13,40 +15,53 @@
         return destino.pathname + destino.search;
     }
 
+    // Cada ventana usa el ancho que necesita su contenido.
+    function anchoPara(ruta) {
+        if (/^\/(chat|portal\/perfil|account\/cambiarcontrasena)/i.test(ruta)) return 'max-w-lg';
+        if (/^\/reservas\//i.test(ruta)) return 'max-w-4xl';
+        return 'max-w-3xl';
+    }
+
     function abrir(url) {
         cerrar(false);
         if (typeof toggleDrawer === 'function') toggleDrawer(false);
         if (typeof toggleBento === 'function') toggleBento(false);
 
-        const esChat = /^\/chat/i.test(new URL(url, location.origin).pathname);
+        const ruta = new URL(url, location.origin).pathname;
+        foco = document.activeElement;
         ventana = document.createElement('div');
         ventana.id = 'ventana-flotante';
-        ventana.className = 'fixed inset-0 z-[60] flex bg-primary/50 backdrop-blur-sm p-2 md:p-6 ' + (esChat ? 'items-end justify-start' : 'items-center justify-center');
+        ventana.className = 'vf-fondo fixed inset-0 z-[60] flex ' + (/^\/chat/i.test(ruta) ? 'vf-izquierda' : 'vf-centro');
         ventana.setAttribute('role', 'dialog');
         ventana.setAttribute('aria-modal', 'true');
+        ventana.setAttribute('aria-labelledby', 'ventana-flotante-titulo');
 
         const panel = document.createElement('section');
-        panel.className = 'flex w-full flex-col overflow-hidden rounded-2xl border border-surface-container-high bg-background shadow-2xl ' + (esChat ? 'h-[85vh] max-w-xl' : 'h-[92vh] max-w-5xl');
+        panel.className = 'vf-panel flex w-full flex-col overflow-hidden bg-surface-container-lowest ' + anchoPara(ruta);
 
         const cabecera = document.createElement('header');
-        cabecera.className = 'flex shrink-0 items-center justify-between gap-3 border-b border-surface-container-high bg-surface-container-lowest px-4 py-3';
-        const titulo = document.createElement('strong');
-        titulo.className = 'truncate text-on-surface';
+        cabecera.className = 'vf-cabecera relative flex shrink-0 items-center justify-between gap-3 py-3 pl-5 pr-3';
+        const titulo = document.createElement('h2');
+        titulo.id = 'ventana-flotante-titulo';
+        titulo.className = 'truncate font-headline-sm text-headline-sm text-on-surface';
         titulo.textContent = 'Cargando…';
         const cerrarBoton = document.createElement('button');
         cerrarBoton.type = 'button';
-        cerrarBoton.className = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-outline hover:bg-surface-container hover:text-on-surface';
+        cerrarBoton.className = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-outline transition-colors hover:bg-surface-container hover:text-on-surface';
         cerrarBoton.setAttribute('aria-label', 'Cerrar');
-        cerrarBoton.innerHTML = '<span class="material-symbols-outlined">close</span>';
+        cerrarBoton.innerHTML = '<span class="material-symbols-outlined text-[20px]">close</span>';
         cerrarBoton.addEventListener('click', () => cerrar());
-        cabecera.append(titulo, cerrarBoton);
+        const carga = document.createElement('span');
+        carga.className = 'vf-carga';
+        cabecera.append(titulo, cerrarBoton, carga);
 
         const marco = document.createElement('iframe');
-        marco.className = 'w-full flex-1 border-0';
-        marco.title = 'Ventana flotante';
+        marco.className = 'vf-marco w-full flex-1 border-0';
+        marco.title = 'Contenido de la ventana';
         marco.src = conModal(url);
         marco.addEventListener('load', () => {
             try { titulo.textContent = marco.contentDocument.title || ''; } catch { titulo.textContent = ''; }
+            panel.classList.add('vf-listo');
         });
 
         panel.append(cabecera, marco);
@@ -54,15 +69,27 @@
         ventana.addEventListener('click', evento => { if (evento.target === ventana) cerrar(); });
         document.body.append(ventana);
         document.body.classList.add('overflow-hidden');
+        panel.tabIndex = -1;
+        panel.focus({ preventScroll: true });
     }
 
     function cerrar(recargarSiHuboCambios = true) {
         if (!ventana) return;
-        ventana.remove();
+        const saliente = ventana;
         ventana = null;
+        saliente.classList.add('vf-cerrando');
+        setTimeout(() => saliente.remove(), DURACION_CIERRE_MS);
         document.body.classList.remove('overflow-hidden');
+        foco?.focus?.({ preventScroll: true });
+        foco = null;
         if (recargarSiHuboCambios && huboCambios) location.reload();
         huboCambios = false;
+    }
+
+    // La página interna informa de su altura: la ventana se ajusta sin pasar del máximo de la pantalla.
+    function ajustarAltura(alto) {
+        const panel = ventana.querySelector('.vf-panel');
+        panel.style.height = `${Math.ceil(alto) + panel.querySelector('header').offsetHeight}px`;
     }
 
     // replace() evita sumar entradas al historial del navegador.
@@ -91,8 +118,9 @@
 
     window.addEventListener('message', evento => {
         if (evento.origin !== location.origin || !ventana) return;
-        const { tipo, url } = evento.data || {};
-        if (tipo === 'listo' && typeof url === 'string') seguir(url, true);
+        const { tipo, url, alto } = evento.data || {};
+        if (tipo === 'altura' && typeof alto === 'number') ajustarAltura(alto);
+        else if (tipo === 'listo' && typeof url === 'string') seguir(url, true);
         else if (tipo === 'navegar' && typeof url === 'string') seguir(url, false);
         else if (tipo === 'cerrar') cerrar();
     });

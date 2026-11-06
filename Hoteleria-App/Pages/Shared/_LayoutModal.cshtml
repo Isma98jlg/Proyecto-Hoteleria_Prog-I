@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="en-ventana">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <partial name="_Head" />
 </head>
-<body class="bg-background font-body-md text-on-surface antialiased">
-    <div class="p-4 md:p-6 flex flex-col items-center gap-6 [&>*]:w-full">
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased">
+    <div class="contenido-ventana px-5 pb-6 pt-4 flex flex-col items-center gap-6 [&>*]:w-full">
         @RenderBody()
     </div>
     <script src="~/js/ventana-flotante-interna.js" asp-append-version="true"></script>

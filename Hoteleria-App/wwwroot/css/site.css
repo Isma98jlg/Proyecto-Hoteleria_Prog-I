@@ -31,6 +31,140 @@
     display: none;
 }
 
+/* ==========================================================================
+   Ventanas flotantes
+   ========================================================================== */
+.vf-fondo {
+    padding: 1.5rem;
+    background: rgb(19 27 46 / 0.32);
+    backdrop-filter: blur(4px);
+    animation: vf-fondo-entra 180ms ease-out both;
+}
+
+.vf-centro {
+    align-items: center;
+    justify-content: center;
+}
+
+.vf-izquierda {
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+.vf-panel {
+    height: 18rem;
+    max-height: min(46rem, 100%);
+    outline: none;
+    border-radius: 1rem;
+    box-shadow:
+        0 0 0 1px rgb(19 27 46 / 0.06),
+        0 24px 60px -16px rgb(19 27 46 / 0.35);
+    transition: height 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: vf-panel-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vf-cabecera {
+    box-shadow: 0 1px 0 rgb(19 27 46 / 0.07);
+}
+
+/* Barra de carga: Render puede tardar en responder si el servicio estaba dormido. */
+.vf-carga {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 35%;
+    height: 2px;
+    background: #fe932c;
+    animation: vf-carga 1100ms ease-in-out infinite;
+}
+
+.vf-listo .vf-carga {
+    display: none;
+}
+
+.vf-marco {
+    opacity: 0;
+    transition: opacity 180ms ease-out;
+}
+
+.vf-listo .vf-marco {
+    opacity: 1;
+}
+
+.vf-cerrando {
+    pointer-events: none;
+    animation: vf-fondo-sale 170ms ease-in both;
+}
+
+.vf-cerrando .vf-panel {
+    animation: vf-panel-sale 170ms ease-in both;
+}
+
+/* En el móvil, la ventana sube desde abajo y ocupa todo el ancho. */
+@media (max-width: 639px) {
+    .vf-fondo {
+        padding: 0.75rem 0 0;
+        align-items: flex-end;
+    }
+
+    .vf-panel {
+        max-width: none;
+        border-radius: 1rem 1rem 0 0;
+        animation-name: vf-hoja-entra;
+    }
+
+    .vf-cerrando .vf-panel {
+        animation-name: vf-hoja-sale;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vf-fondo,
+    .vf-panel,
+    .vf-cerrando,
+    .vf-cerrando .vf-panel,
+    .vf-marco {
+        animation: none;
+        transition: none;
+    }
+
+    .vf-carga {
+        width: 100%;
+        animation: none;
+    }
+}
+
+@keyframes vf-fondo-entra { from { opacity: 0; } }
+@keyframes vf-fondo-sale { to { opacity: 0; } }
+@keyframes vf-panel-entra { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+@keyframes vf-panel-sale { to { opacity: 0; transform: translateY(6px) scale(0.985); } }
+@keyframes vf-hoja-entra { from { transform: translateY(100%); } }
+@keyframes vf-hoja-sale { to { transform: translateY(100%); } }
+@keyframes vf-carga {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(300%); }
+}
+
+/* Dentro de la ventana: una sola superficie, sin tarjetas dentro de tarjetas. */
+.contenido-ventana > * > .bg-surface-container-lowest.rounded-2xl {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Hay barra visible porque, si el contenido no cabe, debe notarse que se puede desplazar. */
+html.en-ventana::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+}
+
+html.en-ventana::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background: #c6c6cd padding-box;
+}
+
 /* Ligaduras de iconos Material Symbols Outlined */
 .material-symbols-outlined {
     font-variation-settings:
