@@ -7,15 +7,7 @@
     <section><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">DIRECTORIO · REGISTRO</span><h1 class="font-headline-lg text-headline-lg mt-1">Nuevo huésped</h1><p class="text-on-surface-variant">Registra los datos de contacto para futuras reservas.</p></section>
     <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-5">
         <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3"></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1">Tipo de documento<select asp-for="Persona.TipoDocumento" class="px-3 py-2 bg-surface-container-low rounded-lg"><option>DNI</option><option>Pasaporte</option><option>CE</option><option>Otro</option></select><span asp-validation-for="Persona.TipoDocumento" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Número de documento<input asp-for="Persona.NumeroDocumento" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Persona.NumeroDocumento" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Nombres<input asp-for="Persona.Nombres" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Persona.Nombres" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Apellidos<input asp-for="Persona.Apellidos" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Persona.Apellidos" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Nacionalidad<input asp-for="Persona.Nacionalidad" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Persona.Nacionalidad" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Teléfono<input asp-for="Persona.Telefono" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Persona.Telefono" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1 md:col-span-2">Correo electrónico<input asp-for="Persona.EMail" type="email" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Persona.EMail" class="text-error text-sm"></span></label>
-        </div>
+        <partial name="_FormPersona" for="Persona" />
         <div class="flex justify-between border-t border-surface-container-high pt-4"><a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Cancelar</a><button class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold" type="submit">Guardar huésped</button></div>
     </form>
 </main>

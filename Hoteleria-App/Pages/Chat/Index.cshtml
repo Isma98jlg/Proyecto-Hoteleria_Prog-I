@@ -1,15 +1,61 @@
 @page
+@model Hoteleria_App.Pages.Chat.IndexModel
 @{
-    ViewData["Title"] = "Comunicación";
+    ViewData["Title"] = "Copiloto de reservas";
+    var r = Model.Resultado;
 }
 <main class="max-w-4xl flex flex-col gap-6">
     <section class="bg-primary-container text-on-primary rounded-2xl p-6 md:p-8 shadow-sm">
-        <span class="text-xs uppercase tracking-[.18em] text-primary-fixed-dim">MÓDULO COMPLEMENTARIO</span>
-        <h1 class="font-headline-lg text-headline-lg mt-2">Comunicación con huéspedes</h1>
-        <p class="text-on-primary/70 mt-2 max-w-2xl">El chat todavía no está habilitado en esta versión. La base de datos del proyecto no incluye conversaciones ni mensajes guardados.</p>
+        <span class="text-xs uppercase tracking-[.18em] text-primary-fixed-dim">ASISTENTE DE IA</span>
+        <h1 class="font-headline-lg text-headline-lg mt-2">Copiloto de reservas</h1>
+        <p class="text-on-primary/70 mt-2 max-w-2xl">Pegue el mensaje de un huésped y obtenga una propuesta. La disponibilidad y los precios salen del sistema, y usted confirma la reserva.</p>
     </section>
-    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 flex flex-col gap-4">
-        <div class="flex items-start gap-4"><span class="material-symbols-outlined text-secondary text-3xl">info</span><div><h2 class="font-headline-sm text-headline-sm">Qué falta para activar el chat</h2><p class="text-on-surface-variant mt-1">Se requiere definir cómo se guardan conversaciones y mensajes, quién puede participar y si el intercambio será en tiempo real. Esta pantalla no crea ni muestra mensajes ficticios.</p></div></div>
-        <div class="flex flex-wrap gap-3 border-t border-surface-container-high pt-4">@if (User.IsInRole("admin") || User.IsInRole("trabajador")) { <a asp-page="/Reservas/Index" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Ir a reservas</a> }<a asp-page="/Usuarios/Index" class="px-4 py-2 rounded-lg bg-surface-container">Ver directorio</a></div>
-    </section>
+
+    @if (!Model.Disponible)
+    {
+        <p class="rounded-xl bg-secondary-fixed text-on-secondary-fixed p-4">El copiloto está desactivado porque falta <code>ANTHROPIC_API_KEY</code>. El resto del sistema funciona con normalidad.</p>
+    }
+
+    <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 flex flex-col gap-3">
+        <label class="flex flex-col gap-1 font-semibold">Mensaje del huésped
+            <textarea asp-for="Mensaje" rows="5" maxlength="2000" required class="px-3 py-2 bg-surface-container-low rounded-lg font-normal" placeholder="Hola, somos dos personas y queremos una habitación VIP del 12 al 15 de diciembre…"></textarea>
+        </label>
+        <small class="text-outline">El texto se envía a Anthropic para interpretarlo. No incluya documentos de identidad ni datos de pago.</small>
+        <button type="submit" disabled="@(!Model.Disponible)" class="self-end px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold disabled:opacity-50">Analizar mensaje</button>
+    </form>
+
+    @if (r?.Error is string error) { <p class="rounded-xl bg-error-container text-on-error-container p-3">@error</p> }
+
+    @if (r?.Solicitud is { } s)
+    {
+        <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 flex flex-col gap-4">
+            <h2 class="font-headline-sm text-headline-sm">Lo que entendió el asistente</h2>
+            <p>@s.Resumen</p>
+            <dl class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                <div><dt class="text-outline">Entrada</dt><dd class="font-semibold">@(s.FechaEntrada ?? "Sin indicar")</dd></div>
+                <div><dt class="text-outline">Noches</dt><dd class="font-semibold">@(s.Noches?.ToString() ?? "Sin indicar")</dd></div>
+                <div><dt class="text-outline">Personas</dt><dd class="font-semibold">@(s.Personas?.ToString() ?? "Sin indicar")</dd></div>
+                <div><dt class="text-outline">Categoría</dt><dd class="font-semibold">@(s.Categoria ?? "Cualquiera")</dd></div>
+            </dl>
+            @if (s.DatosFaltantes.Any())
+            {
+                <div class="rounded-xl bg-secondary-fixed/60 p-3"><strong class="block mb-1">Pida al huésped:</strong><ul class="list-disc pl-5">@foreach (var dato in s.DatosFaltantes) { <li>@dato</li> }</ul></div>
+            }
+        </section>
+    }
+
+    @if (r?.Inicio is not null && r.Noches is not null && r.Error is null)
+    {
+        <section class="flex flex-col gap-3">
+            <h2 class="font-headline-sm text-headline-sm">Habitaciones disponibles</h2>
+            @if (!r.Opciones.Any()) { <p class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 text-center text-outline">No hay habitaciones que cumplan esos criterios.</p> }
+            @foreach (var o in r.Opciones)
+            {
+                <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                    <div><strong class="block">Habitación @o.Habitacion.Codigo</strong><small class="text-on-surface-variant">@o.Habitacion.TipoVip · @o.Habitacion.NroCamas cama(s) · $@o.Habitacion.PrecioNoche.ToString("N0") por noche</small></div>
+                    <div class="flex items-center gap-4"><strong>Total: $@o.Total.ToString("N0")</strong><a asp-page="/Reservas/Crear" asp-route-inicio="@r.Inicio.Value.ToString("yyyy-MM-dd")" asp-route-noches="@r.Noches" asp-route-habitacion="@o.Habitacion.HabitacionId" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Preparar reserva</a></div>
+                </div>
+            }
+        </section>
+    }
 </main>

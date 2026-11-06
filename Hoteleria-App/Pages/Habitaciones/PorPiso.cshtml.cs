@@ -1,9 +1,12 @@
 using Hoteleria_App.Models;
+using Hoteleria_App.Security;
+using Microsoft.AspNetCore.Authorization;
 using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hoteleria_App.Pages.Habitaciones;
 
+[Authorize(Policy = HotelPermissionPolicies.Ver)]
 public class PorPisoModel : PageModel
 {
     private readonly IHabitacionService _habitacionService;

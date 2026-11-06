@@ -6,7 +6,7 @@
     var rate = room is null ? 0m : room.NroCamas * (room.TipoVip?.PrecioCama ?? 0m);
 }
 <main class="flex flex-col gap-6 w-full">
-    @if (TempData["SuccessMessage"] is string success) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@success</div> }
+    <partial name="_Mensajes" />
     @if (room is null) { <div class="rounded-xl bg-error-container text-on-error-container p-5">No se encontró la habitación.</div> }
     else
     {
@@ -20,6 +20,7 @@
             <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa por cama / noche</span><strong class="block text-xl mt-2">$@room.TipoVip?.PrecioCama.ToString("N0")</strong></div>
             <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa total / noche</span><strong class="block text-xl mt-2">$@rate.ToString("N0")</strong></div>
         </section>
+        @if (Model.PuedeVerReservas) {
         <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl overflow-hidden">
             <div class="p-5 border-b border-surface-container-high"><h2 class="font-headline-sm text-headline-sm">Historial de reservas <span class="text-outline">(@(room.ReservaHabitaciones?.Count ?? 0))</span></h2></div>
             <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-surface-container-low text-outline uppercase text-xs"><tr><th class="p-3">Reserva</th><th class="p-3">Huésped</th><th class="p-3">Estado</th><th class="p-3">Estancia</th><th class="p-3 text-right">Precio / noche</th><th class="p-3"></th></tr></thead><tbody class="divide-y divide-surface-container">
@@ -34,5 +35,6 @@
             }
             </tbody></table></div>
         </section>
+        }
     }
 </main>

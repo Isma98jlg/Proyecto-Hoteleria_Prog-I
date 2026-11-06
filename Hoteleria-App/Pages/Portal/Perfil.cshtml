@@ -1,0 +1,14 @@
+@page
+@model Hoteleria_App.Pages.Portal.PerfilModel
+@{
+    ViewData["Title"] = "Mis datos";
+}
+<main class="max-w-4xl flex flex-col gap-6">
+    <section class="flex flex-wrap items-end justify-between gap-3"><div><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">MI CUENTA</span><h1 class="font-headline-lg text-headline-lg mt-1">Mis datos</h1></div><a asp-page="/Account/CambiarContrasena" class="px-4 py-2 rounded-lg bg-surface-container">Cambiar contraseña</a></section>
+    <partial name="_Mensajes" />
+    <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-5">
+        <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
+        <partial name="_FormPersona" for="Persona" />
+        <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold self-end">Guardar cambios</button>
+    </form>
+</main>

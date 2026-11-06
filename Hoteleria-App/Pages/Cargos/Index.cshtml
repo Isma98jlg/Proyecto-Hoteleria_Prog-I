@@ -1,0 +1,36 @@
+@page
+@model Hoteleria_App.Pages.Cargos.IndexModel
+@{
+    ViewData["Title"] = "Cargos y permisos";
+    (string Campo, string Etiqueta)[] permisos = [("ver", "Ver"), ("crudRequerimientos", "Reservas"), ("crudUsuarios", "Huéspedes"), ("crudHabitaciones", "Habitaciones"), ("crudPisos", "Pisos"), ("crudTipoVip", "Tipos")];
+}
+<main class="flex flex-col gap-6 w-full">
+    <section class="flex flex-wrap items-end justify-between gap-3"><div><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">ADMINISTRACIÓN</span><h1 class="font-headline-lg text-headline-lg mt-1">Cargos y permisos</h1><p class="text-on-surface-variant">Defina qué puede gestionar cada cargo.</p></div><a asp-page="/Empleados/Index" class="px-4 py-2 rounded-lg bg-surface-container">Volver a personal</a></section>
+    <partial name="_Mensajes" />
+    <form method="post" asp-page-handler="Crear" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+        <label class="flex flex-col gap-1 flex-1">Nuevo cargo<input name="nombre" maxlength="50" required class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Crear cargo</button>
+    </form>
+    <section class="flex flex-col gap-3">
+        @foreach (var fila in Model.Filas)
+        {
+            var c = fila.Cargo;
+            var esAdmin = c.Name == CargosSistema.Admin;
+            bool[] valores = [c.Ver, c.CrudRequerimientos, c.CrudUsuarios, c.CrudHabitaciones, c.CrudPisos, c.CrudTipoVip];
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="min-w-[160px]"><strong class="block">@c.Name</strong><small class="text-outline">@fila.Personas persona(s)</small></div>
+                <form method="post" asp-page-handler="Guardar" asp-route-id="@c.Id" class="flex flex-wrap items-center gap-4 flex-1">
+                    @for (var i = 0; i < permisos.Length; i++)
+                    {
+                        <label class="flex items-center gap-1.5"><input type="checkbox" name="@permisos[i].Campo" value="true" checked="@valores[i]" disabled="@esAdmin" class="h-4 w-4 accent-primary" />@permisos[i].Etiqueta</label>
+                    }
+                    @if (!esAdmin) { <button type="submit" class="px-3 py-1.5 rounded-lg bg-surface-container font-semibold">Guardar</button> }
+                </form>
+                @if (!CargosSistema.DeSistema(c.Name))
+                {
+                    <form method="post" asp-page-handler="Eliminar" asp-route-id="@c.Id" onsubmit="return confirm('¿Eliminar este cargo?')"><button type="submit" class="text-error font-semibold hover:underline">Eliminar</button></form>
+                }
+            </div>
+        }
+    </section>
+</main>

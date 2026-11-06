@@ -1,0 +1,38 @@
+@page "{id:long}"
+@model Hoteleria_App.Pages.Portal.DetalleModel
+@{
+    ViewData["Title"] = $"Reserva #{Model.Reserva.ReservaId}";
+    var r = Model.Reserva;
+}
+<main class="flex flex-col gap-6 w-full max-w-4xl">
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3">
+        <div><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">MI RESERVA</span><h1 class="font-headline-lg text-headline-lg mt-1">Reserva #@r.ReservaId</h1></div>
+        <span class="px-3 py-1.5 rounded-full text-sm font-semibold @r.BadgeEstado">@r.EstadoEtiqueta</span>
+    </section>
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Entrada</span><strong class="block mt-1">@r.InicioReserva.ToString("dd/MM/yyyy")</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Salida</span><strong class="block mt-1">@r.FinReserva.ToString("dd/MM/yyyy")</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Noches</span><strong class="block mt-1">@r.TotalNoches</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Total</span><strong class="block mt-1">$@r.PrecioTotal.ToString("N0")</strong></div>
+    </section>
+    <section class="flex flex-col gap-3">
+        <h2 class="font-headline-sm text-headline-sm">@(r.Habitaciones.Count == 1 ? "Su habitación" : "Sus habitaciones")</h2>
+        @foreach (var h in r.Habitaciones)
+        {
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div><span class="text-sm text-outline">Habitación</span><strong class="block mt-1 font-mono">@h.CodigoHabitacion</strong></div>
+                <div><span class="text-sm text-outline">Categoría</span><strong class="block mt-1">@h.TipoVip</strong></div>
+                <div><span class="text-sm text-outline">Ubicación</span><strong class="block mt-1">@h.ReferenciaPiso</strong></div>
+                <div><span class="text-sm text-outline">Camas</span><strong class="block mt-1">@h.NroCamas</strong></div>
+                <div><span class="text-sm text-outline">Precio por noche</span><strong class="block mt-1">$@h.PrecioNochePactado.ToString("N0")</strong></div>
+            </div>
+        }
+    </section>
+    <div class="flex justify-between gap-3">
+        <a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Volver a mis reservas</a>
+        @if (Hoteleria_App.Models.EstadosReserva.Editable(r.EstadoReserva))
+        {
+            <form method="post" asp-page-handler="Cancelar" asp-route-id="@r.ReservaId" onsubmit="return confirm('¿Cancelar esta reserva?')"><button type="submit" class="px-4 py-2 rounded-lg bg-error-container text-on-error-container font-semibold">Cancelar reserva</button></form>
+        }
+    </div>
+</main>

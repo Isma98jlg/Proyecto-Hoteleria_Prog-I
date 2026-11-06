@@ -9,9 +9,10 @@
         <h1 class="font-headline-lg text-headline-lg mt-5">No tienes permiso para esta sección</h1>
         <p class="text-on-surface-variant mt-2">El cargo asociado a tu cuenta no tiene activo el permiso requerido. Si crees que es un error, consulta al administrador del hotel.</p>
         <div class="flex flex-wrap justify-center gap-3 mt-6">
-            @if (User.IsInRole("admin")) { <a asp-page="/Index" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Ir al panel</a> }
-            @if (User.HasClaim("hotel", "ver") || User.IsInRole("admin") || User.IsInRole("trabajador") || User.IsInRole("usuario")) { <a asp-page="/Habitaciones/Index" class="px-4 py-2 rounded-lg bg-surface-container">Ver habitaciones</a> }
-            @if (User.IsInRole("admin") || User.IsInRole("trabajador")) { <a asp-page="/Reservas/Index" class="px-4 py-2 rounded-lg bg-surface-container">Ver reservas</a> }
+            @if (User.IsInRole(CargosSistema.Admin)) { <a asp-page="/Index" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Ir al panel</a> }
+            @if (User.IsInRole(CargosSistema.Trabajador)) { <a asp-page="/Reservas/Index" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Ver reservas</a> }
+            @if (User.IsInRole(CargosSistema.Huesped)) { <a asp-page="/Portal/Index" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Mis reservas</a> }
+            @if (!User.IsInRole(CargosSistema.Huesped)) { <a asp-page="/Habitaciones/Index" class="px-4 py-2 rounded-lg bg-surface-container">Ver habitaciones</a> }
         </div>
     </section>
 </main>

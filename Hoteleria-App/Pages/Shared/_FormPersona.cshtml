@@ -1,0 +1,18 @@
+@model Hoteleria_App.Services.DatosPersona
+@inject Hoteleria_App.Services.DominioCorreo Dominio
+@{
+    var correoFijo = ViewData["CorreoFijo"] as bool? == true;
+    const string campo = "px-3 py-2 bg-surface-container-low rounded-lg";
+    var ejemplo = $"usuario@{Dominio.Dominio}";
+    var terminacion = $"@{Dominio.Dominio}";
+}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <label class="flex flex-col gap-1">Tipo de documento<select asp-for="TipoDocumento" class="@campo"><option>DNI</option><option>Pasaporte</option><option>CE</option><option>Otro</option></select><span asp-validation-for="TipoDocumento" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Número de documento<input asp-for="NumeroDocumento" class="@campo" /><span asp-validation-for="NumeroDocumento" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Nombres<input asp-for="Nombres" class="@campo" /><span asp-validation-for="Nombres" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Apellidos<input asp-for="Apellidos" class="@campo" /><span asp-validation-for="Apellidos" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Nacionalidad<input asp-for="Nacionalidad" class="@campo" /><span asp-validation-for="Nacionalidad" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Teléfono<input asp-for="Telefono" class="@campo" /><span asp-validation-for="Telefono" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Correo de acceso<input asp-for="EMail" type="email" readonly="@correoFijo" placeholder="@ejemplo" class="@campo" /><small class="text-outline">Con este correo se inicia sesión. Debe terminar en @terminacion.</small><span asp-validation-for="EMail" class="text-error text-sm"></span></label>
+    <label class="flex flex-col gap-1">Correo de contacto (opcional)<input asp-for="CorreoContacto" type="email" placeholder="nombre@@gmail.com" class="@campo" /><small class="text-outline">Su correo real, de cualquier proveedor.</small><span asp-validation-for="CorreoContacto" class="text-error text-sm"></span></label>
+</div>

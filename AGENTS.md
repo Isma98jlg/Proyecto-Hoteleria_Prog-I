@@ -1,96 +1,106 @@
 # Guía para agentes y colaboradores
 
-Este archivo reúne los pasos mínimos para preparar la base de datos local y ejecutar Hoteleria-App desde un clon limpio.
+Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
 
 ## Estructura relevante
 
-- `docker-compose.yml`: servicio SQL Server y volumen persistente de la base de datos.
-- `Resources/DDBB/Dockerfile`: construye la imagen local de SQL Server.
-- `Resources/DDBB/init-db.sh`: espera a que SQL Server esté listo y ejecuta el SQL de inicialización.
-- `Resources/DDBB/init-docker.sql`: crea `HOTEL` y su esquema inicial.
-- `Resources/DDBB/hoteleria-schema.sql`: esquema generado a partir de las migraciones EF Core.
-- `Resources/DDBB/verify-auth.sql`: consultas para verificar las tablas y las cuentas de autenticación.
-- `Hoteleria-App/`: aplicación ASP.NET Core Razor Pages; se ejecuta en el host con .NET, no en el Compose actual.
-- `scripts/smoke-test.ps1`: recorrido de integración que requiere la app y la base de datos levantadas.
+- `Hoteleria-App/`: aplicación ASP.NET Core Razor Pages (.NET 10).
+  - `Services/`: reglas de negocio. `ReservaService` y `CuentaService` son el único punto de entrada para reservas, cuentas y cargos.
+  - `Security/`: políticas de permisos y su caché.
+  - `Hubs/`: SignalR. `Api/`: API REST `/api/v1`.
+  - `Migrations/`: fuente de verdad del esquema.
+- `docker-compose.yml`: entorno local completo (app, PostgreSQL y Redis) en una red propia de Docker.
+- `Dockerfile` y `render.yaml`: imagen de la app y Blueprint de Render.
+- `Resources/DDBB/`: script SQL generado desde las migraciones y consultas de verificación.
+- `scripts/smoke_test.py`: recorrido de integración; crea datos, úsalo solo en una base desechable.
 
-El Compose configura únicamente SQL Server. No se versionan imágenes, contenedores ni volúmenes Docker: Docker Compose construye la imagen desde el Dockerfile y el código fuente.
+## Reglas de seguridad y configuración
 
-## Requisitos
+- **Sin credenciales en el código.** Contraseñas, claves y cadenas de conexión llegan por variables de entorno (o `.env` en local). No añadas valores de respaldo: si falta una variable obligatoria, la app se detiene con un mensaje claro.
+- **Obligatoria:** `DATABASE_URL`. En Compose se forma con `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB`.
+- **Administrador:** `ADMIN_EMAIL` y `ADMIN_PASSWORD` solo se usan para crearlo cuando no existe ninguno, y son obligatorias en ese caso. Después, su nombre, correo y contraseña se cambian en la app, en «Mis datos» y «Cambiar contraseña»; editar las variables no modifica la cuenta y se pueden retirar.
+- **Autenticación en la base de datos** con ASP.NET Core Identity, sin proveedores externos.
+- `.env` no se versiona. Antes de un commit, comprueba `git status` y `git check-ignore .env`. No imprimas contraseñas en logs, informes ni commits.
+- No agregues `bin/`, `obj/`, archivos de base de datos ni datos de prueba.
 
-- Docker Desktop activo y con contenedores Linux habilitados.
-- .NET SDK 10.
-- PowerShell 7 para el script de humo (opcional).
+## Reglas de negocio que no se deben saltar
 
-## Primera ejecución desde un clon
+- **Correos:** el correo de acceso siempre usa el dominio único `DOMINIO_CORREO` (por defecto `grandstay.com`) y no es un buzón real. `Usuarios.correo_contacto` guarda el correo real, de cualquier proveedor, para futuros envíos; cualquier correo saliente debe usar ese campo.
+- **Cuentas:** el registro público siempre crea un huésped. El personal entra por invitación del administrador y el cargo lo define la invitación.
+- **Cargos:** `Usuarios.cargo_id` y los roles de Identity solo se cambian con `CuentaService.AsignarCargoAsync`.
+- **Huésped:** solo crea y consulta sus reservas en `/Portal`, y ve sus datos. No accede a Habitaciones ni a la API; solo ve las habitaciones disponibles al reservar y las suyas en el detalle.
+- **Datos personales:** el directorio y las fichas exigen `crud_usuarios`. Los avisos de SignalR y el índice de Algolia no llevan datos personales.
+- **Estados de reserva:** `PENDIENTE → CONFIRMADA → EN_CURSO → FINALIZADA`; se puede cancelar antes del check-in. No hay transiciones hacia atrás.
+- **Disponibilidad:** la decide PostgreSQL. La restricción `ex_habitacion_sin_solapes` impide solapes; las columnas `inicio`, `fin` y `activa` de `Reserva Habitaciones` deben coincidir siempre con la reserva.
+- **Estado de la habitación:** `OCUPADO` solo lo cambian el check-in y el check-out.
+- **IA:** el copiloto solo extrae datos del mensaje. Disponibilidad y precios salen de `ReservaService`, y una persona confirma la reserva.
 
-Desde la raíz del repositorio, crea la configuración local:
+## Ventanas flotantes
+
+Los formularios y detalles se abren sobre la página actual. Para sumar una ruta, añádela a `RUTAS_FLOTANTES` en `wwwroot/js/ventana-flotante.js`: los enlaces se interceptan solos y la página se muestra con `_LayoutModal`. `VentanaFlotanteMiddleware` convierte las redirecciones de `?modal=1` en un aviso a la página principal.
+
+## Primera ejecución
+
+Requisito: Docker Desktop.
 
 ```powershell
-Copy-Item .env.example .env
+Copy-Item .env.example .env   # y cambia todos los valores
+docker compose up -d --build
 ```
 
-Edita `.env` antes de iniciar. Define una contraseña fuerte para `DB_PASSWORD`; no guardes credenciales reales en Git ni compartas el archivo `.env`. El Compose usa `DB_PASSWORD` como `MSSQL_SA_PASSWORD` del contenedor. `.env` está excluido por `.gitignore`; `.env.example` solo documenta las variables necesarias.
+Abre `http://localhost:5003`. Para depurar con .NET SDK 10, levanta solo `postgres` y `redis` y ejecuta la app en el host con `dotnet run --project .\Hoteleria-App\Hoteleria-App.csproj --launch-profile http`; en ese caso usa `DATABASE_URL` y `REDIS_URL` de `.env`. Con `DB_AUTO_MIGRATE=true` (valor por defecto), el arranque aplica migraciones y crea los datos de referencia y el administrador. `DEMO_ACCOUNTS=true` crea además un trabajador y un huésped de prueba.
 
-Construye e inicia SQL Server:
+Si la clave de `DATABASE_URL` tiene símbolos, escríbela con formato URL (`@` es `%40`).
 
-```powershell
-docker compose up -d --build mssql
-docker compose ps
-docker compose logs -f mssql
-```
+## Integraciones opcionales
 
-Espera a que el servicio `mssql` aparezca como `healthy`. Su healthcheck prueba la conexión con `sqlcmd`; el entrypoint ejecuta `init-docker.sql` después de que SQL Server esté disponible.
+Sin sus variables, la app sigue funcionando:
 
-Luego inicia la aplicación:
-
-```powershell
-dotnet restore .\Hoteleria-App\Hoteleria-App.csproj
-dotnet run --project .\Hoteleria-App\Hoteleria-App.csproj --launch-profile http
-```
-
-El perfil `http` configura `Development` y `http://localhost:5003`. La aplicación encuentra el `.env` en la raíz del repositorio aunque se ejecute desde su subcarpeta. Con `DB_AUTO_MIGRATE=true` (valor local por defecto), al arrancar aplica migraciones pendientes y siembra datos de referencia, cargos y cuentas de demostración.
-
-## Acceso de demostración local
-
-Las direcciones y contraseñas se configuran en `.env` y tienen valores de desarrollo en `.env.example`:
-
-| Cargo | Variable de correo | Variable de contraseña |
-|---|---|---|
-| Administrador | `ADMIN_EMAIL` | `ADMIN_PASSWORD` |
-| Trabajador | `DEMO_WORKER_EMAIL` | `DEMO_WORKER_PASSWORD` |
-| Usuario | `DEMO_USER_EMAIL` | `DEMO_USER_PASSWORD` |
-
-No uses estas credenciales de demostración en un entorno publicado. Los agentes deben leer los valores localmente y evitar imprimir contraseñas en logs, informes o commits.
+| Variable | Sin ella |
+|---|---|
+| `REDIS_URL` | Caché en memoria y SignalR en una sola instancia |
+| `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_KEY` | La búsqueda usa PostgreSQL |
+| `ANTHROPIC_API_KEY` | El copiloto queda desactivado |
 
 ## Verificación
 
-Una vez iniciada la aplicación, `Resources/DDBB/verify-auth.sql` permite revisar el esquema y la cuenta inicial desde SSMS o Azure Data Studio.
-
-Para ejecutar el recorrido de integración desde la raíz con PowerShell 7:
-
 ```powershell
-pwsh -ExecutionPolicy Bypass -File .\scripts\smoke-test.ps1
+dotnet build .\Hoteleria-App\Hoteleria-App.csproj
 ```
 
-El recorrido usa las cuentas de `.env`, crea registros temporales con prefijo de prueba y los elimina al terminar. No ejecutes varios recorridos simultáneos sobre la misma base.
+Para el recorrido completo, levanta la app contra una **base vacía** con `DEMO_ACCOUNTS=true` y define en el entorno `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DEMO_WORKER_EMAIL`, `DEMO_WORKER_PASSWORD`, `DEMO_USER_EMAIL` y `DEMO_USER_PASSWORD`:
+
+```powershell
+python .\scripts\smoke_test.py
+```
+
+## Despliegue en Render
+
+1. Sube la rama a GitHub.
+2. En Render: **New > Blueprint**, elige el repositorio y usa `render.yaml`.
+3. Completa `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `HOTEL_TIMEZONE`, y las claves opcionales de Algolia y Anthropic.
+4. Comprueba `/health` y entra con el administrador.
+
+En el plan gratuito el servicio se duerme tras 15 minutos, Postgres expira a los 30 días y Key Value pierde sus datos al reiniciarse.
 
 ## Detener y conservar los datos
 
 ```powershell
-docker compose stop mssql
+docker compose stop
 ```
 
-`docker compose down` también detiene y elimina el contenedor, pero conserva el volumen `hoteleria-auth-data`. **No uses `docker compose down -v`** salvo que el usuario haya pedido borrar la base local: elimina permanentemente ese volumen y sus datos.
+`docker compose down` conserva el volumen `hoteleria-pg-data`. **No uses `docker compose down -v`** salvo que el usuario haya pedido borrar la base local.
 
 ## Cambios de base de datos
 
-- Mantén las migraciones de `Hoteleria-App/Migrations/` como fuente de verdad del modelo EF Core.
-- Si cambia el esquema, actualiza y revisa los scripts SQL iniciales para que un clon nuevo pueda aprovisionar la misma versión.
-- No edites el volumen ni intentes versionar un contenedor como sustituto de los archivos fuente.
-- Para problemas de conexión, confirma que Docker está activo, `mssql` está `healthy`, el puerto definido por `MSSQL_PORT` está libre y `DB_SERVER` coincide con ese puerto (por defecto `localhost,1433`).
+- Crea una migración para cada cambio de esquema y regenera `Resources/DDBB/hoteleria-schema.sql`:
+
+```powershell
+dotnet ef migrations script --idempotent --project .\Hoteleria-App\Hoteleria-App.csproj -o .\Resources\DDBB\hoteleria-schema.sql
+```
+
+- No edites el volumen a mano ni versiones contenedores como sustituto de los archivos fuente.
 
 ## Git y publicación
 
-- Confirma que `.env` no se ha añadido al índice antes de crear commits (`git status` y `git check-ignore .env`).
-- No agregues `bin/`, `obj/`, archivos de base de datos, contraseñas, volúmenes ni datos de prueba.
-- El remoto configurado en este checkout se llama `rep-origin`. Verifica `git remote -v` antes de publicar; no hagas push a un remoto sin una instrucción explícita.
+El remoto configurado se llama `rep-origin`. Verifica `git remote -v` antes de publicar y no hagas push sin una instrucción explícita.

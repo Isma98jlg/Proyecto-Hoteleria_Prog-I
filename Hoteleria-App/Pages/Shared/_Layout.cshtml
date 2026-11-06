@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -6,126 +6,18 @@
     <meta name="shell-type" content="web_dashboard" />
     <title>@ViewData["Title"] - GrandStay HMS</title>
 
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-secondary": "#ffffff",
-                        "inverse-primary": "#bec6e0",
-                        "error-container": "#ffdad6",
-                        "on-primary-container": "#7c839b",
-                        "primary": "#000000",
-                        "on-primary-fixed": "#131b2e",
-                        "on-secondary-container": "#663500",
-                        "outline-variant": "#c6c6cd",
-                        "secondary": "#904d00",
-                        "background": "#faf9f7",
-                        "surface-variant": "#e3e2e0",
-                        "on-error": "#ffffff",
-                        "tertiary-fixed-dim": "#68dba9",
-                        "primary-fixed-dim": "#bec6e0",
-                        "on-tertiary-container": "#069669",
-                        "surface-container-high": "#e9e8e6",
-                        "on-surface": "#1a1c1b",
-                        "outline": "#76777d",
-                        "tertiary-container": "#002114",
-                        "secondary-fixed-dim": "#ffb77d",
-                        "on-surface-variant": "#45464d",
-                        "on-tertiary-fixed-variant": "#005137",
-                        "on-secondary-fixed-variant": "#6e3900",
-                        "surface": "#faf9f7",
-                        "surface-tint": "#565e74",
-                        "surface-bright": "#faf9f7",
-                        "tertiary-fixed": "#85f8c4",
-                        "on-tertiary": "#ffffff",
-                        "surface-container-low": "#f4f3f1",
-                        "secondary-fixed": "#ffdcc3",
-                        "primary-fixed": "#dae2fd",
-                        "surface-container-lowest": "#ffffff",
-                        "tertiary": "#000000",
-                        "primary-container": "#131b2e",
-                        "surface-container": "#efeeec",
-                        "on-background": "#1a1c1b",
-                        "secondary-container": "#fe932c",
-                        "on-secondary-fixed": "#2f1500",
-                        "inverse-on-surface": "#f1f1ef",
-                        "error": "#ba1a1a",
-                        "on-primary": "#ffffff",
-                        "on-tertiary-fixed": "#002114",
-                        "on-primary-fixed-variant": "#3f465c",
-                        "inverse-surface": "#2f3130",
-                        "surface-dim": "#dadad8",
-                        "surface-container-highest": "#e3e2e0",
-                        "on-error-container": "#93000a"
-                    },
-                    borderRadius: {
-                        DEFAULT: "0.25rem",
-                        lg: "0.5rem",
-                        xl: "0.75rem",
-                        full: "9999px"
-                    },
-                    spacing: {
-                        "gutter": "1.25rem",
-                        "space-md": "0.75rem",
-                        "space-lg": "1.25rem",
-                        "space-xl": "2rem",
-                        "space-xs": "0.25rem",
-                        "gutter-desktop": "1.5rem",
-                        "margin-desktop": "2rem",
-                        "space-sm": "0.5rem",
-                        "margin": "1rem"
-                    },
-                    fontFamily: {
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "headline-xl": ["Plus Jakarta Sans"],
-                        "headline-xl-mobile": ["Plus Jakarta Sans"],
-                        "label-md": ["Plus Jakarta Sans"],
-                        "body-md": ["Plus Jakarta Sans"],
-                        "headline-sm": ["Plus Jakarta Sans"],
-                        "label-sm": ["Plus Jakarta Sans"],
-                        "numeric-table": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "body-sm": ["Plus Jakarta Sans"],
-                        "body-lg": ["Plus Jakarta Sans"],
-                        "display-lg": ["Plus Jakarta Sans"],
-                        "headline-lg-mobile": ["Plus Jakarta Sans"]
-                    },
-                    fontSize: {
-                        "headline-md": ["1.25rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                        "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
-                        "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
-                        "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.04em", "fontWeight": "600" }],
-                        "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
-                        "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                        "label-sm": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.06em", "fontWeight": "700" }],
-                        "numeric-table": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
-                        "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
-                        "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0.005em", "fontWeight": "400" }],
-                        "body-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0em", "fontWeight": "400" }],
-                        "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "700" }],
-                        "headline-lg-mobile": ["1.375rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "600" }]
-                    }
-                }
-            }
-        };
-    </script>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <partial name="_Head" />
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased min-h-screen">
-@inject IWebHostEnvironment HostEnvironment
 @inject Microsoft.AspNetCore.Authorization.IAuthorizationService AuthorizationService
 @{
-    var authLoginDebug = HostEnvironment.IsDevelopment() ? TempData["AuthLoginDebug"] as string : null;
     var canViewHotel = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.Ver)).Succeeded;
     var canManageReservations = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.CrudRequerimientos)).Succeeded;
     var canManageRooms = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.CrudHabitaciones)).Succeeded;
+    var canManageGuests = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.CrudUsuarios)).Succeeded;
+    var canManageTypes = (await AuthorizationService.AuthorizeAsync(User, null, HotelPermissionPolicies.CrudTipoVip)).Succeeded;
+    var isAdmin = User.IsInRole(CargosSistema.Admin);
+    var cargoVisible = isAdmin ? "Administrador" : User.IsInRole(CargosSistema.Huesped) ? "Huésped" : "Personal";
     var currentPath = (Context.Request.Path.Value ?? "/").ToLowerInvariant();
     System.Func<string, bool> IsActive = (page) =>
         page == "/"
@@ -144,38 +36,7 @@
             </button>
             <div class="h-5 w-px bg-outline-variant/50 hidden sm:block"></div>
             <!-- Logo GrandStay HMS + Perfil desplegable -->
-            <div class="flex items-center gap-2.5 group relative">
-                <img alt="GrandStay Hotels Logo" class="h-8 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" src="~/images/grandstay-logo.png" onclick="toggleUserProfile()" />
-                <div id="user-profile-dropdown" class="absolute right-0 mt-2 w-56 bg-surface-container-lowest border border-surface-container-high rounded-xl shadow-lg hidden z-50 p-3 flex flex-col gap-2">
-                    <div class="flex items-center gap-3 pb-2 border-b border-surface-container-high">
-                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
-                            <span class="material-symbols-outlined text-[16px]">person</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-body-sm text-body-sm font-semibold text-on-surface">@User.Identity?.Name</span>
-                            <span class="font-label-sm text-[11px] text-outline">Personal HMS</span>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        @if (canViewHotel) { <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Habitaciones/Index">
-                            <span class="material-symbols-outlined text-[16px]">meeting_room</span>
-                            <span>Habitaciones</span>
-                        </a> }
-                        @if (canManageReservations) { <a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm text-body-sm transition-colors" asp-page="/Reservas/Index">
-                            <span class="material-symbols-outlined text-[16px]">calendar_month</span>
-                            <span>Reservas</span>
-                        </a> }
-                    </div>
-                    <div class="pt-2 border-t border-surface-container-high flex items-center gap-2">
-                        <form method="post" asp-page="/Account/Logout">
-                            <button type="submit" class="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg bg-error-container hover:bg-error text-on-error hover:text-on-error-container text-left font-body-sm text-body-sm transition-colors" title="Cerrar sesión">
-                                <span class="material-symbols-outlined text-[16px]">logout</span>
-                                <span>Cerrar sesión</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <img alt="GrandStay Hotels Logo" class="h-8 w-auto object-contain" src="~/images/grandstay-logo.png" />
         </div>
         <!-- Buscador global unificado -->
         <div class="flex-1 max-w-md mx-4 hidden md:block">
@@ -196,11 +57,11 @@
             <div class="flex items-center gap-3 pl-1">
                 <div class="flex flex-col text-right hidden sm:flex">
                     <span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">@User.Identity?.Name</span>
-                    <span class="font-label-sm text-label-sm text-outline leading-tight">Personal</span>
+                    <span class="font-label-sm text-label-sm text-outline leading-tight">@cargoVisible</span>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-2 ring-primary/10">
+                <a asp-page="/Portal/Perfil" title="Mis datos" aria-label="Mis datos" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-2 ring-primary/10 hover:opacity-80 transition-opacity">
                     <span class="material-symbols-outlined text-[18px]">person</span>
-                </div>
+                </a>
                 <form method="post" asp-page="/Account/Logout">
                     <button type="submit" title="Cerrar sesión" class="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
                         <span class="material-symbols-outlined text-[18px]">logout</span>
@@ -228,7 +89,7 @@
                     </button>
                 </div>
                 <div class="px-5 pt-4 pb-2">
-                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos Principales (4)</span>
+                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Módulos</span>
                 </div>
                 <nav class="flex flex-col gap-1 px-3">
                     @if (User.IsInRole("admin"))
@@ -236,7 +97,7 @@
     <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">grid_view</span>
-                            <span>1. Dashboard General</span>
+                            <span>Panel general</span>
                         </div>
                         @if (IsActive("/"))
                         {
@@ -247,45 +108,37 @@
                     @if (canViewHotel) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Habitaciones") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Habitaciones/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">meeting_room</span>
-                            <span>2. Habitaciones y Pisos</span>
+                            <span>Habitaciones y pisos</span>
                         </div>
                         @if (IsActive("/Habitaciones"))
                         {
                             <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
                         }
-                        else
-                        {
-                            <span class="font-label-sm text-label-sm text-outline">280 habs</span>
-                        }
                     </a> }
                     @if (canManageReservations) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Reservas") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Reservas/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                            <span>3. Reservas</span>
+                            <span>Reservas</span>
                         </div>
                         @if (IsActive("/Reservas"))
                         {
                             <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
                         }
-                        else
-                        {
-                            <span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">En vivo</span>
-                        }
                     </a> }
-                    @if (canViewHotel) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Usuarios/Index">
+                    @if (canManageGuests) { <a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Usuarios/Index">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-[20px]">group</span>
-                            <span>4. Huéspedes / Directorio</span>
+                            <span>Huéspedes</span>
                         </div>
                         @if (IsActive("/Usuarios"))
                         {
                             <span class="font-label-sm text-[10px] bg-on-tertiary-container text-surface-container-lowest px-1.5 py-0.5 rounded font-bold">Activo</span>
                         }
-                        else
-                        {
-                            <span class="font-label-sm text-label-sm text-outline">496 activos</span>
-                        }
                     </a> }
+                    @if (!canManageReservations) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/Portal") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Portal/Index"><span class="material-symbols-outlined text-[20px]">hotel</span><span>Mis reservas</span></a> }
+                    @if (canManageTypes) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/TiposVip") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/TiposVip/Index"><span class="material-symbols-outlined text-[20px]">sell</span><span>Tipos y precios</span></a> }
+                    @if (isAdmin) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/Empleados") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Empleados/Index"><span class="material-symbols-outlined text-[20px]">badge</span><span>Personal</span></a> }
+                    @if (isAdmin) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/Cargos") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Cargos/Index"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span><span>Cargos y permisos</span></a> }
                 </nav>
                 <div class="px-5 pt-6 pb-2">
                     <span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Atajos de Turno</span>
@@ -298,27 +151,7 @@
                         </div>
                         <span class="font-label-sm text-[10px] bg-surface-container-highest px-1 py-0.5 rounded text-outline font-mono">⌘K</span>
                     </button>
-                    <a class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors" asp-page="/Chat/Index">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px] text-outline">forum</span>
-                            <span>Chat operativo</span>
-                        </div>
-                        <span class="font-label-sm text-[10px] text-outline">BETA</span>
-                    </a>
-                </div>
-            </div>
-            <div class="p-4 border-t border-surface-container-high bg-surface-container-low/40">
-                <div class="bg-surface-container-lowest rounded-xl p-3 flex items-center justify-between shadow-sm border border-surface-container-high/60">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary">
-                            <span class="material-symbols-outlined text-[16px]">hotel_class</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-label-sm text-label-sm text-on-surface font-bold">Auditoría Nocturna</span>
-                            <span class="font-label-sm text-[10px] text-outline">02:00 AM Programada</span>
-                        </div>
-                    </div>
-                    <span class="font-label-sm text-[10px] text-secondary font-bold bg-secondary-fixed/70 px-2 py-0.5 rounded">Auto</span>
+                    @if (canManageReservations) { <a class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-left font-body-sm transition-colors" asp-page="/Chat/Index"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-outline">auto_awesome</span><span>Copiloto de reservas</span></div></a> }
                 </div>
             </div>
         </aside>
@@ -360,7 +193,7 @@
                         </div>
                         <span class="font-label-sm text-[10px] @(IsActive("/Reservas") ? "text-on-primary" : "text-outline") font-mono">^3</span>
                     </a> }
-                    @if (canViewHotel) { <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Usuarios/Index">
+                    @if (canManageGuests) { <a class="flex items-center justify-between p-2.5 rounded-xl @(IsActive("/Usuarios") ? "bg-primary-container text-on-primary" : "bg-surface-container-low hover:bg-surface-container") transition-colors group" asp-page="/Usuarios/Index">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined @(IsActive("/Usuarios") ? "text-on-primary" : "text-outline group-hover:text-on-surface") text-[20px]">group</span>
                             <span class="font-body-sm text-body-sm font-semibold @(IsActive("/Usuarios") ? "text-on-primary" : "text-on-surface")">Huéspedes</span>
@@ -410,41 +243,24 @@
         </div>
     </main>
 
-    @if (User.Identity?.IsAuthenticated == true)
+    @if (canManageReservations)
     {
-        <a asp-page="/Chat/Index" aria-label="Chat operativo, todavía no habilitado" title="Chat operativo · todavía no habilitado" class="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-xl transition duration-200 hover:-translate-y-0.5 hover:bg-on-surface-variant hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/15">
-            <span class="material-symbols-outlined text-[25px]">chat_bubble_outline</span>
+        <a asp-page="/Chat/Index" aria-label="Copiloto de reservas" title="Copiloto de reservas" class="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-xl transition duration-200 hover:-translate-y-0.5 hover:bg-on-surface-variant hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/15">
+            <span class="material-symbols-outlined text-[25px]">auto_awesome</span>
         </a>
     }
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/ventana-flotante.js" asp-append-version="true"></script>
 
-    @if (!string.IsNullOrWhiteSpace(authLoginDebug))
+    @if (User.Identity?.IsAuthenticated == true)
     {
-        <script>
-            console.info("[Autenticación] Usuario autenticado:", @Html.Raw(authLoginDebug));
-        </script>
+        <div id="avisos-vivo" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2" aria-live="polite"></div>
+        <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+        <script src="~/js/tiempo-real.js" asp-append-version="true"></script>
     }
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script>
-        // Perfil desplegable al hacer click en el logo
-        function toggleUserProfile() {
-            const dropdown = document.getElementById('user-profile-dropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('hidden');
-            }
-        }
-
-        // Cerrar dropdown al hacer click fuera
-        document.addEventListener('click', function (e) {
-            const dropdown = document.getElementById('user-profile-dropdown');
-            const logo = document.querySelector('img[alt="GrandStay Hotels Logo"]');
-            if (dropdown && !dropdown.contains(e.target) && logo && !logo.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    </script>
 </body>
 </html>

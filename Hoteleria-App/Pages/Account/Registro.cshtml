@@ -1,0 +1,20 @@
+@page
+@model Hoteleria_App.Pages.Account.RegistroModel
+@{
+    Layout = "_LayoutPublico";
+    ViewData["Title"] = "Crear cuenta de huésped";
+    ViewData["Subtitulo"] = "Reserve y consulte sus estancias en GrandStay";
+}
+<form method="post" class="flex flex-col gap-5">
+    <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
+    <partial name="_FormPersona" for="Persona" />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="flex flex-col gap-1">Contraseña<input asp-for="Password" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Password" class="text-error text-sm"></span></label>
+        <label class="flex flex-col gap-1">Repita la contraseña<input asp-for="Confirmacion" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Confirmacion" class="text-error text-sm"></span></label>
+    </div>
+    <p class="text-sm text-outline">Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.</p>
+    <div class="flex items-center justify-between gap-3 border-t border-surface-container-high pt-4">
+        <a asp-page="/Account/Login" class="text-secondary font-semibold hover:underline">Ya tengo cuenta</a>
+        <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Crear cuenta</button>
+    </div>
+</form>

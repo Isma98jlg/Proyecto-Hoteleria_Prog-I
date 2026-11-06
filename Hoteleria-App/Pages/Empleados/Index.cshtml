@@ -1,0 +1,25 @@
+@page
+@model Hoteleria_App.Pages.Empleados.IndexModel
+@inject Hoteleria_App.Services.DominioCorreo Dominio
+@{
+    ViewData["Title"] = "Personal";
+    var ejemplo = $"usuario@{Dominio.Dominio}";
+}
+<main class="flex flex-col gap-6 w-full">
+    <section class="flex flex-wrap items-end justify-between gap-3"><div><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">ADMINISTRACIÓN</span><h1 class="font-headline-lg text-headline-lg mt-1">Personal del hotel</h1><p class="text-on-surface-variant">Invite trabajadores y gestione su cargo y datos laborales.</p></div><a asp-page="/Cargos/Index" class="px-4 py-2 rounded-lg bg-surface-container">Cargos y permisos</a></section>
+    <partial name="_Mensajes" />
+    <form method="post" asp-page-handler="Invitar" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+        <label class="flex flex-col gap-1 md:col-span-2">Correo de acceso del trabajador<input asp-for="Email" type="email" placeholder="@ejemplo" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Email" class="text-error text-sm"></span></label>
+        <label class="flex flex-col gap-1 md:col-span-2">Cargo<select asp-for="CargoId" asp-items="Model.CargosPersonal" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="0">Seleccione</option></select><span asp-validation-for="CargoId" class="text-error text-sm"></span></label>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Generar invitación</button>
+    </form>
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left text-sm">
+        <thead class="bg-surface-container-low text-outline uppercase text-xs"><tr><th class="p-3">Nombre</th><th class="p-3">Correo</th><th class="p-3">Cargo</th><th class="p-3">Contratación</th><th class="p-3 text-right">Sueldo</th><th class="p-3"></th></tr></thead>
+        <tbody class="divide-y divide-surface-container">
+        @foreach (var e in Model.Empleados)
+        {
+            <tr><td class="p-3 font-semibold">@e.Nombre</td><td class="p-3">@e.Email</td><td class="p-3">@e.Cargo</td><td class="p-3">@e.Contratacion.ToString("dd/MM/yyyy")</td><td class="p-3 text-right">$@e.Sueldo.ToString("N2")</td><td class="p-3 text-right"><a asp-page="Editar" asp-route-id="@e.UsuarioId" class="text-secondary font-semibold hover:underline">Editar</a></td></tr>
+        }
+        </tbody>
+    </table></div></section>
+</main>

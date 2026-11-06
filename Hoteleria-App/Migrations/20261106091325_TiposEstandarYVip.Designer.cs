@@ -3,17 +3,17 @@ using System;
 using Hoteleria_App.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Hoteleria_App.Migrations
 {
     [DbContext(typeof(HoteleriaDbContext))]
-    [Migration("20261101141821_IdentityAndHotelRoles")]
-    partial class IdentityAndHotelRoles
+    [Migration("20261106091325_TiposEstandarYVip")]
+    partial class TiposEstandarYVip
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,9 +21,10 @@ namespace Hoteleria_App.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.14")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "btree_gist");
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Hoteleria_App.Models.Employee", b =>
                 {
@@ -36,7 +37,7 @@ namespace Hoteleria_App.Migrations
                         .HasColumnName("fecha_contratacion");
 
                     b.Property<decimal>("Sueldo")
-                        .HasColumnType("decimal(12,2)")
+                        .HasColumnType("numeric(12,2)")
                         .HasColumnName("sueldo");
 
                     b.HasKey("UsuarioId");
@@ -53,11 +54,11 @@ namespace Hoteleria_App.Migrations
                     b.Property<string>("Estado")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("estado");
 
                     b.Property<int>("NroCamas")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("nro_camas");
 
                     b.Property<long>("NroPiso")
@@ -67,7 +68,7 @@ namespace Hoteleria_App.Migrations
                     b.Property<string>("TipoVipNombre")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)")
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("tipo_vip");
 
                     b.HasKey("HabitacionId");
@@ -96,52 +97,51 @@ namespace Hoteleria_App.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("cargo_id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("CrudHabitaciones")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("crud_habitaciones");
 
                     b.Property<bool>("CrudPisos")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("crud_pisos");
 
                     b.Property<bool>("CrudRequerimientos")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("crud_requerimientos");
 
                     b.Property<bool>("CrudTipoVip")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("crud_tipo_vip");
 
                     b.Property<bool>("CrudUsuarios")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("crud_usuarios");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("cargo_nombre");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("nombre_normalizado");
 
                     b.Property<bool>("Ver")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasColumnName("ver");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[nombre_normalizado] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("Roles", (string)null);
                 });
@@ -152,51 +152,51 @@ namespace Hoteleria_App.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
@@ -205,10 +205,60 @@ namespace Hoteleria_App.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Hoteleria_App.Models.Invitacion", b =>
+                {
+                    b.Property<long>("InvitacionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("invitacion_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("InvitacionId"));
+
+                    b.Property<long>("CargoId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("cargo_id");
+
+                    b.Property<long>("CreadaPorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("creada_por_id");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("e_mail");
+
+                    b.Property<DateTime>("ExpiraEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expira_en");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("token_hash");
+
+                    b.Property<DateTime?>("UsadaEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("usada_en");
+
+                    b.Property<long?>("UsuarioId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("usuario_id");
+
+                    b.HasKey("InvitacionId");
+
+                    b.HasIndex("CargoId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("Invitaciones", (string)null);
                 });
 
             modelBuilder.Entity("Hoteleria_App.Models.Piso", b =>
@@ -219,7 +269,7 @@ namespace Hoteleria_App.Migrations
 
                     b.Property<string>("RefPiso")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("ref_piso");
 
                     b.HasKey("NroPiso");
@@ -230,31 +280,34 @@ namespace Hoteleria_App.Migrations
             modelBuilder.Entity("Hoteleria_App.Models.Reserva", b =>
                 {
                     b.Property<long>("ReservaId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("reserva_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ReservaId"));
 
                     b.Property<string>("EstadoReserva")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)")
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("estado_reserva");
 
                     b.Property<DateTime>("FechaReservaCreacion")
-                        .HasColumnType("datetime2(7)")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_reserva_creacion");
 
                     b.Property<DateTime>("FinReserva")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2(7)")
+                        .HasColumnType("date")
                         .HasColumnName("fin_reserva")
-                        .HasComputedColumnSql("DATEADD(day, total_noches, inicio_reserva)", true);
+                        .HasComputedColumnSql("inicio_reserva + total_noches", true);
 
                     b.Property<DateTime>("InicioReserva")
-                        .HasColumnType("datetime2(7)")
+                        .HasColumnType("date")
                         .HasColumnName("inicio_reserva");
 
                     b.Property<int>("TotalNoches")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasColumnName("total_noches");
 
                     b.Property<long>("UsuarioId")
@@ -274,9 +327,7 @@ namespace Hoteleria_App.Migrations
 
                     b.ToTable("Reservas", null, t =>
                         {
-                            t.HasCheckConstraint("check_estado_reserva", "estado_reserva IN ('CANCELADA', 'FINALIZADA', 'CONFIRMADA', 'PENDIENTE')");
-
-                            t.HasCheckConstraint("check_fin_reserva", "fin_reserva > inicio_reserva");
+                            t.HasCheckConstraint("check_estado_reserva", "estado_reserva IN ('CANCELADA', 'FINALIZADA', 'EN_CURSO', 'CONFIRMADA', 'PENDIENTE')");
 
                             t.HasCheckConstraint("check_total_noches", "total_noches >= 1");
                         });
@@ -292,8 +343,20 @@ namespace Hoteleria_App.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("habitacion_id");
 
+                    b.Property<bool>("Activa")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activa");
+
+                    b.Property<DateTime>("Fin")
+                        .HasColumnType("date")
+                        .HasColumnName("fin");
+
+                    b.Property<DateTime>("Inicio")
+                        .HasColumnType("date")
+                        .HasColumnName("inicio");
+
                     b.Property<decimal>("PrecioNochePactado")
-                        .HasColumnType("decimal(12,2)")
+                        .HasColumnType("numeric(12,2)")
                         .HasColumnName("precio_noche_pactado");
 
                     b.HasKey("ReservaId", "HabitacionId");
@@ -307,15 +370,14 @@ namespace Hoteleria_App.Migrations
                 {
                     b.Property<string>("TipoVipNombre")
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)")
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("tipo_vip");
 
                     b.Property<decimal>("PrecioCama")
-                        .HasColumnType("decimal(12,2)")
+                        .HasColumnType("numeric(12,2)")
                         .HasColumnName("precio_cama");
 
-                    b.Property<string>("Sigla")
-                        .IsRequired()
+                    b.Property<char>("Sigla")
                         .HasColumnType("char(1)")
                         .HasColumnName("sigla");
 
@@ -324,81 +386,119 @@ namespace Hoteleria_App.Migrations
                     b.HasIndex("Sigla")
                         .IsUnique();
 
-                    b.ToTable("Tipo Vip", (string)null);
+                    b.ToTable("Tipo Vip", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_precio_cama", "precio_cama >= 0");
+                        });
                 });
 
             modelBuilder.Entity("Hoteleria_App.Models.Usuario", b =>
                 {
                     b.Property<long>("UsuarioId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("usuario_id");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("UsuarioId"));
+
                     b.Property<string>("Apellidos")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("apellidos");
 
-                    b.Property<long?>("CargoId")
+                    b.Property<long>("CargoId")
                         .HasColumnType("bigint")
                         .HasColumnName("cargo_id");
 
+                    b.Property<string>("CorreoContacto")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("correo_contacto");
+
                     b.Property<string>("EMail")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
                         .HasColumnName("e_mail");
 
                     b.Property<string>("Nacionalidad")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
                         .HasColumnName("nacionalidad");
 
                     b.Property<string>("Nombres")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("nombres");
 
                     b.Property<string>("NumeroDocumento")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasColumnType("character varying(25)")
                         .HasColumnName("numero_documento");
 
                     b.Property<string>("Telefono")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)")
+                        .HasColumnType("character varying(25)")
                         .HasColumnName("telefono");
 
                     b.Property<string>("TipoDocumento")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)")
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("tipo_documento");
 
                     b.HasKey("UsuarioId");
 
                     b.HasIndex("CargoId");
 
+                    b.HasIndex("EMail")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Usuarios_Email");
+
+                    b.HasIndex("TipoDocumento", "NumeroDocumento")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Usuarios_Documento");
+
                     b.ToTable("Usuarios", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FriendlyName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Xml")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DataProtectionKeys");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
@@ -414,15 +514,15 @@ namespace Hoteleria_App.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -437,13 +537,13 @@ namespace Hoteleria_App.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -476,13 +576,13 @@ namespace Hoteleria_App.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -505,14 +605,14 @@ namespace Hoteleria_App.Migrations
                     b.HasOne("Hoteleria_App.Models.Piso", "Piso")
                         .WithMany("Habitaciones")
                         .HasForeignKey("NroPiso")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_habitacion_piso");
 
                     b.HasOne("Hoteleria_App.Models.TipoVip", "TipoVip")
                         .WithMany("Habitaciones")
                         .HasForeignKey("TipoVipNombre")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_habitacion_tipovip");
 
@@ -532,12 +632,23 @@ namespace Hoteleria_App.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("Hoteleria_App.Models.Invitacion", b =>
+                {
+                    b.HasOne("Hoteleria_App.Models.HotelRole", "Cargo")
+                        .WithMany()
+                        .HasForeignKey("CargoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cargo");
+                });
+
             modelBuilder.Entity("Hoteleria_App.Models.Reserva", b =>
                 {
                     b.HasOne("Hoteleria_App.Models.Usuario", "Usuario")
                         .WithMany("Reservas")
                         .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_reserva_usuario");
 
@@ -549,7 +660,7 @@ namespace Hoteleria_App.Migrations
                     b.HasOne("Hoteleria_App.Models.Habitacion", "Habitacion")
                         .WithMany("ReservaHabitaciones")
                         .HasForeignKey("HabitacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_habitacion_rh");
 
@@ -567,10 +678,13 @@ namespace Hoteleria_App.Migrations
 
             modelBuilder.Entity("Hoteleria_App.Models.Usuario", b =>
                 {
-                    b.HasOne("Hoteleria_App.Models.HotelRole", null)
+                    b.HasOne("Hoteleria_App.Models.HotelRole", "Cargo")
                         .WithMany()
                         .HasForeignKey("CargoId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cargo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>

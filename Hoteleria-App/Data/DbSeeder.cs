@@ -1,11 +1,13 @@
 using Hoteleria_App.Models;
+using Hoteleria_App.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hoteleria_App.Data;
 
 /// <summary>
-/// Datos semilla de referencia y cuentas de demostración (idempotentes).
+/// Datos de referencia y cuentas iniciales (idempotente). No hay contraseñas por defecto:
+/// una cuenta solo se crea si su contraseña llega por configuración.
 /// </summary>
 public static class DbSeeder
 {
@@ -25,9 +27,7 @@ public static class DbSeeder
         {
             db.TiposVip.AddRange(
                 new TipoVip { TipoVipNombre = "ESTANDAR", Sigla = 'E', PrecioCama = 50.00m },
-                new TipoVip { TipoVipNombre = "SUPERIOR", Sigla = 'S', PrecioCama = 80.00m },
-                new TipoVip { TipoVipNombre = "SUITE", Sigla = 'U', PrecioCama = 150.00m },
-                new TipoVip { TipoVipNombre = "PRESIDENCIAL", Sigla = 'P', PrecioCama = 300.00m });
+                new TipoVip { TipoVipNombre = "VIP", Sigla = 'V', PrecioCama = 150.00m });
         }
 
         await db.SaveChangesAsync();
@@ -35,129 +35,128 @@ public static class DbSeeder
         if (!await db.Habitaciones.AnyAsync())
         {
             db.Habitaciones.AddRange(
-                new Habitacion { HabitacionId = 101, NroPiso = 1, NroCamas = 2, TipoVipNombre = "ESTANDAR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 102, NroPiso = 1, NroCamas = 1, TipoVipNombre = "ESTANDAR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 103, NroPiso = 1, NroCamas = 2, TipoVipNombre = "SUPERIOR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 201, NroPiso = 2, NroCamas = 2, TipoVipNombre = "ESTANDAR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 202, NroPiso = 2, NroCamas = 2, TipoVipNombre = "SUPERIOR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 203, NroPiso = 2, NroCamas = 1, TipoVipNombre = "SUITE", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 301, NroPiso = 3, NroCamas = 2, TipoVipNombre = "ESTANDAR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 302, NroPiso = 3, NroCamas = 2, TipoVipNombre = "SUPERIOR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 303, NroPiso = 3, NroCamas = 2, TipoVipNombre = "SUITE", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 401, NroPiso = 4, NroCamas = 2, TipoVipNombre = "SUPERIOR", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 402, NroPiso = 4, NroCamas = 2, TipoVipNombre = "SUITE", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 501, NroPiso = 5, NroCamas = 2, TipoVipNombre = "PRESIDENCIAL", Estado = "LIBRE" },
-                new Habitacion { HabitacionId = 502, NroPiso = 5, NroCamas = 3, TipoVipNombre = "PRESIDENCIAL", Estado = "LIBRE" });
-        }
-
-        if (!await db.Usuarios.AnyAsync())
-        {
-            db.Usuarios.Add(new Usuario
-            {
-                UsuarioId = 1,
-                TipoDocumento = "DNI",
-                NumeroDocumento = "12345678",
-                Nombres = "Admin",
-                Apellidos = "Hoteleria",
-                Nacionalidad = "Local",
-                Telefono = "555-0000",
-                EMail = "admin@hoteleria.com"
-            });
+                Hab(101, 1, 2, "ESTANDAR"), Hab(102, 1, 1, "ESTANDAR"), Hab(103, 1, 2, "VIP"),
+                Hab(201, 2, 2, "ESTANDAR"), Hab(202, 2, 2, "VIP"), Hab(203, 2, 1, "VIP"),
+                Hab(301, 3, 2, "ESTANDAR"), Hab(302, 3, 2, "VIP"), Hab(303, 3, 2, "VIP"),
+                Hab(401, 4, 2, "VIP"), Hab(402, 4, 2, "VIP"),
+                Hab(501, 5, 2, "VIP"), Hab(502, 5, 3, "VIP"));
         }
 
         await db.SaveChangesAsync();
+    }
+
+    private static Habitacion Hab(long id, long piso, int camas, string tipo) =>
+        new() { HabitacionId = id, NroPiso = piso, NroCamas = camas, TipoVipNombre = tipo, Estado = EstadosHabitacion.Libre };
+
+    public static async Task EnsureRolesAsync(RoleManager<HotelRole> roleManager)
+    {
+        await EnsureRoleAsync(roleManager, CargosSistema.Huesped);
+        await EnsureRoleAsync(roleManager, CargosSistema.Trabajador);
+        await EnsureRoleAsync(roleManager, CargosSistema.Admin);
+    }
+
+    /// <summary>Crea una cuenta inicial si no existe. Las contraseñas existentes no se tocan.</summary>
+    public static async Task EnsureAccountAsync(HoteleriaDbContext db, UserManager<HotelUser> userManager,
+        RoleManager<HotelRole> roleManager, string email, string password, string nombres, string apellidos,
+        string cargoNombre, bool esPersonal)
+    {
+        if (await userManager.FindByEmailAsync(email) is not null) return;
+
+        var cargo = await roleManager.FindByNameAsync(cargoNombre)
+            ?? throw new InvalidOperationException($"Falta el cargo {cargoNombre}.");
+
+        // Ficha provisional: la propia persona completa sus datos reales en «Mis datos».
+        var tipoDocumento = cargoNombre == CargosSistema.Admin ? "SISTEMA" : "DEMO";
+        var numeroDocumento = $"{tipoDocumento}-{email}";
+        var persona = new Usuario
+        {
+            TipoDocumento = tipoDocumento,
+            NumeroDocumento = numeroDocumento[..Math.Min(25, numeroDocumento.Length)],
+            Nombres = nombres,
+            Apellidos = apellidos,
+            Nacionalidad = "Local",
+            Telefono = "0000000000",
+            EMail = email,
+            CargoId = cargo.Id
+        };
+        db.Usuarios.Add(persona);
+        await db.SaveChangesAsync();
+
+        if (esPersonal)
+        {
+            db.Employees.Add(new Employee { UsuarioId = persona.UsuarioId, FechaContratacion = DateTime.UtcNow.Date, Sueldo = 0m });
+            await db.SaveChangesAsync();
+        }
+
+        var cuenta = new HotelUser { Id = persona.UsuarioId, UserName = email, Email = email, EmailConfirmed = true };
+        var creada = await userManager.CreateAsync(cuenta, password);
+        if (!creada.Succeeded)
+        {
+            db.Usuarios.Remove(persona);
+            await db.SaveChangesAsync();
+            throw new InvalidOperationException($"No se pudo crear la cuenta {email}: " + string.Join("; ", creada.Errors.Select(e => e.Description)));
+        }
+
+        var rol = await userManager.AddToRoleAsync(cuenta, cargoNombre);
+        if (!rol.Succeeded)
+            throw new InvalidOperationException($"No se pudo asignar el cargo {cargoNombre} a {email}: " + string.Join("; ", rol.Errors.Select(e => e.Description)));
     }
 
     /// <summary>
-    /// Crea cargos y cuentas de demostración para validar cada perfil de permisos.
+    /// Pasa al dominio único las personas e invitaciones que aún usen otro. El correo anterior queda
+    /// como correo de contacto y la contraseña no cambia. Si el correo nuevo ya existe, no se toca la cuenta.
     /// </summary>
-    public static async Task SeedAccessAccountsAsync(HoteleriaDbContext db, UserManager<HotelUser> userManager,
-        RoleManager<HotelRole> roleManager, string adminEmail, string adminPassword,
-        string workerEmail, string workerPassword, string userEmail, string userPassword)
+    public static async Task ConvertirCorreosAsync(HoteleriaDbContext db, UserManager<HotelUser> userManager, DominioCorreo dominio, ILogger logger)
     {
-        var userRole = await EnsureRoleAsync(roleManager, "usuario");
-        var workerRole = await EnsureRoleAsync(roleManager, "trabajador");
-        var adminRole = await EnsureRoleAsync(roleManager, "admin");
+        var personas = await db.Usuarios.ToListAsync();
+        var ocupados = personas.Select(u => u.EMail.ToLowerInvariant()).ToHashSet();
 
-        await EnsureAccountAsync(db, userManager, 1, adminEmail, adminPassword, "Admin", "Hoteleria", adminRole);
-        await EnsureAccountAsync(db, userManager, 2, workerEmail, workerPassword, "Trabajador", "Demostracion", workerRole);
-        await EnsureAccountAsync(db, userManager, 3, userEmail, userPassword, "Usuario", "Demostracion", userRole);
-    }
-
-    private static async Task EnsureAccountAsync(HoteleriaDbContext db, UserManager<HotelUser> userManager,
-        long userId, string email, string password, string firstName, string lastName, HotelRole role)
-    {
-        var person = await db.Usuarios.SingleOrDefaultAsync(u => u.UsuarioId == userId);
-        if (person is null)
+        foreach (var persona in personas.Where(u => !dominio.Admite(u.EMail)))
         {
-            person = new Usuario
+            var nuevo = dominio.Convertir(persona.EMail);
+            if (!ocupados.Add(nuevo))
             {
-                UsuarioId = userId,
-                TipoDocumento = "DEMO",
-                NumeroDocumento = $"DEMO{userId}",
-                Nombres = firstName,
-                Apellidos = lastName,
-                Nacionalidad = "Local",
-                Telefono = "0000000000",
-                EMail = email
-            };
-            db.Usuarios.Add(person);
-        }
-        person.EMail = email;
-        person.CargoId = role.Id;
+                logger.LogWarning("No se convirtió la persona {UsuarioId}: el correo {Correo} ya existe.", persona.UsuarioId, nuevo);
+                continue;
+            }
 
-        if (!await db.Employees.AnyAsync(e => e.UsuarioId == userId))
-            db.Employees.Add(new Employee { UsuarioId = userId, FechaContratacion = DateTime.UtcNow.Date, Sueldo = 0m });
+            persona.CorreoContacto ??= persona.EMail;
+            persona.EMail = nuevo;
+            await db.SaveChangesAsync();
+
+            var cuenta = await userManager.FindByIdAsync(persona.UsuarioId.ToString());
+            if (cuenta is null) continue;
+            cuenta.Email = nuevo;
+            cuenta.UserName = nuevo;
+            var actualizada = await userManager.UpdateAsync(cuenta);
+            if (!actualizada.Succeeded)
+                throw new InvalidOperationException($"No se pudo convertir la cuenta {persona.UsuarioId}: " + string.Join("; ", actualizada.Errors.Select(e => e.Description)));
+        }
+
+        var invitaciones = await db.Invitaciones.Where(i => i.UsadaEn == null).ToListAsync();
+        foreach (var invitacion in invitaciones.Where(i => !dominio.Admite(i.Email)))
+            invitacion.Email = dominio.Convertir(invitacion.Email);
         await db.SaveChangesAsync();
-
-        var account = await userManager.FindByIdAsync(userId.ToString());
-        if (account is null)
-        {
-            account = new HotelUser { Id = userId, UserName = email, Email = email, EmailConfirmed = true, Usuario = person };
-            var result = await userManager.CreateAsync(account, password);
-            if (!result.Succeeded)
-                throw new InvalidOperationException($"No se pudo crear la cuenta {email}: " + string.Join("; ", result.Errors.Select(e => e.Description)));
-        }
-        else if (!string.Equals(account.Email, email, StringComparison.OrdinalIgnoreCase))
-        {
-            account.UserName = email;
-            account.Email = email;
-            var update = await userManager.UpdateAsync(account);
-            if (!update.Succeeded)
-                throw new InvalidOperationException($"No se pudo actualizar la cuenta {email}: " + string.Join("; ", update.Errors.Select(e => e.Description)));
-        }
-
-        foreach (var currentRole in await userManager.GetRolesAsync(account))
-            if (!string.Equals(currentRole, role.Name, StringComparison.OrdinalIgnoreCase))
-                await userManager.RemoveFromRoleAsync(account, currentRole);
-        if (!await userManager.IsInRoleAsync(account, role.Name!))
-        {
-            var addRole = await userManager.AddToRoleAsync(account, role.Name!);
-            if (!addRole.Succeeded)
-                throw new InvalidOperationException($"No se pudo asignar el cargo {role.Name} a {email}: " + string.Join("; ", addRole.Errors.Select(e => e.Description)));
-        }
     }
 
-    private static async Task<HotelRole> EnsureRoleAsync(RoleManager<HotelRole> roleManager, string cargoNombre)
+    private static async Task EnsureRoleAsync(RoleManager<HotelRole> roleManager, string cargoNombre)
     {
-        var role = await roleManager.FindByNameAsync(cargoNombre);
-        var isAdmin = cargoNombre == "admin";
-        var isWorker = cargoNombre == "trabajador";
-        if (role is not null) return role;
+        if (await roleManager.FindByNameAsync(cargoNombre) is not null) return;
 
-        role = new HotelRole
+        var esAdmin = cargoNombre == CargosSistema.Admin;
+        var esPersonal = esAdmin || cargoNombre == CargosSistema.Trabajador;
+        var role = new HotelRole
         {
             Name = cargoNombre,
-            Ver = true,
-            CrudRequerimientos = isAdmin || isWorker,
-            CrudPisos = isAdmin,
-            CrudUsuarios = isAdmin,
-            CrudHabitaciones = isAdmin || isWorker,
-            CrudTipoVip = isAdmin
+            Ver = esPersonal, // El huésped solo accede a sus reservas.
+            CrudRequerimientos = esPersonal,
+            CrudPisos = esAdmin,
+            CrudUsuarios = esPersonal, // Recepción registra huéspedes; el personal solo lo gestiona admin.
+            CrudHabitaciones = esPersonal,
+            CrudTipoVip = esAdmin
         };
         var result = await roleManager.CreateAsync(role);
         if (!result.Succeeded)
             throw new InvalidOperationException($"No se pudo crear el cargo {cargoNombre}: " + string.Join("; ", result.Errors.Select(e => e.Description)));
-        return role;
     }
 }

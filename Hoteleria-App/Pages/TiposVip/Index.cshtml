@@ -1,0 +1,28 @@
+@page
+@model Hoteleria_App.Pages.TiposVip.IndexModel
+@{
+    ViewData["Title"] = "Tipos de habitación";
+}
+<main class="flex flex-col gap-6 w-full max-w-4xl">
+    <section><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">ADMINISTRACIÓN</span><h1 class="font-headline-lg text-headline-lg mt-1">Tipos de habitación y precios</h1><p class="text-on-surface-variant">El precio por cama se usa en las reservas nuevas; las existentes conservan el pactado.</p></section>
+    <partial name="_Mensajes" />
+    <form method="post" asp-page-handler="Crear" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+        <label class="flex flex-col gap-1">Nombre<input name="nombre" maxlength="15" required class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
+        <label class="flex flex-col gap-1">Sigla<input name="sigla" maxlength="1" required class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
+        <label class="flex flex-col gap-1">Precio por cama<input name="precioCama" type="number" min="0" step="0.01" required class="px-3 py-2 bg-surface-container-low rounded-lg" /></label>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold">Crear tipo</button>
+    </form>
+    <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left text-sm">
+        <thead class="bg-surface-container-low text-outline uppercase text-xs"><tr><th class="p-3">Tipo</th><th class="p-3">Sigla</th><th class="p-3">Habitaciones</th><th class="p-3">Precio por cama</th><th class="p-3"></th></tr></thead>
+        <tbody class="divide-y divide-surface-container">
+        @foreach (var t in Model.Tipos)
+        {
+            <tr>
+                <td class="p-3 font-semibold">@t.Nombre</td><td class="p-3 font-mono">@t.Sigla</td><td class="p-3">@t.Habitaciones</td>
+                <td class="p-3"><form method="post" asp-page-handler="Guardar" asp-route-nombre="@t.Nombre" class="flex gap-2"><input name="precioCama" type="number" min="0" step="0.01" value="@t.PrecioCama.ToString(System.Globalization.CultureInfo.InvariantCulture)" required class="w-28 px-2 py-1 bg-surface-container-low rounded-lg" /><button type="submit" class="px-3 py-1 rounded-lg bg-surface-container font-semibold">Guardar</button></form></td>
+                <td class="p-3 text-right">@if (t.Habitaciones == 0) { <form method="post" asp-page-handler="Eliminar" asp-route-nombre="@t.Nombre" onsubmit="return confirm('¿Eliminar este tipo?')"><button type="submit" class="text-error font-semibold hover:underline">Eliminar</button></form> }</td>
+            </tr>
+        }
+        </tbody>
+    </table></div></section>
+</main>

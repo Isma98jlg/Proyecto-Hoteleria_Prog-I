@@ -13,7 +13,7 @@
             <div class="flex flex-col gap-1.5">
                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold bg-secondary-fixed/50 px-2.5 py-0.5 rounded-full">• MÓDULO RESERVAS · EDITAR</span>
                 <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Editar Reserva #@Model.Detalle?.ReservaId</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant">Modifique el estado de la reserva y revise las habitaciones asignadas.</p>
+                <p class="font-body-md text-body-md text-on-surface-variant">Modifique el estado y, antes del check-in, las fechas o habitaciones.</p>
             </div>
             <div class="flex items-center gap-2">
                 <a class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page="Detalles" asp-route-id="@Model.Detalle?.ReservaId">
@@ -56,11 +56,16 @@
                     </div>
                     <div class="flex flex-col gap-3">
                         <label class="font-label-sm text-label-sm text-on-surface-variant">Estado</label>
-                        <select asp-for="Reserva.EstadoReserva" asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(Model.Estados))"
+                        <select asp-for="Reserva.EstadoReserva" asp-items="@(Model.Estados.Select(e => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(EstadosReserva.Etiqueta(e), e)))"
                                 class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none">
                         </select>
                         <span asp-validation-for="Reserva.EstadoReserva" class="text-label-sm text-error"></span>
                     </div>
+                    @if (EstadosReserva.Editable(Model.Detalle.EstadoReserva))
+                    {
+                        <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">Check-in<input asp-for="Reserva.InicioReserva" type="date" class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm" /></label>
+                        <label class="flex flex-col gap-1 font-label-sm text-label-sm text-on-surface-variant">Noches<input asp-for="Reserva.TotalNoches" type="number" min="1" max="365" class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm" /><span asp-validation-for="Reserva.TotalNoches" class="text-error"></span></label>
+                    }
                 </div>
 
                 <!-- Habitaciones asignadas (solo lectura) -->
@@ -95,12 +100,26 @@
                                         <td class="py-3 px-4 text-on-surface-variant">@h.TipoVip</td>
                                         <td class="py-3 px-4 text-on-surface">@h.NroCamas</td>
                                         <td class="py-3 px-4 text-right text-on-surface">$@h.PrecioNochePactado.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
-                                        <td class="py-3 px-4 text-right font-numeric-table text-numeric-table font-bold text-on-surface">$@(h.PrecioNochePactado * Model.Detalle.TotalNoches).ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                        <td class="py-3 px-4 text-right font-numeric-table text-numeric-table font-bold text-on-surface">$@((h.PrecioNochePactado * Model.Detalle.TotalNoches).ToString("N0", System.Globalization.CultureInfo.InvariantCulture))</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
+                    @if (EstadosReserva.Editable(Model.Detalle.EstadoReserva))
+                    {
+                        <fieldset class="flex flex-col gap-2 rounded-xl border border-surface-container-high p-3">
+                            <legend class="px-1 font-label-sm text-label-sm text-on-surface-variant">Habitaciones de la reserva (las fechas se revisan al guardar)</legend>
+                            @foreach (var h in Model.Detalle.Habitaciones)
+                            {
+                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" checked class="h-4 w-4 accent-primary" />@h.CodigoHabitacion · @h.TipoVip · $@h.PrecioNochePactado.ToString("N0") / noche</label>
+                            }
+                            @foreach (var h in Model.OtrasHabitaciones)
+                            {
+                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" class="h-4 w-4 accent-primary" />@h.Codigo · @h.TipoVip · $@h.PrecioNoche.ToString("N0") / noche</label>
+                            }
+                        </fieldset>
+                    }
                     <div class="mt-2 text-right">
                         <span class="font-body-sm text-body-sm font-bold text-on-surface">Total de la reserva: </span>
                         <span class="font-body-sm text-body-sm font-mono text-on-surface">$@Model.Detalle.PrecioTotal.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</span>

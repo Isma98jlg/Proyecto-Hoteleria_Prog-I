@@ -1,0 +1,16 @@
+@page
+@model Hoteleria_App.Pages.Account.RestablecerModel
+@{
+    Layout = "_LayoutPublico";
+    ViewData["Title"] = "Nueva contraseña";
+}
+<form method="post" class="flex flex-col gap-5">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Codigo" />
+    <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="flex flex-col gap-1">Contraseña<input asp-for="Password" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Password" class="text-error text-sm"></span></label>
+        <label class="flex flex-col gap-1">Repita la contraseña<input asp-for="Confirmacion" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Confirmacion" class="text-error text-sm"></span></label>
+    </div>
+    <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold self-end">Guardar contraseña</button>
+</form>
