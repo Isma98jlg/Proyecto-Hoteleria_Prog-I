@@ -17,6 +17,8 @@ public class HoteleriaDbContext : IdentityDbContext<HotelUser, HotelRole, long>,
     public DbSet<ReservaHabitacion> ReservaHabitaciones => Set<ReservaHabitacion>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Invitacion> Invitaciones => Set<Invitacion>();
+    public DbSet<Competidor> Competidores => Set<Competidor>();
+    public DbSet<ConsultaCompetencia> ConsultasCompetencia => Set<ConsultaCompetencia>();
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -190,6 +192,33 @@ public class HoteleriaDbContext : IdentityDbContext<HotelUser, HotelRole, long>,
             entity.Property(e => e.UsadaEn).HasColumnName("usada_en").HasColumnType("timestamp with time zone");
             entity.HasIndex(e => e.TokenHash).IsUnique();
             entity.HasOne(e => e.Cargo).WithMany().HasForeignKey(e => e.CargoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Competidor>(entity =>
+        {
+            entity.ToTable("Competidores");
+            entity.HasKey(e => e.CompetidorId);
+            entity.Property(e => e.CompetidorId).HasColumnName("competidor_id").UseIdentityByDefaultColumn();
+            entity.Property(e => e.PropertyToken).HasColumnName("property_token").HasMaxLength(500);
+            entity.Property(e => e.Nombre).HasColumnName("nombre").HasMaxLength(200);
+            entity.Property(e => e.Ciudad).HasColumnName("ciudad").HasMaxLength(60);
+            entity.Property(e => e.CreadoEn).HasColumnName("creado_en").HasColumnType("timestamp with time zone");
+            entity.HasIndex(e => e.PropertyToken).IsUnique();
+        });
+
+        modelBuilder.Entity<ConsultaCompetencia>(entity =>
+        {
+            entity.ToTable("Consultas Competencia");
+            entity.HasKey(e => e.ConsultaId);
+            entity.Property(e => e.ConsultaId).HasColumnName("consulta_id").UseIdentityByDefaultColumn();
+            entity.Property(e => e.RealizadaEn).HasColumnName("realizada_en").HasColumnType("timestamp with time zone");
+            entity.Property(e => e.Ciudad).HasColumnName("ciudad").HasMaxLength(60);
+            entity.Property(e => e.Entrada).HasColumnName("entrada").HasColumnType("date");
+            entity.Property(e => e.Noches).HasColumnName("noches");
+            entity.Property(e => e.Adultos).HasColumnName("adultos");
+            entity.Property(e => e.Resultado).HasColumnName("resultado").HasColumnType("jsonb");
+            entity.HasIndex(e => new { e.Ciudad, e.Entrada, e.Noches, e.Adultos, e.RealizadaEn }).HasDatabaseName("IX_Consultas_Competencia_Criterios");
+            entity.HasIndex(e => e.RealizadaEn).HasDatabaseName("IX_Consultas_Competencia_Fecha");
         });
     }
 }
