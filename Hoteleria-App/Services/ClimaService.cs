@@ -4,6 +4,8 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Hoteleria_App.Services;
 
+public sealed record LugarEncontrado(string Nombre, double Latitud, double Longitud);
+
 public sealed record ClimaActual(string Lugar, double Temperatura, double Sensacion, int Humedad, double Viento, string Descripcion, string Icono);
 
 /// <summary>
@@ -49,7 +51,13 @@ public sealed class ClimaService(HttpClient http, IDistributedCache cache, ILogg
         }
     }
 
-    public async Task<ClimaActual?> PorCiudadAsync(string ciudad, CancellationToken ct = default)
+    public async Task<ClimaActual?> PorCiudadAsync(string ciudad, CancellationToken ct = default) =>
+        await BuscarLugarAsync(ciudad, ct) is { } lugar
+            ? await PorCoordenadasAsync(lugar.Latitud, lugar.Longitud, lugar.Nombre, ct)
+            : null;
+
+    /// <summary>Convierte el nombre de una ciudad en coordenadas.</summary>
+    public async Task<LugarEncontrado?> BuscarLugarAsync(string ciudad, CancellationToken ct = default)
     {
         try
         {
@@ -60,7 +68,7 @@ public sealed class ClimaService(HttpClient http, IDistributedCache cache, ILogg
             var primero = resultados[0];
             var nombre = primero.GetProperty("name").GetString() ?? ciudad;
             var lugar = primero.TryGetProperty("country", out var pais) ? $"{nombre}, {pais.GetString()}" : nombre;
-            return await PorCoordenadasAsync(primero.GetProperty("latitude").GetDouble(), primero.GetProperty("longitude").GetDouble(), lugar, ct);
+            return new LugarEncontrado(lugar, primero.GetProperty("latitude").GetDouble(), primero.GetProperty("longitude").GetDouble());
         }
         catch (Exception ex) when (EsFalloExterno(ex))
         {

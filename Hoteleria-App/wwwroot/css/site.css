@@ -227,6 +227,107 @@ html.en-ventana::-webkit-scrollbar-thumb {
     }
 }
 
+/* ==========================================================================
+   Explora tu zona: destaca a propósito, como el clima
+   ========================================================================== */
+.explora-boton,
+.explora-banner {
+    background: linear-gradient(135deg, #9a3412 0%, #ea580c 55%, #f59e0b 120%);
+}
+
+.explora-boton {
+    box-shadow: -6px 8px 24px -8px rgb(154 52 18 / 0.7);
+    transition: padding 160ms ease-out;
+    animation: explora-llamada 2.6s ease-in-out 1s infinite;
+}
+
+.explora-boton:hover {
+    padding-right: 1.1rem;
+    animation-play-state: paused;
+}
+
+.explora-banner {
+    box-shadow: 0 16px 36px -18px rgb(154 52 18 / 0.75);
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.explora-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 40px -18px rgb(154 52 18 / 0.85);
+}
+
+.explora-banner-icono {
+    font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 48;
+    animation: explora-brujula 5s ease-in-out infinite;
+}
+
+html.en-ventana .explora-huesped {
+    height: calc(100dvh - 2.5rem);
+}
+
+.explora-mapa {
+    isolation: isolate;
+    background: #e9e8e6;
+}
+
+.explora-filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: 1px solid #c6c6cd;
+    border-radius: 9999px;
+    background: #ffffff;
+    padding: 0.25rem 0.625rem;
+    color: #45464d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out;
+}
+
+.explora-filtro:hover {
+    border-color: var(--filtro);
+    color: var(--filtro);
+}
+
+.explora-filtro[aria-pressed="true"] {
+    border-color: var(--filtro);
+    background: var(--filtro);
+    color: #ffffff;
+}
+
+.explora-tarjeta {
+    transition: border-color 140ms ease-out, box-shadow 140ms ease-out;
+}
+
+.explora-tarjeta:hover {
+    border-color: #c6c6cd;
+}
+
+.explora-activa {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 1px #ea580c;
+}
+
+@keyframes explora-llamada {
+    0%, 70%, 100% { box-shadow: -6px 8px 24px -8px rgb(154 52 18 / 0.7), 0 0 0 0 rgb(234 88 12 / 0.45); }
+    85% { box-shadow: -6px 8px 24px -8px rgb(154 52 18 / 0.7), 0 0 0 10px rgb(234 88 12 / 0); }
+}
+
+@keyframes explora-brujula {
+    0%, 80%, 100% { transform: rotate(0deg); }
+    88% { transform: rotate(20deg); }
+    94% { transform: rotate(-12deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .explora-boton,
+    .explora-banner,
+    .explora-banner-icono {
+        animation: none;
+        transition: none;
+    }
+}
+
 /* Ligaduras de iconos Material Symbols Outlined */
 .material-symbols-outlined {
     font-variation-settings:

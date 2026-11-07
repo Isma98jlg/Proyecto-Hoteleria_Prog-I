@@ -1,6 +1,6 @@
 // Abre los formularios y detalles en una ventana flotante, sin salir de la página actual.
 (() => {
-    const RUTAS_FLOTANTES = /^\/(reservas\/(crear|editar|detalles)|habitaciones\/(crear|editar|detalles)|usuarios\/(crear|editar|detalles)|empleados\/editar|portal\/(reservar|perfil|detalle|asistente)|account\/cambiarcontrasena)(\/|$)/i;
+    const RUTAS_FLOTANTES = /^\/(reservas\/(crear|editar|detalles)|habitaciones\/(crear|editar|detalles)|usuarios\/(crear|editar|detalles)|empleados\/editar|portal\/(reservar|perfil|detalle|asistente|explora)|account\/cambiarcontrasena)(\/|$)/i;
 
     let ventana = null;
     let huboCambios = false;
@@ -17,6 +17,7 @@
 
     // Cada ventana usa el ancho que necesita su contenido.
     function anchoPara(ruta) {
+        if (/^\/portal\/explora/i.test(ruta)) return 'max-w-6xl vf-alto-fijo';
         if (/^\/portal\/asistente/i.test(ruta)) return 'max-w-lg vf-alto-fijo';
         if (/^\/(portal\/perfil|account\/cambiarcontrasena)/i.test(ruta)) return 'max-w-lg';
         if (/^\/reservas\//i.test(ruta)) return 'max-w-4xl';

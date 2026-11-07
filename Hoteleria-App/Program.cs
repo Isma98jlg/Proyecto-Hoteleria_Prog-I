@@ -38,6 +38,7 @@ builder.Services.AddScoped<CuentaService>();
 builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
 builder.Services.AddScoped<SelectorHabitaciones>();
 builder.Services.AddHttpClient<ClimaService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(5));
+builder.Services.AddHttpClient<LugaresService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(8));
 builder.Services.AddScoped<AsistenteHuespedService>();
 
 // Redis es opcional: da caché compartida y conecta SignalR entre instancias.
@@ -111,9 +112,20 @@ builder.Services.AddRateLimiter(options =>
              || path.StartsWith("/Account/Invitacion", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Account/Restablecer", StringComparison.OrdinalIgnoreCase)
              || path.StartsWith("/Portal/Asistente", StringComparison.OrdinalIgnoreCase));
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
+
+        // Cada búsqueda de lugares puede consumir créditos de la API externa.
+        if (HttpMethods.IsGet(context.Request.Method) && context.Request.Query.ContainsKey("handler")
+            && path.StartsWith("/Portal/Explora", StringComparison.OrdinalIgnoreCase))
+        {
+            return RateLimitPartition.GetFixedWindowLimiter($"{ip}:explora", _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1)
+            });
+        }
         if (!esEnvioSensible) return RateLimitPartition.GetNoLimiter("sin-limite");
 
-        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
         return RateLimitPartition.GetFixedWindowLimiter($"{ip}:{path.ToLowerInvariant()}", _ => new FixedWindowRateLimiterOptions
         {
             PermitLimit = int.TryParse(config["RATE_LIMIT_POR_MINUTO"], out var limite) ? limite : 20,

@@ -1,0 +1,59 @@
+@page
+@model Hoteleria_App.Pages.Portal.ExploraModel
+@{
+    ViewData["Title"] = "Explora tu zona";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+<section id="explora" class="explora-huesped flex h-[78vh] w-full flex-col gap-3" data-disponible="@(Model.Disponible ? "1" : "0")">
+    <div class="flex flex-wrap items-end gap-2">
+        <button data-explora-ubicacion type="button" class="flex items-center gap-1.5 rounded-lg bg-primary-container px-3 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90">
+            <span class="material-symbols-outlined text-[18px]">my_location</span>Usar mi ubicación
+        </button>
+        <form data-explora-formulario class="flex min-w-[12rem] flex-1 items-center gap-2">
+            <input data-explora-ciudad type="search" maxlength="60" aria-label="Ciudad" placeholder="O escriba una ciudad" class="min-w-0 flex-1 rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm" />
+            <button type="submit" aria-label="Buscar ciudad" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-container hover:bg-surface-container-high"><span class="material-symbols-outlined text-[20px]">search</span></button>
+        </form>
+        <label class="flex items-center gap-2 text-xs font-medium text-on-surface">Distancia
+            <select data-explora-radio class="rounded-lg border border-outline-variant/60 bg-surface-container-lowest py-2 pl-3 pr-8 text-sm font-normal">
+                <option value="500">500 m</option>
+                <option value="1000">1 km</option>
+                <option value="2000" selected>2 km</option>
+                <option value="5000">5 km</option>
+                <option value="10000">10 km</option>
+                <option value="@Hoteleria_App.Services.LugaresService.RadioTodos">Ver todos (hasta 50 km)</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por tipo de lugar">
+        <button data-explora-todo type="button" aria-pressed="true" class="explora-filtro" style="--filtro:#131b2e">
+            <span class="material-symbols-outlined text-[16px]">apps</span>Todo
+        </button>
+        @foreach (var f in Hoteleria_App.Services.LugaresService.Filtros)
+        {
+            <button data-explora-filtro="@f.Clave" data-etiqueta="@f.Etiqueta" data-icono="@f.Icono" data-color="@f.Color" type="button" aria-pressed="false" class="explora-filtro" style="--filtro:@f.Color">
+                <span class="material-symbols-outlined text-[16px]">@f.Icono</span>@f.Etiqueta
+            </button>
+        }
+    </div>
+
+    <p data-explora-aviso class="hidden rounded-lg bg-secondary-fixed/50 px-3 py-2 text-sm text-on-surface" aria-live="polite"></p>
+
+    <div class="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(11rem,2fr)_minmax(0,3fr)] gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:grid-rows-1">
+        <div data-explora-mapa class="explora-mapa min-h-0 overflow-hidden rounded-2xl border border-surface-container-high md:order-2"></div>
+        <div class="flex min-h-0 flex-col gap-2 md:order-1">
+            <p data-explora-resumen class="text-xs text-on-surface-variant"></p>
+            <div data-explora-lista class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <small class="text-[11px] leading-4 text-outline">
+        Datos de <a href="https://www.geoapify.com/" target="_blank" rel="noopener" class="underline">Geoapify</a> y © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" class="underline">colaboradores de OpenStreetMap</a>.
+        No incluye menús ni precios, y los horarios pueden no estar al día. Su zona aproximada se envía a estos servicios y no se guarda en su cuenta.
+    </small>
+</section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+    <script src="~/js/explora.js" asp-append-version="true"></script>
+}

@@ -392,6 +392,13 @@ check("personal no consulta el clima del huésped", "AccessDenied" in admin.get(
 check("coordenadas fuera de rango rechazadas", guest.get("/Portal/Clima?lat=500&lon=1")[0] == 400)
 check("clima sin datos rechazado", guest.get("/Portal/Clima")[0] == 400)
 
+# --- Explora tu zona: permisos y validación, sin llamar al servicio externo.
+check("huésped abre Explora tu zona", guest.get("/Portal/Explora")[0] == 200)
+check("personal no usa Explora tu zona", "AccessDenied" in admin.get("/Portal/Explora")[2])
+check("radio no permitido rechazado", guest.get("/Portal/Explora?handler=Buscar&lat=1&lon=1&radio=7")[0] == 400)
+check("filtro desconocido rechazado", guest.get("/Portal/Explora?handler=Buscar&lat=1&lon=1&filtros=casinos")[0] == 400)
+check("coordenadas de lugares fuera de rango rechazadas", guest.get("/Portal/Explora?handler=Buscar&lat=500&lon=1")[0] == 400)
+
 # Vistas restantes
 for ruta in ["/Habitaciones/PorPiso", "/Habitaciones/PorTipoVip", "/Privacy", "/Reservas/Crear", "/Portal/Perfil", "/Account/CambiarContrasena"]:
     s = admin.get(ruta)[0]

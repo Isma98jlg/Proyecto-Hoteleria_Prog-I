@@ -136,6 +136,7 @@
                         }
                     </a> }
                     @if (!canManageReservations) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/Portal") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Portal/Index"><span class="material-symbols-outlined text-[20px]">hotel</span><span>Mis reservas</span></a> }
+                    @if (User.IsInRole(CargosSistema.Huesped)) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-body-md text-body-md" asp-page="/Portal/Explora"><span class="material-symbols-outlined text-[20px]">explore</span><span>Explora tu zona</span></a> }
                     @if (canManageTypes) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/TiposVip") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/TiposVip/Index"><span class="material-symbols-outlined text-[20px]">sell</span><span>Tipos y precios</span></a> }
                     @if (isAdmin) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/Empleados") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Empleados/Index"><span class="material-symbols-outlined text-[20px]">badge</span><span>Personal</span></a> }
                     @if (isAdmin) { <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg @(IsActive("/Cargos") ? "bg-primary-container text-on-primary font-semibold shadow-sm" : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface") transition-all font-body-md text-body-md" asp-page="/Cargos/Index"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span><span>Cargos y permisos</span></a> }
@@ -245,6 +246,10 @@
     @if (User.IsInRole(CargosSistema.Huesped))
     {
         <partial name="_ClimaHuesped" />
+        <a asp-page="/Portal/Explora" aria-label="Explora tu zona: restaurantes, cafés, parques y más en el mapa" title="Explora tu zona" class="explora-boton fixed right-0 top-[9rem] z-20 flex items-center gap-1.5 rounded-l-2xl py-2.5 pl-3.5 pr-3 text-sm font-semibold text-white">
+            <span class="material-symbols-outlined text-[22px]" aria-hidden="true">explore</span>
+            <span class="hidden sm:inline">Explora tu zona</span>
+        </a>
         <a asp-page="/Portal/Asistente" aria-label="Asistente de reservas" title="Asistente de reservas" class="fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-xl transition duration-200 hover:-translate-y-0.5 hover:bg-on-surface-variant hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-primary/15">
             <span class="material-symbols-outlined text-[25px]">auto_awesome</span>
         </a>

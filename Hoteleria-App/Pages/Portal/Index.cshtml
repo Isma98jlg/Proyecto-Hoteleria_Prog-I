@@ -5,7 +5,7 @@
     ViewData["Title"] = "Mis reservas";
 }
 <main class="flex flex-col gap-6 w-full">
-    <section class="bg-primary-container text-on-primary rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-5 shadow-sm">
+    <section class="bg-primary-container text-on-primary rounded-2xl p-6 md:p-8 lg:pr-44 flex flex-col md:flex-row md:items-end md:justify-between gap-5 shadow-sm">
         <div><span class="text-xs uppercase tracking-[.18em] text-primary-fixed-dim">GRANDSTAY · MI CUENTA</span><h1 class="font-headline-lg text-headline-lg mt-2">Mis reservas</h1><p class="text-on-primary/70 mt-1">Consulte sus estancias o reserve una nueva.</p></div>
         <div class="flex flex-wrap gap-2">
             <a asp-page="Perfil" class="px-4 py-2.5 rounded-lg bg-surface-container-lowest/10 text-on-primary">Mis datos</a>
@@ -14,6 +14,19 @@
         </div>
     </section>
     <partial name="_Mensajes" />
+    @if (User.IsInRole(CargosSistema.Huesped))
+    {
+        <a asp-page="Explora" class="explora-banner flex flex-col gap-3 rounded-2xl p-5 text-white sm:flex-row sm:items-center sm:justify-between md:p-6">
+            <span class="flex items-center gap-4">
+                <span class="material-symbols-outlined explora-banner-icono text-[44px]" aria-hidden="true">explore</span>
+                <span>
+                    <strong class="block font-headline-md text-headline-md">Explora tu zona</strong>
+                    <span class="text-sm text-white/85">Restaurantes, cafés, parques, bibliotecas y más, en un mapa y a la distancia que elijas.</span>
+                </span>
+            </span>
+            <span class="shrink-0 self-start rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-[#9a3412] sm:self-auto">Abrir el mapa</span>
+        </a>
+    }
     <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl overflow-hidden">
         <div class="overflow-x-auto"><table class="w-full text-left text-sm">
             <thead class="bg-surface-container-low text-outline uppercase text-xs"><tr><th class="p-3">Reserva</th><th class="p-3">Estado</th><th class="p-3">Estancia</th><th class="p-3">Habitaciones</th><th class="p-3 text-right">Total</th><th class="p-3"></th></tr></thead>

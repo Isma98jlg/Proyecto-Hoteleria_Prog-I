@@ -62,6 +62,9 @@ Sin sus variables, la app sigue funcionando:
 | `REDIS_URL` | Caché en memoria y SignalR en una sola instancia |
 | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_KEY` | La búsqueda usa PostgreSQL |
 | `ANTHROPIC_API_KEY` | El asistente del huésped queda desactivado |
+| `GEOAPIFY_API_KEY` | «Explora tu zona» queda desactivado |
+
+«Explora tu zona» (`/Portal/Explora`) usa Geoapify por el servidor y mapa de OpenStreetMap, y debe mostrar la atribución de ambos. La ubicación se redondea a unos 110 m y no se asocia al usuario ni se registra; cada consulta de hasta 20 lugares cuesta 1 crédito, por eso va en caché una hora.
 
 El clima del huésped (`/Portal/Clima`) usa Open-Meteo, sin clave. La ubicación solo se pide al pulsar el botón, se redondea a unos 11 km y no se asocia al usuario ni se registra.
 
