@@ -31,7 +31,11 @@ public sealed class CompetenciaService(HttpClient http, IConfiguration config, H
 
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
-    private readonly string? _clave = config["SERPAPI_API_KEY"];
+    private const string ErrorClave = "SerpApi rechazó la clave. Revise SERPAPI_API_KEY en Render: reintentar no lo soluciona.";
+    private const string ErrorCuota = "SerpApi no aceptó más búsquedas: puede haberse agotado el plan del mes o haber demasiadas seguidas.";
+    private const string ErrorGeneral = "No se pudo consultar el mercado en este momento. Inténtelo más tarde.";
+
+    private readonly string? _clave = config["SERPAPI_API_KEY"]?.Trim();
     private readonly string _baseUrl = config["SERPAPI_BASE_URL"] is { Length: > 0 } url ? url.TrimEnd('/') : "https://serpapi.com";
 
     public bool Disponible => !string.IsNullOrWhiteSpace(_clave);
@@ -81,8 +85,8 @@ public sealed class CompetenciaService(HttpClient http, IConfiguration config, H
             return new(reciente, $"Se alcanzó el tope de {LimiteMensual} búsquedas de este mes. Se muestra la última consulta guardada, si existe.");
 
         var fecha = Fecha(entrada);
-        var hoteles = await BuscarAsync(nombre, fecha, noches, adultos, ct);
-        if (hoteles is null) return new(reciente, "No se pudo consultar el mercado en este momento. Inténtelo más tarde.");
+        var (hoteles, fallo) = await BuscarAsync(nombre, fecha, noches, adultos, ct);
+        if (hoteles is null) return new(reciente, fallo);
 
         var consulta = new ConsultaCompetencia
         {
@@ -98,7 +102,7 @@ public sealed class CompetenciaService(HttpClient http, IConfiguration config, H
         return new(new(consulta, hoteles), null);
     }
 
-    private async Task<List<HotelMercado>?> BuscarAsync(string ciudad, DateTime entrada, int noches, int adultos, CancellationToken ct)
+    private async Task<(List<HotelMercado>? Hoteles, string? Fallo)> BuscarAsync(string ciudad, DateTime entrada, int noches, int adultos, CancellationToken ct)
     {
         var parametros = new Dictionary<string, string>
         {
@@ -123,26 +127,35 @@ public sealed class CompetenciaService(HttpClient http, IConfiguration config, H
             if (raiz.TryGetProperty("error", out var error) && error.ValueKind == JsonValueKind.String)
             {
                 // Sin resultados no es un fallo: una ciudad puede no tener hoteles para esas fechas.
-                if (error.GetString()!.Contains("hasn't returned any results", StringComparison.OrdinalIgnoreCase)) return [];
+                if (error.GetString()!.Contains("hasn't returned any results", StringComparison.OrdinalIgnoreCase)) return ([], null);
                 logger.LogWarning("SerpApi rechazó la consulta con el estado {Estado}.", (int)respuesta.StatusCode);
-                return null;
+                var claveInvalida = error.GetString()!.Contains("API key", StringComparison.OrdinalIgnoreCase);
+                return (null, MotivoDe(respuesta.StatusCode, claveInvalida));
             }
             if (!respuesta.IsSuccessStatusCode)
             {
                 logger.LogWarning("SerpApi respondió con el estado {Estado}.", (int)respuesta.StatusCode);
-                return null;
+                return (null, MotivoDe(respuesta.StatusCode, false));
             }
 
-            if (!raiz.TryGetProperty("properties", out var propiedades) || propiedades.ValueKind != JsonValueKind.Array) return [];
-            return propiedades.EnumerateArray().Select(Proyectar).OfType<HotelMercado>().ToList();
+            if (!raiz.TryGetProperty("properties", out var propiedades) || propiedades.ValueKind != JsonValueKind.Array) return ([], null);
+            return (propiedades.EnumerateArray().Select(Proyectar).OfType<HotelMercado>().ToList(), null);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or InvalidOperationException)
         {
             // Solo el tipo de error: la dirección de la consulta lleva la clave.
             logger.LogWarning("No se pudo consultar SerpApi: {Tipo}", ex.GetType().Name);
-            return null;
+            return (null, ErrorGeneral);
         }
     }
+
+    private static string MotivoDe(System.Net.HttpStatusCode estado, bool claveInvalida) => estado switch
+    {
+        _ when claveInvalida => ErrorClave,
+        System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden => ErrorClave,
+        System.Net.HttpStatusCode.TooManyRequests => ErrorCuota,
+        _ => ErrorGeneral
+    };
 
     private static HotelMercado? Proyectar(JsonElement p)
     {
