@@ -25,15 +25,38 @@
     const marcadores = new Map();
 
     const hayMapa = typeof L !== 'undefined';
-    let mapa, capaLugares, capaZona;
+    let mapa, capaLugares, pin, circulo;
+    let encuadrarResultados = false;
     if (hayMapa) {
         mapa = L.map(parte('mapa'), { zoomControl: true }).setView([0, 0], 2);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(mapa);
-        capaZona = L.layerGroup().addTo(mapa);
         capaLugares = L.layerGroup().addTo(mapa);
+        // Panel propio por encima de los marcadores: el pin nunca queda tapado por los resultados.
+        mapa.createPane('explora-punto').style.zIndex = 650;
+
+        const BotonCentrar = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd() {
+                const boton = elemento('button', 'explora-centrar leaflet-bar');
+                boton.type = 'button';
+                boton.title = 'Ver mi punto en el mapa';
+                boton.setAttribute('aria-label', 'Ver mi punto en el mapa');
+                boton.append(elemento('span', 'material-symbols-outlined text-[18px]', 'center_focus_strong'));
+                L.DomEvent.disableClickPropagation(boton);
+                boton.addEventListener('click', encuadrarZona);
+                return boton;
+            }
+        });
+        mapa.addControl(new BotonCentrar());
+
+        // Sin punto todavía, un clic en el mapa lo elige. Después solo se mueve arrastrándolo,
+        // para que un clic casual no cambie la búsqueda ni gaste créditos.
+        mapa.on('click', evento => {
+            if (!punto) fijarPunto(evento.latlng.lat, evento.latlng.lng, 'el punto elegido');
+        });
     } else {
         parte('mapa').classList.add('hidden');
     }
@@ -133,24 +156,53 @@
         marcadores.set(l.id, marcador);
     }
 
-    function pintarZona(datos) {
-        if (!hayMapa) return;
-        capaZona.clearLayers();
-        const centro = [datos.latitud, datos.longitud];
-        L.circleMarker(centro, { radius: 8, color: '#ffffff', weight: 3, fillColor: '#2563eb', fillOpacity: 1 })
-            .bindTooltip(nombreLugar || 'Su ubicación')
-            .addTo(capaZona);
-        const zona = L.circle(centro, { radius: datos.radioMetros, color: '#2563eb', weight: 1, fillOpacity: 0.05 }).addTo(capaZona);
-        // Con «Ver todos» se encuadran los resultados: a 50 km no se distinguiría nada.
-        const limites = datos.radioMetros <= 10000 || !lugares.length
-            ? zona.getBounds()
-            : L.latLngBounds([centro, ...lugares.map(l => [l.latitud, l.longitud])]);
-        mapa.fitBounds(limites, { padding: [24, 24], maxZoom: 16 });
+    const esVerTodos = () => Number(radio.value) > 10000;
+
+    // El pin y el círculo son siempre la referencia de la búsqueda: no dependen de los resultados.
+    function pintarPunto() {
+        if (!hayMapa || !punto) return;
+        const centro = [punto.lat, punto.lon];
+        if (!pin) {
+            circulo = L.circle(centro, { radius: Number(radio.value), color: '#ea580c', weight: 2, dashArray: '6 6', fillColor: '#ea580c', fillOpacity: 0.06, interactive: false }).addTo(mapa);
+            pin = L.marker(centro, {
+                pane: 'explora-punto',
+                draggable: true,
+                autoPan: true,
+                title: 'Su punto de búsqueda',
+                alt: 'Su punto de búsqueda. Arrástrelo para moverlo.',
+                icon: L.divIcon({ className: 'explora-pin', html: '<span class="explora-pin-gota"></span>', iconSize: [30, 40], iconAnchor: [15, 38] })
+            }).addTo(mapa);
+            pin.bindTooltip('Arrástreme para buscar desde otro punto', { direction: 'top', offset: [0, -38] });
+            pin.on('drag', () => circulo.setLatLng(pin.getLatLng()));
+            pin.on('dragend', () => {
+                const { lat, lng } = pin.getLatLng();
+                punto = { lat, lon: lng };
+                nombreLugar = 'el punto elegido';
+                ciudad.value = '';
+                buscar();
+            });
+        } else {
+            pin.setLatLng(centro);
+            circulo.setLatLng(centro);
+            circulo.setRadius(Number(radio.value));
+        }
+    }
+
+    function encuadrarZona() {
+        if (!hayMapa || !punto) return;
+        const centro = L.latLng(punto.lat, punto.lon);
+        // A 50 km no se distinguiría nada: «Ver todos» encuadra el punto y lo encontrado.
+        const limites = esVerTodos() && lugares.length
+            ? L.latLngBounds([centro, ...lugares.map(l => [l.latitud, l.longitud])])
+            : circulo.getBounds();
+        mapa.fitBounds(limites, { padding: [36, 36], maxZoom: 16 });
     }
 
     function actualizarResumen() {
-        const quien = nombreLugar || 'su ubicación';
-        resumen.textContent = lugares.length ? `${lugares.length} lugar(es) cerca de ${quien}, del más cercano al más lejano.` : '';
+        const donde = nombreLugar === 'el punto elegido' ? 'del punto elegido' : `de ${nombreLugar || 'su ubicación'}`;
+        resumen.textContent = lugares.length
+            ? `${lugares.length} lugar(es) cerca ${donde}. Arrastre el pin para buscar desde otro punto.`
+            : '';
     }
 
     function botonMas() {
@@ -203,7 +255,10 @@
                 lista.append(tarjeta(l));
                 pintarMapa(l);
             });
-            if (!ampliar) pintarZona(datos);
+            if (encuadrarResultados) {
+                encuadrarResultados = false;
+                encuadrarZona();
+            }
             botonMas();
             actualizarResumen();
             if (!lugares.length) {
@@ -223,6 +278,9 @@
     function fijarPunto(lat, lon, nombre) {
         punto = { lat, lon };
         nombreLugar = nombre;
+        pintarPunto();
+        encuadrarZona();
+        encuadrarResultados = esVerTodos();
         buscar();
     }
 
@@ -262,7 +320,12 @@
         if (nombre) buscarCiudad(nombre);
     });
     ciudad.addEventListener('focus', () => ciudad.select());
-    radio.addEventListener('change', () => buscar());
+    radio.addEventListener('change', () => {
+        pintarPunto();
+        encuadrarZona();
+        encuadrarResultados = esVerTodos();
+        buscar();
+    });
 
     botonesFiltro.forEach(boton => boton.addEventListener('click', () => {
         boton.setAttribute('aria-pressed', String(boton.getAttribute('aria-pressed') !== 'true'));
@@ -279,7 +342,7 @@
         avisar('La búsqueda de lugares no está disponible en este momento.');
         return;
     }
-    resumen.textContent = 'Use su ubicación o escriba una ciudad para empezar.';
+    resumen.textContent = 'Use su ubicación, escriba una ciudad o haga clic en el mapa para empezar.';
     if (hayMapa) setTimeout(() => mapa.invalidateSize(), 300);
 
     let recordada = null;
