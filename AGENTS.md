@@ -63,9 +63,6 @@ Sin sus variables, la app sigue funcionando:
 | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_KEY` | La búsqueda usa PostgreSQL |
 | `ANTHROPIC_API_KEY` | El asistente del huésped queda desactivado |
 | `GEOAPIFY_API_KEY` | «Explora tu zona» queda desactivado |
-| `SERPAPI_API_KEY` | «Tarifas de la competencia» queda desactivado |
-
-«Tarifas de la competencia» (`/Competencia`, solo administradores) consulta Google Hotels con SerpApi. Solo informa: nunca cambia precios. Cada consulta nueva gasta 1 búsqueda de las 250 gratuitas al mes: solo se gasta al pulsar el botón, se reutiliza lo consultado en las últimas 6 horas y `COMPETENCIA_LIMITE_MENSUAL` fija un tope (200 por defecto). Las consultas se guardan en PostgreSQL como historial.
 
 «Explora tu zona» (`/Portal/Explora`) usa Geoapify por el servidor y mapa de OpenStreetMap, y debe mostrar la atribución de ambos. La ubicación se redondea a unos 110 m y no se asocia al usuario ni se registra; cada consulta de hasta 20 lugares cuesta 1 crédito, por eso va en caché una hora.
 

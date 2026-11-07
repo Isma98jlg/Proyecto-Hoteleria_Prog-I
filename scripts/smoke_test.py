@@ -399,11 +399,6 @@ check("radio no permitido rechazado", guest.get("/Portal/Explora?handler=Buscar&
 check("filtro desconocido rechazado", guest.get("/Portal/Explora?handler=Buscar&lat=1&lon=1&filtros=casinos")[0] == 400)
 check("coordenadas de lugares fuera de rango rechazadas", guest.get("/Portal/Explora?handler=Buscar&lat=500&lon=1")[0] == 400)
 
-# --- Tarifas de la competencia: permisos, sin llamar al servicio externo.
-check("administrador abre la competencia", admin.get("/Competencia")[0] == 200)
-check("personal no ve la competencia", "AccessDenied" in worker.get("/Competencia")[2])
-check("huésped no ve la competencia", "AccessDenied" in guest.get("/Competencia")[2])
-
 # Vistas restantes
 for ruta in ["/Habitaciones/PorPiso", "/Habitaciones/PorTipoVip", "/Privacy", "/Reservas/Crear", "/Portal/Perfil", "/Account/CambiarContrasena"]:
     s = admin.get(ruta)[0]
