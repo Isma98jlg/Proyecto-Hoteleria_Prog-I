@@ -11,9 +11,18 @@
         <partial name="_VerificarDocumentoPersonal" />
         <div class="flex flex-wrap justify-between gap-3 border-t border-surface-container-high pt-4"><a asp-page="Detalles" asp-route-id="@Model.UsuarioId" class="px-4 py-2 rounded-lg bg-surface-container">Cancelar</a><button class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold" type="submit">Guardar cambios</button></div>
     </form>
-    @if (Model.ReservasAsociadas == 0)
+    @if (Model.PuedeEliminar)
     {
-        <form method="post" asp-page-handler="Eliminar" onsubmit="return confirm('¿Eliminar definitivamente este huésped?')" class="flex justify-end"><button class="px-4 py-2 rounded-lg bg-error-container text-on-error-container" type="submit">Eliminar huésped</button></form>
+        var aviso = Model.ReservasAsociadas == 0 && !Model.TieneCuenta
+            ? "¿Eliminar definitivamente este huésped?"
+            : $"¿Eliminar definitivamente este huésped? También se borrarán sus {Model.ReservasAsociadas} reservas{(Model.TieneCuenta ? " y su cuenta de acceso" : "")}. No se puede deshacer.";
+        <form method="post" asp-page-handler="Eliminar" data-confirmar="@aviso" onsubmit="return confirm(this.dataset.confirmar)" class="flex flex-wrap items-center justify-end gap-3">
+            @if (Model.ReservasAsociadas > 0)
+            {
+                <small class="text-on-surface-variant">Se borrarán también sus @Model.ReservasAsociadas reservas y quedarán libres sus habitaciones.</small>
+            }
+            <button class="px-4 py-2 rounded-lg bg-error-container text-on-error-container" type="submit">Eliminar huésped</button>
+        </form>
     }
 </main>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

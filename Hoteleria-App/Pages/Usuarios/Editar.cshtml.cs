@@ -11,11 +11,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Hoteleria_App.Pages.Usuarios;
 
 [Authorize(Policy = HotelPermissionPolicies.CrudUsuarios)]
-public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManager<HotelUser> userManager, VerificacionDocumentoService verificacion) : PageModel
+public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, VerificacionDocumentoService verificacion) : PageModel
 {
     [BindProperty] public DatosPersona Persona { get; set; } = new();
     public long UsuarioId { get; set; }
     public int ReservasAsociadas { get; set; }
+    public bool TieneCuenta { get; set; }
+
+    /// <summary>Con reservas o cuenta de acceso, solo el administrador elimina al huésped (y se borran con él).</summary>
+    public bool PuedeEliminar => User.IsInRole(CargosSistema.Admin) || (ReservasAsociadas == 0 && !TieneCuenta);
 
     /// <summary>Solo para verificar carnés con Migraciones. No se guarda.</summary>
     [BindProperty] public DateTime? FechaNacimiento { get; set; }
@@ -36,6 +40,7 @@ public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManag
         if (usuario is null) return NotFound();
         UsuarioId = id;
         ReservasAsociadas = await db.Reservas.CountAsync(r => r.UsuarioId == id);
+        TieneCuenta = await db.Users.AnyAsync(c => c.Id == id);
         Persona = DatosPersona.Desde(usuario);
         return Page();
     }
@@ -46,6 +51,7 @@ public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManag
         var usuario = await BuscarHuesped().FirstOrDefaultAsync(u => u.UsuarioId == id);
         if (usuario is null) return NotFound();
         ReservasAsociadas = await db.Reservas.CountAsync(r => r.UsuarioId == id);
+        TieneCuenta = await db.Users.AnyAsync(c => c.Id == id);
         if (!ModelState.IsValid) return Page();
 
         var duplicado = await cuentas.ValidarDuplicadosAsync(Persona, id);
@@ -77,17 +83,15 @@ public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManag
 
     public async Task<IActionResult> OnPostEliminarAsync(long id)
     {
-        var usuario = await BuscarHuesped().FirstOrDefaultAsync(u => u.UsuarioId == id);
-        if (usuario is null) return NotFound();
-        if (await db.Reservas.AnyAsync(r => r.UsuarioId == id) || await userManager.FindByIdAsync(id.ToString()) is not null)
+        var reservas = await db.Reservas.CountAsync(r => r.UsuarioId == id);
+        var resultado = await cuentas.EliminarHuespedAsync(id, User.IsInRole(CargosSistema.Admin));
+        if (!resultado.Ok)
         {
-            TempData["MensajeError"] = "No se puede eliminar: la persona tiene reservas o una cuenta de acceso.";
+            TempData["MensajeError"] = resultado.Error;
             return RedirectToPage("Detalles", new { id });
         }
 
-        db.Usuarios.Remove(usuario);
-        await db.SaveChangesAsync();
-        TempData["MensajeExito"] = "Huésped eliminado correctamente.";
+        TempData["MensajeExito"] = reservas == 0 ? "Huésped eliminado correctamente." : $"Huésped eliminado junto con sus {reservas} reservas.";
         return RedirectToPage("Index");
     }
 

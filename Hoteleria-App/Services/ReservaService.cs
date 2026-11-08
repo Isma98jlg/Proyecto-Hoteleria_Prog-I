@@ -23,6 +23,8 @@ public interface IReservaService
     Task<ResultadoOperacion> EditarAsync(long id, ReservaEditModel model);
     Task<ResultadoOperacion> CancelarPropiaAsync(long reservaId, long usuarioId);
     Task<ResultadoOperacion> EliminarAsync(long id);
+    Task<(ResultadoOperacion Resultado, List<long> Reservas)> BorrarReservasDeHuespedAsync(long usuarioId);
+    Task NotificarReservasEliminadasAsync(IEnumerable<long> reservaIds, long usuarioId);
 }
 
 public class ReservaViewModel
@@ -342,6 +344,29 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
         await context.SaveChangesAsync();
         await NotificarReservaAsync(id, "ELIMINADA", reserva.UsuarioId);
         return ResultadoOperacion.Exito;
+    }
+
+    /// <summary>
+    /// Borra todas las reservas de un huésped que el administrador elimina. Corre dentro de la transacción de
+    /// <see cref="CuentaService.EliminarHuespedAsync"/> y no notifica: eso se hace al confirmarla. Rechaza si el
+    /// huésped está alojado, porque la habitación ocupada solo la libera el check-out.
+    /// </summary>
+    public async Task<(ResultadoOperacion Resultado, List<long> Reservas)> BorrarReservasDeHuespedAsync(long usuarioId)
+    {
+        if (await context.Reservas.AnyAsync(r => r.UsuarioId == usuarioId && r.EstadoReserva == EstadosReserva.EnCurso))
+            return (ResultadoOperacion.Fallo(HuespedAlojado), []);
+
+        var ids = await context.Reservas.Where(r => r.UsuarioId == usuarioId).Select(r => r.ReservaId).ToListAsync();
+        // Las habitaciones de cada reserva se borran en cascada y quedan libres en esas fechas.
+        await context.Reservas.Where(r => r.UsuarioId == usuarioId && r.EstadoReserva != EstadosReserva.EnCurso).ExecuteDeleteAsync();
+        return (ResultadoOperacion.Exito, ids);
+    }
+
+    public const string HuespedAlojado = "El huésped está alojado ahora: haga el check-out antes de eliminarlo.";
+
+    public async Task NotificarReservasEliminadasAsync(IEnumerable<long> reservaIds, long usuarioId)
+    {
+        foreach (var id in reservaIds) await NotificarReservaAsync(id, "ELIMINADA", usuarioId);
     }
 
     /// <summary>Cambia fechas y habitaciones, conservando el precio pactado de las que siguen.</summary>

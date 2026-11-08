@@ -71,7 +71,8 @@ public sealed record InvitacionVista(string Email, string Cargo, bool EsActivaci
 public class CuentaService(
     HoteleriaDbContext db,
     UserManager<HotelUser> userManager,
-    PermisosService permisos)
+    PermisosService permisos,
+    IReservaService reservas)
 {
     private static readonly TimeSpan VigenciaInvitacion = TimeSpan.FromDays(7);
 
@@ -102,6 +103,53 @@ public class CuentaService(
             else db.ChangeTracker.Clear();
             return resultado;
         });
+    }
+
+    /// <summary>
+    /// Elimina a un huésped. Sin reservas ni cuenta lo puede hacer quien administra el directorio; con ellas, solo
+    /// el administrador, y en la misma transacción se borran sus reservas, sus invitaciones pendientes y su cuenta
+    /// de acceso (esta, en cascada con la persona). No se puede deshacer.
+    /// </summary>
+    public async Task<ResultadoOperacion> EliminarHuespedAsync(long usuarioId, bool esAdmin)
+    {
+        var cargoHuesped = await db.Roles.AsNoTracking().Where(r => r.Name == CargosSistema.Huesped).Select(r => r.Id).SingleAsync();
+        if (!await db.Usuarios.AnyAsync(u => u.UsuarioId == usuarioId && u.CargoId == cargoHuesped))
+            return ResultadoOperacion.Fallo("El huésped no existe.");
+        if (!esAdmin && (await db.Reservas.AnyAsync(r => r.UsuarioId == usuarioId) || await db.Users.AnyAsync(c => c.Id == usuarioId)))
+            return ResultadoOperacion.Fallo("Tiene reservas o una cuenta de acceso: solo el administrador puede eliminarlo junto con ellas.");
+
+        List<long> borradas = [];
+        var strategy = db.Database.CreateExecutionStrategy();
+        var resultado = await strategy.ExecuteAsync(async () =>
+        {
+            db.ChangeTracker.Clear();
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            var (reservasBorradas, ids) = await reservas.BorrarReservasDeHuespedAsync(usuarioId);
+            if (!reservasBorradas.Ok) return reservasBorradas;
+
+            await db.Invitaciones.Where(i => i.UsuarioId == usuarioId).ExecuteDeleteAsync();
+            try
+            {
+                var personas = await db.Usuarios.Where(u => u.UsuarioId == usuarioId && u.CargoId == cargoHuesped).ExecuteDeleteAsync();
+                if (personas != 1) return ResultadoOperacion.Fallo("El huésped no existe.");
+            }
+            catch (Npgsql.PostgresException ex) when (ex.SqlState == Npgsql.PostgresErrorCodes.ForeignKeyViolation)
+            {
+                // Una reserva pasó a «En curso» mientras tanto: la transacción se deshace entera.
+                return ResultadoOperacion.Fallo(ReservaService.HuespedAlojado);
+            }
+
+            await transaction.CommitAsync();
+            borradas = ids;
+            return ResultadoOperacion.Exito;
+        });
+
+        if (resultado.Ok)
+        {
+            await permisos.InvalidarAsync(usuarioId);
+            await reservas.NotificarReservasEliminadasAsync(borradas, usuarioId);
+        }
+        return resultado;
     }
 
     /// <summary>Alta sin cuenta hecha por recepción para quien llega al mostrador.</summary>
