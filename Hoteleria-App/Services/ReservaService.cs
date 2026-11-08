@@ -258,6 +258,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
         {
             var esHuesped = await context.Usuarios.AnyAsync(u => u.UsuarioId == model.UsuarioId && u.Cargo.Name == CargosSistema.Huesped);
             if (!esHuesped) return ResultadoOperacion.Fallo("Seleccione un huésped registrado.");
+            await BloquearHabitacionesAsync(model.HabitacionIds);
 
             var habitaciones = await HabitacionesLibresEn(inicio, fin, null, reloj.Hoy)
                 .Where(h => model.HabitacionIds.Contains(h.HabitacionId))
@@ -387,6 +388,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
         if (noches is < 1 or > 365) return ResultadoOperacion.Fallo("El número de noches debe estar entre 1 y 365.");
 
         var fin = inicio.AddDays(noches);
+        await BloquearHabitacionesAsync(nuevas);
         var disponibles = await HabitacionesLibresEn(inicio, fin, reserva.ReservaId, reloj.Hoy)
             .Where(h => nuevas.Contains(h.HabitacionId))
             .Select(h => new { h.HabitacionId, Precio = h.NroCamas * h.TipoVip.PrecioCama })
@@ -453,6 +455,20 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
         reserva.EstadoReserva = nuevo;
         foreach (var linea in reserva.ReservaHabitaciones) linea.Activa = EstadosReserva.Activo(nuevo);
         return ResultadoOperacion.Exito;
+    }
+
+    /// <summary>Espacio de los bloqueos consultivos de habitaciones, para no chocar con otros usos de pg_advisory_lock.</summary>
+    private const int BloqueoHabitaciones = 7101;
+
+    /// <summary>
+    /// Bloquea las habitaciones hasta el fin de la transacción, siempre en el mismo orden. Dos reservas de la misma
+    /// habitación esperan su turno y la segunda ve que ya no está libre, en vez de bloquearse entre sí (interbloqueo)
+    /// y esperar los reintentos. Las de habitaciones distintas no se esperan.
+    /// </summary>
+    private async Task BloquearHabitacionesAsync(IEnumerable<long> habitacionIds)
+    {
+        foreach (var id in habitacionIds.Distinct().Order())
+            await context.Database.ExecuteSqlAsync($"SELECT pg_advisory_xact_lock({BloqueoHabitaciones}, {(int)id})");
     }
 
     private async Task<ResultadoOperacion> EjecutarEnTransaccionAsync(Func<Task<ResultadoOperacion>> operacion)
