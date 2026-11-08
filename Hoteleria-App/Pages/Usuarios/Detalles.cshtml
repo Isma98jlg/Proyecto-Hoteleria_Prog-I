@@ -10,6 +10,13 @@
         <div class="flex gap-2"><a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Volver</a>@if (Model.PuedeAdministrar && !persona.EsEmpleado) { <a asp-page="Editar" asp-route-id="@persona.UsuarioId" class="px-4 py-2 rounded-lg bg-primary text-on-primary">Editar datos</a> }</div>
     </section>
     <partial name="_Mensajes" />
+    <section class="flex flex-wrap items-center gap-3 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-4">
+        <span class="material-symbols-outlined text-[22px] @(persona.EstadoVerificacion == EstadosVerificacion.Confirmado ? "text-on-tertiary-container" : "text-outline")">@(persona.EstadoVerificacion == EstadosVerificacion.SinVerificar ? "help" : "verified_user")</span>
+        <div class="flex flex-col">
+            <strong>Documento: @EstadosVerificacion.Etiqueta(persona.EstadoVerificacion)</strong>
+            <small class="text-on-surface-variant">@TiposDocumento.Etiqueta(persona.TipoDocumento)@(persona.PaisEmisor is null ? "" : $" · emitido en {persona.PaisEmisor}")@(persona.FuenteVerificacion is null ? "" : $" · {persona.FuenteVerificacion}, {persona.VerificadoEn:dd/MM/yyyy}")</small>
+        </div>
+    </section>
     @if (!persona.EsEmpleado)
     {
         <form method="post" asp-page-handler="@(persona.TieneCuenta ? "Restablecer" : "Activacion")" asp-route-id="@persona.UsuarioId" class="flex flex-wrap items-center justify-between gap-3 bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4">

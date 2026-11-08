@@ -39,6 +39,9 @@ builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
 builder.Services.AddScoped<SelectorHabitaciones>();
 builder.Services.AddHttpClient<ClimaService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(5));
 builder.Services.AddHttpClient<LugaresService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(8));
+builder.Services.AddHttpClient<VerificacionDocumentoService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(10));
+// El cliente HTTP anota cada dirección consultada, y la de PeruAPI lleva el DNI: solo se registran sus avisos.
+builder.Logging.AddFilter("System.Net.Http.HttpClient.VerificacionDocumentoService", LogLevel.Warning);
 builder.Services.AddScoped<AsistenteHuespedService>();
 
 // Redis es opcional: da caché compartida y conecta SignalR entre instancias.

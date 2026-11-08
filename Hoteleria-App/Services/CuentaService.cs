@@ -20,13 +20,28 @@ public class DatosPersona
     [Required(ErrorMessage = "Indique el teléfono."), StringLength(25)] public string Telefono { get; set; } = "";
     [Required(ErrorMessage = "Indique el correo de acceso."), EmailAddress(ErrorMessage = "Correo no válido."), StringLength(254), CorreoDelDominio] public string EMail { get; set; } = "";
     [EmailAddress(ErrorMessage = "Correo no válido."), StringLength(254)] public string? CorreoContacto { get; set; }
+    /// <summary>Código ISO de 2 letras del país que emitió el pasaporte. Se ignora en otros documentos.</summary>
+    [StringLength(2)] public string? PaisEmisor { get; set; }
 
     public void CopiarA(Usuario u)
     {
-        u.TipoDocumento = TipoDocumento.Trim();
-        u.NumeroDocumento = NumeroDocumento.Trim();
-        u.Nombres = Nombres.Trim();
-        u.Apellidos = Apellidos.Trim();
+        var tipo = TipoDocumento.Trim();
+        var numero = NumeroDocumento.Trim();
+        var nombres = Nombres.Trim();
+        var apellidos = Apellidos.Trim();
+        var pais = tipo == TiposDocumento.Pasaporte && !string.IsNullOrWhiteSpace(PaisEmisor) ? PaisEmisor.Trim().ToUpperInvariant() : null;
+        // Una verificación solo vale para los datos que se comprobaron.
+        if (u.TipoDocumento != tipo || u.NumeroDocumento != numero || u.Nombres != nombres || u.Apellidos != apellidos || u.PaisEmisor != pais)
+        {
+            u.EstadoVerificacion = EstadosVerificacion.SinVerificar;
+            u.FuenteVerificacion = null;
+            u.VerificadoEn = null;
+        }
+        u.TipoDocumento = tipo;
+        u.NumeroDocumento = numero;
+        u.Nombres = nombres;
+        u.Apellidos = apellidos;
+        u.PaisEmisor = pais;
         u.Nacionalidad = Nacionalidad.Trim();
         u.Telefono = Telefono.Trim();
         u.EMail = EMail.Trim().ToLowerInvariant();
@@ -42,7 +57,8 @@ public class DatosPersona
         Nacionalidad = u.Nacionalidad,
         Telefono = u.Telefono,
         EMail = u.EMail,
-        CorreoContacto = u.CorreoContacto
+        CorreoContacto = u.CorreoContacto,
+        PaisEmisor = u.PaisEmisor
     };
 }
 
@@ -59,7 +75,7 @@ public class CuentaService(
 {
     private static readonly TimeSpan VigenciaInvitacion = TimeSpan.FromDays(7);
 
-    public async Task<ResultadoOperacion> RegistrarHuespedAsync(DatosPersona datos, string password)
+    public async Task<ResultadoOperacion> RegistrarHuespedAsync(DatosPersona datos, string password, DocumentoVerificado? verificacion = null)
     {
         var duplicado = await ValidarDuplicadosAsync(datos, null);
         if (duplicado is not null) return ResultadoOperacion.Fallo(duplicado);
@@ -72,6 +88,12 @@ public class CuentaService(
             await using var transaction = await db.Database.BeginTransactionAsync();
             var usuario = new Usuario { CargoId = cargo.Id };
             datos.CopiarA(usuario);
+            if (verificacion is not null)
+            {
+                usuario.EstadoVerificacion = verificacion.Estado;
+                usuario.FuenteVerificacion = verificacion.Fuente;
+                usuario.VerificadoEn = verificacion.En;
+            }
             db.Usuarios.Add(usuario);
             await db.SaveChangesAsync();
 
@@ -83,7 +105,7 @@ public class CuentaService(
     }
 
     /// <summary>Alta sin cuenta hecha por recepción para quien llega al mostrador.</summary>
-    public async Task<ResultadoOperacion> RegistrarHuespedSinCuentaAsync(DatosPersona datos)
+    public async Task<ResultadoOperacion> RegistrarHuespedSinCuentaAsync(DatosPersona datos, DocumentoVerificado? verificacion = null)
     {
         var duplicado = await ValidarDuplicadosAsync(datos, null);
         if (duplicado is not null) return ResultadoOperacion.Fallo(duplicado);
@@ -91,6 +113,12 @@ public class CuentaService(
         var cargo = await db.Roles.AsNoTracking().SingleAsync(r => r.Name == CargosSistema.Huesped);
         var usuario = new Usuario { CargoId = cargo.Id };
         datos.CopiarA(usuario);
+        if (verificacion is not null)
+        {
+            usuario.EstadoVerificacion = verificacion.Estado;
+            usuario.FuenteVerificacion = verificacion.Fuente;
+            usuario.VerificadoEn = verificacion.En;
+        }
         db.Usuarios.Add(usuario);
         await db.SaveChangesAsync();
         return ResultadoOperacion.Exito;

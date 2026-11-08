@@ -11,11 +11,24 @@ using Microsoft.EntityFrameworkCore;
 namespace Hoteleria_App.Pages.Usuarios;
 
 [Authorize(Policy = HotelPermissionPolicies.CrudUsuarios)]
-public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManager<HotelUser> userManager) : PageModel
+public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManager<HotelUser> userManager, VerificacionDocumentoService verificacion) : PageModel
 {
     [BindProperty] public DatosPersona Persona { get; set; } = new();
     public long UsuarioId { get; set; }
     public int ReservasAsociadas { get; set; }
+
+    /// <summary>Solo para verificar carnés con Migraciones. No se guarda.</summary>
+    [BindProperty] public DateTime? FechaNacimiento { get; set; }
+    [BindProperty] public string? TokenVerificacion { get; set; }
+
+    /// <summary>Verificación en ventanilla: devuelve los datos oficiales para autocompletar.</summary>
+    public async Task<IActionResult> OnPostVerificarAsync([FromForm] bool consentimiento)
+    {
+        if (!consentimiento) return new JsonResult(new ResultadoAutocompletado(EstadosVerificacion.SinVerificar, "Marque que el huésped autoriza la consulta.", null, null, null, null));
+        if ((Persona.NumeroDocumento?.Length ?? 0) > 25 || (Persona.Nombres?.Length ?? 0) > 100 || (Persona.Apellidos?.Length ?? 0) > 100) return BadRequest();
+        var solicitud = new SolicitudVerificacion(Persona.TipoDocumento ?? "", Persona.NumeroDocumento ?? "", Persona.Nombres ?? "", Persona.Apellidos ?? "", Persona.PaisEmisor, FechaNacimiento);
+        return new JsonResult(await verificacion.AutocompletarAsync(solicitud, User.Id() ?? 0, HttpContext.RequestAborted));
+    }
 
     public async Task<IActionResult> OnGetAsync(long id)
     {
@@ -43,6 +56,13 @@ public class EditarModel(HoteleriaDbContext db, CuentaService cuentas, UserManag
         }
 
         Persona.CopiarA(usuario);
+        var documento = await verificacion.ConsumirAsync(TokenVerificacion, Persona, HttpContext.RequestAborted);
+        if (documento.Estado != EstadosVerificacion.SinVerificar)
+        {
+            usuario.EstadoVerificacion = documento.Estado;
+            usuario.FuenteVerificacion = documento.Fuente;
+            usuario.VerificadoEn = documento.En;
+        }
         await db.SaveChangesAsync();
         var correo = await cuentas.SincronizarCorreoAsync(id, usuario.EMail);
         if (!correo.Ok)

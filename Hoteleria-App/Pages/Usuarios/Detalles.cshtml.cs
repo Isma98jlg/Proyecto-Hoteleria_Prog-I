@@ -26,6 +26,7 @@ public class DetallesModel(HoteleriaDbContext db, CuentaService cuentas) : PageM
                 UsuarioId = u.UsuarioId, TipoDocumento = u.TipoDocumento, NumeroDocumento = u.NumeroDocumento,
                 Nombres = u.Nombres, Apellidos = u.Apellidos, Nacionalidad = u.Nacionalidad,
                 Telefono = u.Telefono, EMail = u.EMail, CorreoContacto = u.CorreoContacto, EsEmpleado = u.Employee != null,
+                PaisEmisor = u.PaisEmisor, EstadoVerificacion = u.EstadoVerificacion, FuenteVerificacion = u.FuenteVerificacion, VerificadoEn = u.VerificadoEn,
                 TieneCuenta = db.Users.Any(c => c.Id == u.UsuarioId),
                 Reservas = u.Reservas.OrderByDescending(r => r.InicioReserva).Select(r => new ReservaFila
                 {
@@ -72,6 +73,10 @@ public class DetallesModel(HoteleriaDbContext db, CuentaService cuentas) : PageM
         public string EMail { get; set; } = "";
         public string? CorreoContacto { get; set; }
         public bool EsEmpleado { get; set; }
+        public string? PaisEmisor { get; set; }
+        public string EstadoVerificacion { get; set; } = "";
+        public string? FuenteVerificacion { get; set; }
+        public DateTime? VerificadoEn { get; set; }
         public bool TieneCuenta { get; set; }
         public string NombreCompleto => $"{Nombres} {Apellidos}".Trim();
         public List<ReservaFila> Reservas { get; set; } = new();

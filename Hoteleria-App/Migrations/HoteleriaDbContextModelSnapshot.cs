@@ -419,6 +419,19 @@ namespace Hoteleria_App.Migrations
                         .HasColumnType("character varying(254)")
                         .HasColumnName("e_mail");
 
+                    b.Property<string>("EstadoVerificacion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("SIN_VERIFICAR")
+                        .HasColumnName("estado_verificacion");
+
+                    b.Property<string>("FuenteVerificacion")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("fuente_verificacion");
+
                     b.Property<string>("Nacionalidad")
                         .IsRequired()
                         .HasMaxLength(60)
@@ -437,6 +450,11 @@ namespace Hoteleria_App.Migrations
                         .HasColumnType("character varying(25)")
                         .HasColumnName("numero_documento");
 
+                    b.Property<string>("PaisEmisor")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("pais_emisor");
+
                     b.Property<string>("Telefono")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -448,6 +466,10 @@ namespace Hoteleria_App.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)")
                         .HasColumnName("tipo_documento");
+
+                    b.Property<DateTime?>("VerificadoEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("verificado_en");
 
                     b.HasKey("UsuarioId");
 

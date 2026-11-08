@@ -89,6 +89,10 @@ public class HoteleriaDbContext : IdentityDbContext<HotelUser, HotelRole, long>,
             entity.Property(e => e.Telefono).HasColumnName("telefono").HasMaxLength(25);
             entity.Property(e => e.EMail).HasColumnName("e_mail").HasMaxLength(254);
             entity.Property(e => e.CorreoContacto).HasColumnName("correo_contacto").HasMaxLength(254);
+            entity.Property(e => e.PaisEmisor).HasColumnName("pais_emisor").HasMaxLength(2);
+            entity.Property(e => e.EstadoVerificacion).HasColumnName("estado_verificacion").HasMaxLength(20).HasDefaultValue(EstadosVerificacion.SinVerificar);
+            entity.Property(e => e.FuenteVerificacion).HasColumnName("fuente_verificacion").HasMaxLength(60);
+            entity.Property(e => e.VerificadoEn).HasColumnName("verificado_en").HasColumnType("timestamp with time zone");
             entity.Property(e => e.CargoId).HasColumnName("cargo_id");
             entity.HasOne(e => e.Cargo).WithMany().HasForeignKey(e => e.CargoId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => new { e.TipoDocumento, e.NumeroDocumento }).IsUnique().HasDatabaseName("UX_Usuarios_Documento");

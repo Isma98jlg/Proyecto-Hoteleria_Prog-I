@@ -27,6 +27,7 @@ Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
 
 - **Correos:** el correo de acceso siempre usa el dominio único `DOMINIO_CORREO` (por defecto `grandstay.com`) y no es un buzón real. `Usuarios.correo_contacto` guarda el correo real, de cualquier proveedor, para futuros envíos; cualquier correo saliente debe usar ese campo.
 - **Cuentas:** el registro público siempre crea un huésped. El personal entra por invitación del administrador y el cargo lo define la invitación.
+- **Verificación de documentos (registro público):** documentos aceptados: DNI, pasaporte, CPP y carné de extranjería. DNI con PeruAPI (RENIEC), CE y CPP con ApisTed (Migraciones) y pasaporte con Luhnify (solo formato). Se verifica sin revelar: el navegador nunca recibe los datos oficiales, solo si coinciden. La fecha de nacimiento solo se pide para CE y CPP, se envía a ApisTed y no se guarda. Si no coincide o la API falla, la cuenta se crea «sin verificar». El estado vale solo para los datos comprobados: cambiar el documento o los nombres lo reinicia.
 - **Cargos:** `Usuarios.cargo_id` y los roles de Identity solo se cambian con `CuentaService.AsignarCargoAsync`.
 - **Huésped:** solo crea y consulta sus reservas en `/Portal`, y ve sus datos. No accede a Habitaciones ni a la API; solo ve las habitaciones disponibles al reservar y las suyas en el detalle.
 - **Datos personales:** el directorio y las fichas exigen `crud_usuarios`. Los avisos de SignalR y el índice de Algolia no llevan datos personales.
@@ -63,6 +64,7 @@ Sin sus variables, la app sigue funcionando:
 | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_KEY` | La búsqueda usa PostgreSQL |
 | `ANTHROPIC_API_KEY` | El asistente del huésped queda desactivado |
 | `GEOAPIFY_API_KEY` | «Explora tu zona» queda desactivado |
+| `PERUAPI_API_KEY`, `APISTED_TOKEN`, `LUHNIFY_API_KEY` | El registro funciona, pero el documento queda «sin verificar» |
 
 «Explora tu zona» (`/Portal/Explora`) usa Geoapify por el servidor y mapa de OpenStreetMap, y debe mostrar la atribución de ambos. La ubicación se redondea a unos 110 m y no se asocia al usuario ni se registra; cada consulta de hasta 20 lugares cuesta 1 crédito, por eso va en caché una hora.
 

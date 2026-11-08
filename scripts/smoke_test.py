@@ -231,11 +231,21 @@ check("concurrencia sin doble reserva", exitos_max == 1, str(exitos_max))
 
 # --- Registro público y portal
 nuevo = f"reg{doc}@grandstay.com".lower()
+dni_registro = f"{int(time.time()) % 100000000:08d}"
+# Sin claves de las APIs en este entorno: verificar responde sin datos oficiales y el documento queda sin verificar.
+verif = Client()
+tok_reg = token(verif.get("/Account/Registro")[1])
+s, cuerpo_v, _ = verif.post("/Account/Registro", "/Account/Registro?handler=Verificar", {**persona(dni_registro, nuevo), "consentimiento": "true", "__RequestVerificationToken": tok_reg})
+check("verificar documento responde sin datos oficiales", s == 200 and '"estado"' in cuerpo_v and "apellido_paterno" not in cuerpo_v and "nombre_completo" not in cuerpo_v, cuerpo_v[:200])
+s, cuerpo_v, _ = verif.post("/Account/Registro", "/Account/Registro?handler=Verificar", {**persona("123", nuevo), "consentimiento": "true", "__RequestVerificationToken": tok_reg})
+check("verificar rechaza un DNI mal formado", "8 d" in cuerpo_v, cuerpo_v[:200])
+s, body, _ = Client().post("/Account/Registro", "/Account/Registro", {**persona("12AB", nuevo), "Password": "Registro-Prueba-1!", "Confirmacion": "Registro-Prueba-1!"})
+check("registro rechaza un DNI mal formado", s == 200 and "8 d" in body)
 anon = Client()
-s, body, _ = anon.post("/Account/Registro", "/Account/Registro", {**persona("R" + doc, nuevo), "Password": "corta", "Confirmacion": "corta"})
+s, body, _ = anon.post("/Account/Registro", "/Account/Registro", {**persona(dni_registro, nuevo), "Password": "corta", "Confirmacion": "corta"})
 check("registro rechaza contraseña débil", s == 200)
 anon = Client()
-s, _, loc = anon.post("/Account/Registro", "/Account/Registro", {**persona("R" + doc, nuevo), "Password": "Registro-Prueba-1!", "Confirmacion": "Registro-Prueba-1!", "Cargo": "admin", "Persona.CargoId": 1})
+s, _, loc = anon.post("/Account/Registro", "/Account/Registro", {**persona(dni_registro, nuevo), "Password": "Registro-Prueba-1!", "Confirmacion": "Registro-Prueba-1!", "Cargo": "admin", "Persona.CargoId": 1})
 check("registro crea cuenta e inicia sesión", s == 302 and "Portal" in loc, f"{s} {loc}")
 check("registrado queda como huésped", "AccessDenied" in anon.get("/Reservas")[2])
 s, body, _ = anon.get(f"/Portal/Reservar?handler=Disponibles&q=vip&inicio={d(70)}&noches=2")

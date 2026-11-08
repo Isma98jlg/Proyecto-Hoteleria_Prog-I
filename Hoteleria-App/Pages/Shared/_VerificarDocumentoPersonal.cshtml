@@ -1,0 +1,24 @@
+@* Verificación en ventanilla. Va dentro del formulario de _FormPersona y usa sus mismos campos. *@
+<section id="verificar-documento" class="flex flex-col gap-3 rounded-xl border border-surface-container-high bg-surface-container-low/60 p-4">
+    <input type="hidden" name="TokenVerificacion" data-verificar-token />
+    <div class="flex flex-wrap items-center justify-between gap-2">
+        <strong class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">verified_user</span>Verificar documento</strong>
+        <small class="text-outline">Con la persona delante: DNI con RENIEC, carnés con Migraciones y pasaportes solo en su formato.</small>
+    </div>
+    <label class="flex max-w-xs flex-col gap-1" data-verificar-fecha>Fecha de nacimiento
+        <input type="date" name="FechaNacimiento" class="px-3 py-2 bg-surface-container-lowest rounded-lg" />
+        <small class="text-outline">Migraciones la pide para los carnés. No se guarda.</small>
+    </label>
+    <label class="flex items-start gap-2 text-sm text-on-surface-variant">
+        <input type="checkbox" name="consentimiento" value="true" class="mt-0.5 h-4 w-4 accent-primary" data-verificar-consentimiento />
+        <span>El huésped autoriza consultar su documento en la fuente oficial.</span>
+    </label>
+    <div class="flex flex-wrap items-center gap-3">
+        <button type="button" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary disabled:opacity-50" data-verificar-boton>
+            <span class="material-symbols-outlined text-[18px]">badge</span>Verificar y autocompletar
+        </button>
+        <small class="text-outline">Rellena nombres y apellidos con los datos oficiales. Revíselos con el huésped antes de guardar.</small>
+    </div>
+    <p class="hidden rounded-lg p-3 text-sm" role="status" aria-live="polite" data-verificar-resultado></p>
+</section>
+<script src="~/js/verificacion-personal.js" asp-append-version="true"></script>

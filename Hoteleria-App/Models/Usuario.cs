@@ -14,6 +14,12 @@ public class Usuario
     public string EMail { get; set; } = null!;
     /// <summary>Correo real de cualquier proveedor, para futuros envíos.</summary>
     public string? CorreoContacto { get; set; }
+    /// <summary>País que emitió el documento, en código ISO de 2 letras. Solo para pasaportes.</summary>
+    public string? PaisEmisor { get; set; }
+    /// <summary>Uno de <see cref="EstadosVerificacion"/>. Cambiar el documento o los nombres lo reinicia.</summary>
+    public string EstadoVerificacion { get; set; } = EstadosVerificacion.SinVerificar;
+    public string? FuenteVerificacion { get; set; }
+    public DateTime? VerificadoEn { get; set; }
     public long CargoId { get; set; }
 
     public virtual HotelRole Cargo { get; set; } = null!;

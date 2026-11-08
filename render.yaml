@@ -35,6 +35,12 @@ services:
         sync: false
       - key: GEOAPIFY_API_KEY
         sync: false
+      - key: PERUAPI_API_KEY
+        sync: false
+      - key: APISTED_TOKEN
+        sync: false
+      - key: LUHNIFY_API_KEY
+        sync: false
 
   - type: keyvalue
     name: hoteleria-cache

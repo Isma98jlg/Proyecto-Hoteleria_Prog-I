@@ -1,20 +1,91 @@
 @page
 @model Hoteleria_App.Pages.Account.RegistroModel
+@inject Hoteleria_App.Services.DominioCorreo Dominio
+@using Hoteleria_App.Models
+@using Hoteleria_App.Services
 @{
     Layout = "_LayoutPublico";
     ViewData["Title"] = "Crear cuenta de huésped";
-    ViewData["Subtitulo"] = "Reserve y consulte sus estancias en GrandStay";
+    ViewData["Subtitulo"] = "Primero verificamos su documento; después crea su acceso";
+    const string campo = "w-full px-3 py-2 bg-surface-container-low rounded-lg";
+    var tipo = TiposDocumento.Todos.Contains(Model.Persona.TipoDocumento) ? Model.Persona.TipoDocumento : TiposDocumento.Dni;
+    var mostrarPaso2 = Request.Method == "POST";
+    var ejemploCorreo = $"usuario@{Dominio.Dominio}";
+    var terminacion = $"@{Dominio.Dominio}";
+    const string ejemploContacto = "nombre@gmail.com";
 }
-<form method="post" class="flex flex-col gap-5">
+<form method="post" id="registro" class="flex flex-col gap-6" data-paso2="@(mostrarPaso2 ? "1" : "0")">
     <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
-    <partial name="_FormPersona" for="Persona" />
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <label class="flex flex-col gap-1">Contraseña<input asp-for="Password" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Password" class="text-error text-sm"></span></label>
-        <label class="flex flex-col gap-1">Repita la contraseña<input asp-for="Confirmacion" autocomplete="new-password" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Confirmacion" class="text-error text-sm"></span></label>
-    </div>
-    <p class="text-sm text-outline">Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.</p>
+    <input type="hidden" asp-for="TokenVerificacion" data-registro-token />
+
+    <section class="flex flex-col gap-4">
+        <h2 class="flex items-center gap-2 font-headline-sm text-headline-sm"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">1</span>Su documento</h2>
+
+        <fieldset class="grid grid-cols-2 gap-2 md:grid-cols-4">
+            <legend class="sr-only">Tipo de documento</legend>
+            @foreach (var t in TiposDocumento.Todos)
+            {
+                <label class="registro-tipo flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-outline-variant/60 px-2 py-3 text-center text-sm font-semibold has-[:checked]:border-primary has-[:checked]:bg-primary-container has-[:checked]:text-on-primary">
+                    <input type="radio" name="Persona.TipoDocumento" value="@t" checked="@(t == tipo)" class="sr-only" data-registro-tipo />
+                    <span class="material-symbols-outlined text-[22px]">@(t switch { TiposDocumento.Dni => "badge", TiposDocumento.Pasaporte => "travel_explore", _ => "id_card" })</span>
+                    <span>@(t == TiposDocumento.Pasaporte ? "Pasaporte" : t == TiposDocumento.Ce ? "Carné de extranjería" : t)</span>
+                </label>
+            }
+        </fieldset>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label class="flex flex-col gap-1">Número de documento
+                <input asp-for="Persona.NumeroDocumento" autocomplete="off" class="@campo" data-registro-documento />
+                <small class="text-outline" data-registro-ayuda></small>
+                <span asp-validation-for="Persona.NumeroDocumento" class="text-error text-sm"></span>
+            </label>
+            <label class="flex flex-col gap-1" data-solo="Pasaporte">País emisor
+                <select asp-for="Persona.PaisEmisor" class="@campo" data-registro-documento data-registro-paises>
+                    <option value="">Elija un país</option>
+                    @foreach (var codigo in VerificacionDocumentoService.Paises) { <option value="@codigo">@codigo</option> }
+                </select>
+            </label>
+            <label class="flex flex-col gap-1">Nombres<input asp-for="Persona.Nombres" autocomplete="given-name" class="@campo" data-registro-documento /><span asp-validation-for="Persona.Nombres" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Apellidos<input asp-for="Persona.Apellidos" autocomplete="family-name" class="@campo" data-registro-documento /><span asp-validation-for="Persona.Apellidos" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1" data-solo="Pasaporte CPP CE">Nacionalidad<input asp-for="Persona.Nacionalidad" class="@campo" /><span asp-validation-for="Persona.Nacionalidad" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1" data-solo="CPP CE">Fecha de nacimiento
+                <input asp-for="FechaNacimiento" type="date" class="@campo" data-registro-documento />
+                <small class="text-outline">Migraciones la pide para verificar su carné. No se guarda.</small>
+            </label>
+        </div>
+
+        <label class="flex items-start gap-2 text-sm text-on-surface-variant">
+            <input type="checkbox" name="consentimiento" value="true" class="mt-0.5 h-4 w-4 accent-primary" data-registro-consentimiento />
+            <span>Autorizo que GrandStay compruebe mi documento con <span data-registro-fuente>RENIEC, a través de PeruAPI</span>, solo para verificar mi identidad. Si no lo autorizo, puedo continuar y recepción lo revisará.</span>
+        </label>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-on-primary disabled:opacity-50" data-registro-verificar>
+                <span class="material-symbols-outlined text-[18px]">verified_user</span>Verificar documento
+            </button>
+            <button type="button" class="text-sm font-semibold text-secondary hover:underline" data-registro-saltar>Continuar sin verificar</button>
+        </div>
+        <p class="hidden rounded-xl p-3 text-sm" role="status" aria-live="polite" data-registro-resultado></p>
+    </section>
+
+    <section class="flex flex-col gap-4 border-t border-surface-container-high pt-6" data-registro-paso2>
+        <h2 class="flex items-center gap-2 font-headline-sm text-headline-sm"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-on-primary">2</span>Sus datos de acceso</h2>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label class="flex flex-col gap-1">Teléfono<input asp-for="Persona.Telefono" autocomplete="tel" class="@campo" /><span asp-validation-for="Persona.Telefono" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Correo de acceso<input asp-for="Persona.EMail" type="email" placeholder="@ejemploCorreo" class="@campo" /><small class="text-outline">Con este correo se inicia sesión. Debe terminar en @terminacion.</small><span asp-validation-for="Persona.EMail" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1 md:col-span-2">Correo de contacto (opcional)<input asp-for="Persona.CorreoContacto" type="email" placeholder="@ejemploContacto" class="@campo" /><small class="text-outline">Su correo real, de cualquier proveedor.</small><span asp-validation-for="Persona.CorreoContacto" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Contraseña<input asp-for="Password" autocomplete="new-password" class="@campo" /><span asp-validation-for="Password" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Repita la contraseña<input asp-for="Confirmacion" autocomplete="new-password" class="@campo" /><span asp-validation-for="Confirmacion" class="text-error text-sm"></span></label>
+        </div>
+        <p class="text-sm text-outline">Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.</p>
+    </section>
+
     <div class="flex items-center justify-between gap-3 border-t border-surface-container-high pt-4">
         <a asp-page="/Account/Login" class="text-secondary font-semibold hover:underline">Ya tengo cuenta</a>
-        <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Crear cuenta</button>
+        <button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold" data-registro-crear>Crear cuenta</button>
     </div>
 </form>
+
+@section Scripts {
+    <script src="~/js/registro.js" asp-append-version="true"></script>
+}

@@ -575,3 +575,42 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261108061651_VerificacionDocumentos') THEN
+    ALTER TABLE "Usuarios" ADD estado_verificacion character varying(20) NOT NULL DEFAULT 'SIN_VERIFICAR';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261108061651_VerificacionDocumentos') THEN
+    ALTER TABLE "Usuarios" ADD fuente_verificacion character varying(60);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261108061651_VerificacionDocumentos') THEN
+    ALTER TABLE "Usuarios" ADD pais_emisor character varying(2);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261108061651_VerificacionDocumentos') THEN
+    ALTER TABLE "Usuarios" ADD verificado_en timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261108061651_VerificacionDocumentos') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261108061651_VerificacionDocumentos', '10.0.14');
+    END IF;
+END $EF$;
+COMMIT;
+
