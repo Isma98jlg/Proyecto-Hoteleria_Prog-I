@@ -20,7 +20,8 @@ public sealed record ResultadoVerificacion(string Estado, string Mensaje, string
 public sealed record DocumentoVerificado(string Estado, string? Fuente, DateTime? En);
 
 /// <summary>
-/// Comprueba el documento del huésped: DNI con PeruAPI, CE y CPP con ApisTed (Migraciones) y pasaportes con
+/// Comprueba el documento del huésped: DNI con MigoAPI (y RENIEC por ApisTed si MigoAPI no lo resuelve), CE y CPP con
+/// ApisTed (Migraciones) y pasaportes con
 /// Luhnify. Los nombres de DNI y carnés salen de la fuente oficial, no de lo que escriba el usuario; por eso el
 /// registro público exige consentimiento y tiene poca cuota por IP. Del pasaporte solo se comprueba el formato.
 /// Ni la fecha de nacimiento ni la respuesta de las APIs se guardan, y nada de esto se registra.
@@ -31,6 +32,11 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
     private const int VerificacionesPorHoraPersonal = 40;
     private static readonly DistributedCacheEntryOptions TtlToken = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30) };
     private static readonly DistributedCacheEntryOptions TtlContador = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) };
+
+    // Migraciones resuelve una verificación visual antes de responder: tarda bastante más que las demás.
+    private static readonly TimeSpan EsperaRapida = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan EsperaMigraciones = TimeSpan.FromSeconds(40);
+    private const string DniNoEncontrado = "No encontramos ese DNI. Revise el número.";
 
     private const string NoDisponible = "La verificación automática no está disponible en este momento. Puede continuar: recepción revisará su documento.";
 
@@ -125,17 +131,70 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
         catch (Exception ex) when (EsFalloDeCache(ex)) { return sinVerificar; }
     }
 
+    /// <summary>
+    /// DNI con MigoAPI. Su fuente (padrón de SUNAT) no siempre tiene todos los DNI, así que si no lo encuentra o
+    /// falla, se consulta RENIEC por ApisTed con su mismo token.
+    /// </summary>
     private async Task<Consulta> ConsultarDniAsync(SolicitudVerificacion s, CancellationToken ct)
     {
-        if (Clave("PERUAPI_API_KEY") is not { } clave) return Consulta.Fallo(NoDisponible);
-        using var peticion = new HttpRequestMessage(HttpMethod.Get, $"{Base("PERUAPI_BASE_URL", "https://peruapi.com")}/api/dni/{s.Numero.Trim()}");
-        peticion.Headers.Add("X-API-KEY", clave);
-        var (estado, json) = await EnviarAsync("PeruAPI", peticion, ct);
-        if (estado == HttpStatusCode.NotFound) return Consulta.Fallo("No encontramos ese DNI. Revise el número.");
-        if (json is not { } d || Texto(d, "nombres") is not { } nombres) return Consulta.Fallo(NoDisponible);
+        var migo = await ConsultarDniMigoAsync(s, ct);
+        if (migo.Oficial is not null) return migo;
+        return await ConsultarDniApisTedAsync(s, ct) ?? migo;
+    }
 
+    private async Task<Consulta> ConsultarDniMigoAsync(SolicitudVerificacion s, CancellationToken ct)
+    {
+        if (Clave("MIGO_API_TOKEN") is not { } token) return Consulta.Fallo(NoDisponible);
+        using var peticion = new HttpRequestMessage(HttpMethod.Get, $"{Base("MIGO_API_BASE_URL", "https://api.migo.pe/api/v2")}/dni/{s.Numero.Trim()}");
+        peticion.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        peticion.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        var (estado, json) = await EnviarAsync("MigoAPI", peticion, EsperaRapida, ct);
+        if (estado == HttpStatusCode.NotFound) return Consulta.Fallo(DniNoEncontrado);
+        if (json is not { } d || !(d.TryGetProperty("success", out var ok) && ok.ValueKind == JsonValueKind.True) || Texto(d, "nombre") is not { } completo)
+            return Consulta.Fallo(json is null ? NoDisponible : DniNoEncontrado);
+        if (SepararNombreSunat(completo) is not var (apellidos, nombres)) return Consulta.Fallo(NoDisponible);
+        return new(EstadosVerificacion.Confirmado, "SUNAT (MigoAPI)", "Documento confirmado.",
+            new DatosOficiales(Formatear(nombres), Formatear(apellidos), "Peruana"));
+    }
+
+    private static readonly HashSet<string> Particulas = ["DE", "DEL", "LA", "LAS", "LOS", "Y", "SAN", "SANTA", "DA", "DI", "VAN", "VON"];
+
+    /// <summary>
+    /// SUNAT escribe «APELLIDO_PATERNO APELLIDO_MATERNO NOMBRES» en un solo texto. Cada apellido es una palabra,
+    /// con sus partículas delante («DE LA CRUZ»). Si no quedan nombres, devuelve null.
+    /// </summary>
+    internal static (string Apellidos, string Nombres)? SepararNombreSunat(string completo)
+    {
+        var palabras = completo.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var i = 0;
+        for (var apellido = 0; apellido < 2 && i < palabras.Length - 1; apellido++)
+        {
+            while (i < palabras.Length - 2 && Particulas.Contains(palabras[i].ToUpperInvariant())) i++;
+            i++;
+        }
+        return i == 0 || i >= palabras.Length ? null : (string.Join(' ', palabras[..i]), string.Join(' ', palabras[i..]));
+    }
+
+    /// <summary>Respaldo: devuelve null si ApisTed no está configurado, para conservar el resultado de MigoAPI.</summary>
+    private async Task<Consulta?> ConsultarDniApisTedAsync(SolicitudVerificacion s, CancellationToken ct)
+    {
+        if (Clave("APISTED_TOKEN") is not { } token) return null;
+        using var peticion = new HttpRequestMessage(HttpMethod.Post, $"{Base("APISTED_BASE_URL", "https://apisted.com/api")}/reniec/dni")
+        {
+            Content = Json(new { dni = s.Numero.Trim() })
+        };
+        peticion.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var (estado, json) = await EnviarAsync("ApisTed RENIEC", peticion, EsperaRapida, ct);
+        if (estado == HttpStatusCode.NotFound) return Consulta.Fallo(DniNoEncontrado);
+        return DesdeReniec(json, "RENIEC (ApisTed)");
+    }
+
+    /// <summary>RENIEC responde con los nombres y cada apellido por separado.</summary>
+    private static Consulta DesdeReniec(JsonElement? json, string fuente)
+    {
+        if (json is not { } d || Texto(d, "nombres") is not { } nombres) return Consulta.Fallo(NoDisponible);
         var apellidos = $"{Texto(d, "apellido_paterno")} {Texto(d, "apellido_materno")}".Trim();
-        return new(EstadosVerificacion.Confirmado, "RENIEC (PeruAPI)", "Documento confirmado.",
+        return new(EstadosVerificacion.Confirmado, fuente, "Documento confirmado.",
             new DatosOficiales(Formatear(nombres), Formatear(apellidos), "Peruana"));
     }
 
@@ -148,7 +207,9 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
             Content = Json(new { numero = s.Numero.Trim(), fecha_nacimiento = s.FechaNacimiento!.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) })
         };
         peticion.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var (estado, json) = await EnviarAsync("ApisTed", peticion, ct);
+        var (estado, json) = await EnviarAsync("ApisTed", peticion, EsperaMigraciones, ct);
+        if (estado == HttpStatusCode.TooManyRequests)
+            return Consulta.Fallo("Migraciones está recibiendo muchas consultas. Inténtelo en un minuto o continúe sin verificar.");
         const string noEncontrado = "Migraciones no encontró ese carné con esa fecha de nacimiento.";
         if (estado == HttpStatusCode.NotFound) return Consulta.Fallo(noEncontrado);
         if (json is not { } d) return Consulta.Fallo(NoDisponible);
@@ -173,7 +234,7 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
             Content = Json(new { country_code = pais.ToLowerInvariant(), document_type = "passport", document_number = s.Numero.Trim() })
         };
         peticion.Headers.Add("X-API-KEY", clave);
-        var (estado, json) = await EnviarAsync("Luhnify", peticion, ct);
+        var (estado, json) = await EnviarAsync("Luhnify", peticion, EsperaRapida, ct);
         // Luhnify responde 4xx cuando no conoce el formato de ese país: no es un error del huésped.
         if (json is not { } d) return Consulta.Fallo(estado is >= HttpStatusCode.BadRequest and < HttpStatusCode.InternalServerError and not HttpStatusCode.Unauthorized and not HttpStatusCode.TooManyRequests
             ? "No podemos validar automáticamente los pasaportes de ese país. Puede continuar: recepción lo revisará."
@@ -192,23 +253,25 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
     /// <summary>Cuerpo JSON con su tamaño indicado: algunos servidores rechazan los envíos por partes.</summary>
     private static StringContent Json(object cuerpo) => new(JsonSerializer.Serialize(cuerpo), Encoding.UTF8, "application/json");
 
-    private async Task<(HttpStatusCode?, JsonElement?)> EnviarAsync(string servicio, HttpRequestMessage peticion, CancellationToken ct)
+    private async Task<(HttpStatusCode?, JsonElement?)> EnviarAsync(string servicio, HttpRequestMessage peticion, TimeSpan espera, CancellationToken ct)
     {
+        using var limite = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        limite.CancelAfter(espera);
         try
         {
-            using var respuesta = await http.SendAsync(peticion, ct);
+            using var respuesta = await http.SendAsync(peticion, limite.Token);
             if (!respuesta.IsSuccessStatusCode)
             {
                 // Solo el servicio y el estado: la petición lleva el documento y la clave.
                 if (respuesta.StatusCode != HttpStatusCode.NotFound) logger.LogWarning("{Servicio} respondió con el estado {Estado}.", servicio, (int)respuesta.StatusCode);
                 return (respuesta.StatusCode, null);
             }
-            using var documento = JsonDocument.Parse(await respuesta.Content.ReadAsStringAsync(ct));
+            using var documento = JsonDocument.Parse(await respuesta.Content.ReadAsStringAsync(limite.Token));
             return (respuesta.StatusCode, documento.RootElement.Clone());
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
         {
-            logger.LogWarning("No se pudo consultar {Servicio}: {Tipo}", servicio, ex.GetType().Name);
+            logger.LogWarning("No se pudo consultar {Servicio}: {Tipo}", servicio, ex is TaskCanceledException && !ct.IsCancellationRequested ? $"sin respuesta en {espera.TotalSeconds:0} s" : ex.GetType().Name);
             return (null, null);
         }
     }

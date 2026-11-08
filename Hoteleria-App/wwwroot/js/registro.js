@@ -18,7 +18,7 @@
     const nota = parte('nota');
 
     const AYUDAS = {
-        DNI: ['8 dígitos', 'RENIEC, a través de PeruAPI', /^\d{8}$/],
+        DNI: ['8 dígitos', 'MigoAPI y RENIEC (ApisTed)', /^\d{8}$/],
         Pasaporte: ['Letras y números, tal como figuran en el pasaporte', 'Luhnify, que comprueba el formato del número', /^[A-Za-z0-9]{5,15}$/],
         CPP: ['Solo los dígitos del carné', 'Migraciones, a través de ApisTed', /^\d{6,12}$/],
         CE: ['Solo los dígitos del carné', 'Migraciones, a través de ApisTed', /^\d{6,12}$/]
@@ -132,7 +132,7 @@
         if (actual === ultimaClave) return;
         ultimaClave = actual;
         const esta = ++peticion;
-        mostrarResultado('Verificando su documento…', 'aviso');
+        mostrarResultado(['CE', 'CPP'].includes(tipoActual()) ? 'Consultando a Migraciones; puede tardar hasta medio minuto…' : 'Verificando su documento…', 'aviso');
         const datos = new FormData(formulario);
         datos.set('consentimiento', 'true');
         try {

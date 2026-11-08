@@ -38,7 +38,7 @@
 
     boton.addEventListener('click', async () => {
         boton.disabled = true;
-        avisar('Consultando…', 'aviso');
+        avisar(tipo.value === 'CE' || tipo.value === 'CPP' ? 'Consultando a Migraciones; puede tardar hasta medio minuto…' : 'Consultando…', 'aviso');
         const datos = new FormData(formulario);
         datos.set('consentimiento', parte('consentimiento').checked ? 'true' : 'false');
         try {
