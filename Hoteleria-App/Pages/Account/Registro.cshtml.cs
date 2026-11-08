@@ -30,15 +30,13 @@ public class RegistroModel(CuentaService cuentas, VerificacionDocumentoService v
 
     public void OnGet() { }
 
-    /// <summary>Paso 1. Responde si el documento se pudo confirmar, sin devolver nunca los datos oficiales.</summary>
+    /// <summary>Paso 1. Consulta la fuente oficial y devuelve los nombres que figuran en el documento.</summary>
     public async Task<IActionResult> OnPostVerificarAsync([FromForm] bool consentimiento)
     {
-        if (!consentimiento) return new JsonResult(new ResultadoVerificacion(EstadosVerificacion.SinVerificar, "Para verificar su documento, acepte la consulta a la fuente oficial.", null));
-        if (string.IsNullOrWhiteSpace(Persona.Nombres) || string.IsNullOrWhiteSpace(Persona.Apellidos))
-            return new JsonResult(new ResultadoVerificacion(EstadosVerificacion.SinVerificar, "Escriba sus nombres y apellidos tal como figuran en el documento.", null));
-        if (Persona.Nombres.Length > 100 || Persona.Apellidos.Length > 100 || Persona.NumeroDocumento.Length > 25) return BadRequest();
+        if (!consentimiento) return new JsonResult(new ResultadoVerificacion(EstadosVerificacion.SinVerificar, "Para verificar su documento, marque la autorización.", null, null, null, null));
+        if ((Persona.NumeroDocumento?.Length ?? 0) > 25) return BadRequest();
 
-        var solicitud = new SolicitudVerificacion(Persona.TipoDocumento, Persona.NumeroDocumento, Persona.Nombres, Persona.Apellidos, Persona.PaisEmisor, FechaNacimiento);
+        var solicitud = new SolicitudVerificacion(Persona.TipoDocumento ?? "", Persona.NumeroDocumento ?? "", "", "", Persona.PaisEmisor, FechaNacimiento);
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "desconocida";
         return new JsonResult(await verificacion.VerificarAsync(solicitud, ip, HttpContext.RequestAborted));
     }

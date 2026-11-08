@@ -1,23 +1,27 @@
-// Registro de huéspedes: el formulario cambia según el documento y la verificación ocurre sin recargar.
-// Sin JavaScript, todo el formulario queda visible y la cuenta se crea sin verificar.
+// Registro de huéspedes: verifica el documento en cuanto está completo y rellena los datos con los oficiales.
+// Sin JavaScript, todo el formulario queda visible y editable, y la cuenta se crea sin verificar.
 (() => {
     const formulario = document.getElementById('registro');
     if (!formulario) return;
 
     const parte = nombre => formulario.querySelector(`[data-registro-${nombre}]`);
+    const campo = nombre => formulario.querySelector(`[name="Persona.${nombre}"]`);
     const tipos = [...formulario.querySelectorAll('[data-registro-tipo]')];
+    const oficiales = [...formulario.querySelectorAll('[data-registro-oficial]')];
     const paso2 = parte('paso2');
     const resultado = parte('resultado');
-    const verificar = parte('verificar');
     const token = parte('token');
-    const ayuda = parte('ayuda');
-    const fuente = parte('fuente');
+    const consentimiento = parte('consentimiento');
+    const numero = campo('NumeroDocumento');
+    const pais = campo('PaisEmisor');
+    const fecha = formulario.querySelector('[name="FechaNacimiento"]');
+    const nota = parte('nota');
 
     const AYUDAS = {
-        DNI: ['8 dígitos', 'RENIEC, a través de PeruAPI'],
-        Pasaporte: ['Letras y números, tal como figuran en el pasaporte', 'Luhnify, que comprueba el formato del número'],
-        CPP: ['Solo los dígitos del carné', 'Migraciones, a través de ApisTed'],
-        CE: ['Solo los dígitos del carné', 'Migraciones, a través de ApisTed']
+        DNI: ['8 dígitos', 'RENIEC, a través de PeruAPI', /^\d{8}$/],
+        Pasaporte: ['Letras y números, tal como figuran en el pasaporte', 'Luhnify, que comprueba el formato del número', /^[A-Za-z0-9]{5,15}$/],
+        CPP: ['Solo los dígitos del carné', 'Migraciones, a través de ApisTed', /^\d{6,12}$/],
+        CE: ['Solo los dígitos del carné', 'Migraciones, a través de ApisTed', /^\d{6,12}$/]
     };
 
     // Nombres de países en español, generados por el navegador a partir del código ISO.
@@ -30,16 +34,37 @@
     } catch { /* Sin Intl.DisplayNames se muestran los códigos. */ }
 
     const tipoActual = () => tipos.find(t => t.checked)?.value || 'DNI';
+    // El pasaporte no tiene fuente oficial de nombres: se escriben a mano.
+    const vienenDeLaFuente = () => tipoActual() !== 'Pasaporte';
+
+    // Modo de los datos personales: «espera» (bloqueados hasta verificar), «oficial» (rellenados por la fuente)
+    // o «manual» (los escribe el huésped: pasaporte o continuar sin verificar).
+    let modo = 'espera';
+    function fijarModo(nuevo) {
+        modo = nuevo;
+        oficiales.forEach(c => {
+            c.readOnly = nuevo !== 'manual';
+            c.placeholder = nuevo === 'espera' ? 'Se completa al verificar' : '';
+        });
+        nota.classList.toggle('hidden', nuevo === 'manual');
+        parte('nota-texto').textContent = nuevo === 'oficial'
+            ? 'Datos tomados del documento. Si no son correctos, cambie el número o continúe sin verificar.'
+            : 'Se completan solos con los datos oficiales al verificar su documento.';
+    }
+
+    function vaciarOficiales() {
+        oficiales.forEach(c => { c.value = ''; });
+    }
 
     function mostrarSegunTipo() {
         const tipo = tipoActual();
-        formulario.querySelectorAll('[data-solo]').forEach(campo => {
-            const visible = campo.dataset.solo.split(' ').includes(tipo);
-            campo.classList.toggle('hidden', !visible);
-            campo.querySelectorAll('input, select').forEach(control => { control.disabled = !visible; });
+        formulario.querySelectorAll('[data-solo]').forEach(bloque => {
+            const visible = bloque.dataset.solo.split(' ').includes(tipo);
+            bloque.classList.toggle('hidden', !visible);
+            bloque.querySelectorAll('input, select').forEach(control => { control.disabled = !visible; });
         });
-        ayuda.textContent = AYUDAS[tipo][0];
-        fuente.textContent = AYUDAS[tipo][1];
+        parte('ayuda').textContent = AYUDAS[tipo][0];
+        parte('fuente').textContent = AYUDAS[tipo][1];
     }
 
     function mostrarResultado(texto, tono) {
@@ -51,50 +76,121 @@
         }[tono]);
     }
 
+    function ocultarResultado() { resultado.className = 'hidden'; }
+
     function abrirPaso2() {
         paso2.classList.remove('hidden');
         parte('crear').classList.remove('hidden');
     }
 
-    // Cambiar el documento después de verificarlo anula la verificación.
-    function invalidar() {
-        if (!token.value) return;
-        token.value = '';
-        mostrarResultado('Cambió los datos del documento: verifíquelo de nuevo o continúe sin verificar.', 'aviso');
+    function cerrarPaso2() {
+        paso2.classList.add('hidden');
+        parte('crear').classList.add('hidden');
     }
 
-    tipos.forEach(t => t.addEventListener('change', () => { mostrarSegunTipo(); invalidar(); }));
-    formulario.querySelectorAll('[data-registro-documento]').forEach(c => c.addEventListener('input', invalidar));
+    // ¿Están todos los datos que pide la fuente de este documento?
+    function completo() {
+        const tipo = tipoActual();
+        if (!AYUDAS[tipo][2].test(numero.value.trim())) return false;
+        if (tipo === 'Pasaporte' && !pais.value) return false;
+        if ((tipo === 'CE' || tipo === 'CPP') && !fecha.value) return false;
+        return true;
+    }
 
-    verificar.addEventListener('click', async () => {
-        verificar.disabled = true;
-        mostrarResultado('Verificando…', 'aviso');
+    const clave = () => [tipoActual(), numero.value.trim(), pais.value, fecha.value].join('|');
+    let ultimaClave = '';
+    let espera = null;
+    let peticion = 0;
+
+    // Cualquier cambio del documento anula la verificación anterior y sus datos.
+    function alCambiarDocumento() {
+        if (clave() === ultimaClave) return;
+        token.value = '';
+        ultimaClave = '';
+        if (vienenDeLaFuente()) {
+            if (modo === 'oficial') vaciarOficiales();
+            fijarModo(modo === 'manual' && paso2Abierto ? 'manual' : 'espera');
+        }
+        if (!paso2Abierto) cerrarPaso2();
+        programar();
+    }
+
+    let paso2Abierto = false;
+
+    function programar() {
+        clearTimeout(espera);
+        if (!completo()) { ocultarResultado(); return; }
+        if (!consentimiento.checked) {
+            mostrarResultado('Marque la autorización de arriba para verificar su documento, o continúe sin verificar.', 'aviso');
+            return;
+        }
+        espera = setTimeout(verificar, 450);
+    }
+
+    async function verificar() {
+        const actual = clave();
+        if (actual === ultimaClave) return;
+        ultimaClave = actual;
+        const esta = ++peticion;
+        mostrarResultado('Verificando su documento…', 'aviso');
         const datos = new FormData(formulario);
-        datos.set('consentimiento', parte('consentimiento').checked ? 'true' : 'false');
+        datos.set('consentimiento', 'true');
         try {
             const respuesta = await fetch(`${location.pathname}?handler=Verificar`, { method: 'POST', body: datos });
             if (!respuesta.ok) throw new Error(String(respuesta.status));
             const r = await respuesta.json();
+            if (esta !== peticion || clave() !== actual) return; // Llegó tarde: el documento ya cambió.
             token.value = r.token || '';
-            mostrarResultado(r.mensaje, r.estado === 'CONFIRMADO' ? 'ok' : r.estado === 'FORMATO_VALIDO' ? 'ok' : 'aviso');
-            if (r.token) abrirPaso2();
+            if (r.nombres) {
+                campo('Nombres').value = r.nombres;
+                campo('Apellidos').value = r.apellidos || '';
+                if (r.nacionalidad && campo('Nacionalidad')) campo('Nacionalidad').value = r.nacionalidad;
+                fijarModo('oficial');
+            }
+            mostrarResultado(r.mensaje, r.token ? 'ok' : 'aviso');
+            if (r.token) { paso2Abierto = true; abrirPaso2(); }
+            if (!r.token) ultimaClave = ''; // Permite reintentar si se corrige un dato.
         } catch {
+            if (esta !== peticion) return;
+            ultimaClave = '';
             mostrarResultado('No se pudo verificar ahora. Puede continuar sin verificar.', 'error');
-        } finally {
-            verificar.disabled = false;
         }
+    }
+
+    tipos.forEach(t => t.addEventListener('change', () => {
+        mostrarSegunTipo();
+        if (!vienenDeLaFuente()) fijarModo('manual');
+        else if (modo !== 'oficial') fijarModo(paso2Abierto && modo === 'manual' ? 'manual' : 'espera');
+        alCambiarDocumento();
+    }));
+    formulario.querySelectorAll('[data-registro-documento]').forEach(c => {
+        c.addEventListener('input', alCambiarDocumento);
+        c.addEventListener('change', alCambiarDocumento);
     });
+    consentimiento.addEventListener('change', () => { ultimaClave = ''; programar(); });
 
     parte('saltar').addEventListener('click', () => {
+        clearTimeout(espera);
+        peticion++;
         token.value = '';
-        mostrarResultado('Continuará sin verificar: recepción revisará su documento a su llegada.', 'aviso');
+        ultimaClave = '';
+        if (modo === 'oficial') vaciarOficiales();
+        fijarModo('manual');
+        mostrarResultado('Continuará sin verificar: escriba sus datos tal como figuran en su documento. Recepción lo revisará a su llegada.', 'aviso');
+        paso2Abierto = true;
         abrirPaso2();
-        paso2.querySelector('input')?.focus();
+        campo('Nombres').focus();
     });
 
     mostrarSegunTipo();
-    if (formulario.dataset.paso2 !== '1') {
-        paso2.classList.add('hidden');
-        parte('crear').classList.add('hidden');
+    if (formulario.dataset.paso2 === '1') {
+        // Volvió del servidor con un error: se conservan los datos y la verificación que hubiera.
+        paso2Abierto = true;
+        fijarModo(!vienenDeLaFuente() ? 'manual' : token.value ? 'oficial' : 'manual');
+        if (token.value) ultimaClave = clave();
+    } else {
+        fijarModo(vienenDeLaFuente() ? 'espera' : 'manual');
+        cerrarPaso2();
+        programar();
     }
 })();

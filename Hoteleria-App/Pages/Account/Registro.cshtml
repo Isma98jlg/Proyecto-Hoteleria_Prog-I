@@ -6,13 +6,14 @@
 @{
     Layout = "_LayoutPublico";
     ViewData["Title"] = "Crear cuenta de huésped";
-    ViewData["Subtitulo"] = "Primero verificamos su documento; después crea su acceso";
+    ViewData["Subtitulo"] = "Verificamos su documento y completamos sus datos; después crea su acceso";
     const string campo = "w-full px-3 py-2 bg-surface-container-low rounded-lg";
     var tipo = TiposDocumento.Todos.Contains(Model.Persona.TipoDocumento) ? Model.Persona.TipoDocumento : TiposDocumento.Dni;
     var mostrarPaso2 = Request.Method == "POST";
     var ejemploCorreo = $"usuario@{Dominio.Dominio}";
     var terminacion = $"@{Dominio.Dominio}";
     const string ejemploContacto = "nombre@gmail.com";
+    const string bloqueado = "read-only:cursor-not-allowed read-only:bg-tertiary-fixed/30 read-only:text-on-surface";
 }
 <form method="post" id="registro" class="flex flex-col gap-6" data-paso2="@(mostrarPaso2 ? "1" : "0")">
     <div asp-validation-summary="ModelOnly" class="rounded-xl bg-error-container text-on-error-container p-3 empty:hidden [&.validation-summary-valid]:hidden"></div>
@@ -33,9 +34,14 @@
             }
         </fieldset>
 
+        <label class="flex items-start gap-2 rounded-xl bg-surface-container-low p-3 text-sm text-on-surface-variant">
+            <input type="checkbox" name="consentimiento" value="true" class="mt-0.5 h-4 w-4 accent-primary" data-registro-consentimiento />
+            <span>Autorizo que GrandStay compruebe mi documento con <span data-registro-fuente>RENIEC, a través de PeruAPI</span> y complete mis datos con los que figuran en él, solo para verificar mi identidad.</span>
+        </label>
+
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <label class="flex flex-col gap-1">Número de documento
-                <input asp-for="Persona.NumeroDocumento" autocomplete="off" class="@campo" data-registro-documento />
+                <input asp-for="Persona.NumeroDocumento" autocomplete="off" inputmode="text" class="@campo" data-registro-documento />
                 <small class="text-outline" data-registro-ayuda></small>
                 <span asp-validation-for="Persona.NumeroDocumento" class="text-error text-sm"></span>
             </label>
@@ -45,27 +51,24 @@
                     @foreach (var codigo in VerificacionDocumentoService.Paises) { <option value="@codigo">@codigo</option> }
                 </select>
             </label>
-            <label class="flex flex-col gap-1">Nombres<input asp-for="Persona.Nombres" autocomplete="given-name" class="@campo" data-registro-documento /><span asp-validation-for="Persona.Nombres" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Apellidos<input asp-for="Persona.Apellidos" autocomplete="family-name" class="@campo" data-registro-documento /><span asp-validation-for="Persona.Apellidos" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1" data-solo="Pasaporte CPP CE">Nacionalidad<input asp-for="Persona.Nacionalidad" class="@campo" /><span asp-validation-for="Persona.Nacionalidad" class="text-error text-sm"></span></label>
             <label class="flex flex-col gap-1" data-solo="CPP CE">Fecha de nacimiento
                 <input asp-for="FechaNacimiento" type="date" class="@campo" data-registro-documento />
                 <small class="text-outline">Migraciones la pide para verificar su carné. No se guarda.</small>
             </label>
         </div>
 
-        <label class="flex items-start gap-2 text-sm text-on-surface-variant">
-            <input type="checkbox" name="consentimiento" value="true" class="mt-0.5 h-4 w-4 accent-primary" data-registro-consentimiento />
-            <span>Autorizo que GrandStay compruebe mi documento con <span data-registro-fuente>RENIEC, a través de PeruAPI</span>, solo para verificar mi identidad. Si no lo autorizo, puedo continuar y recepción lo revisará.</span>
-        </label>
+        <p class="hidden rounded-xl p-3 text-sm" role="status" aria-live="polite" data-registro-resultado></p>
 
-        <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-on-primary disabled:opacity-50" data-registro-verificar>
-                <span class="material-symbols-outlined text-[18px]">verified_user</span>Verificar documento
-            </button>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label class="flex flex-col gap-1">Nombres<input asp-for="Persona.Nombres" autocomplete="given-name" class="@campo @bloqueado" data-registro-oficial /><span asp-validation-for="Persona.Nombres" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Apellidos<input asp-for="Persona.Apellidos" autocomplete="family-name" class="@campo @bloqueado" data-registro-oficial /><span asp-validation-for="Persona.Apellidos" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1" data-solo="Pasaporte CPP CE">Nacionalidad<input asp-for="Persona.Nacionalidad" class="@campo @bloqueado" data-registro-oficial /><span asp-validation-for="Persona.Nacionalidad" class="text-error text-sm"></span></label>
+        </div>
+        <p class="flex items-center gap-1 text-sm text-outline" data-registro-nota><span class="material-symbols-outlined text-[16px]">lock</span><span data-registro-nota-texto></span></p>
+
+        <div>
             <button type="button" class="text-sm font-semibold text-secondary hover:underline" data-registro-saltar>Continuar sin verificar</button>
         </div>
-        <p class="hidden rounded-xl p-3 text-sm" role="status" aria-live="polite" data-registro-resultado></p>
     </section>
 
     <section class="flex flex-col gap-4 border-t border-surface-container-high pt-6" data-registro-paso2>

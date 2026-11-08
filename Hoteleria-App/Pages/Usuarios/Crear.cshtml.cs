@@ -22,7 +22,7 @@ public class CrearModel(CuentaService cuentas, VerificacionDocumentoService veri
     /// <summary>Verificación en ventanilla: devuelve los datos oficiales para autocompletar.</summary>
     public async Task<IActionResult> OnPostVerificarAsync([FromForm] bool consentimiento)
     {
-        if (!consentimiento) return new JsonResult(new ResultadoAutocompletado(EstadosVerificacion.SinVerificar, "Marque que el huésped autoriza la consulta.", null, null, null, null));
+        if (!consentimiento) return new JsonResult(new ResultadoVerificacion(EstadosVerificacion.SinVerificar, "Marque que el huésped autoriza la consulta.", null, null, null, null));
         if ((Persona.NumeroDocumento?.Length ?? 0) > 25 || (Persona.Nombres?.Length ?? 0) > 100 || (Persona.Apellidos?.Length ?? 0) > 100) return BadRequest();
         var solicitud = new SolicitudVerificacion(Persona.TipoDocumento ?? "", Persona.NumeroDocumento ?? "", Persona.Nombres ?? "", Persona.Apellidos ?? "", Persona.PaisEmisor, FechaNacimiento);
         return new JsonResult(await verificacion.AutocompletarAsync(solicitud, User.Id() ?? 0, HttpContext.RequestAborted));

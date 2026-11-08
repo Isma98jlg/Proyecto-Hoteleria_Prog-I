@@ -13,24 +13,21 @@ namespace Hoteleria_App.Services;
 
 public sealed record SolicitudVerificacion(string Tipo, string Numero, string Nombres, string Apellidos, string? PaisEmisor, DateTime? FechaNacimiento);
 
-/// <summary>Lo que ve el navegador. Nunca incluye los datos que devuelve la fuente oficial.</summary>
-public sealed record ResultadoVerificacion(string Estado, string Mensaje, string? Token);
-
-/// <summary>Para el personal en ventanilla: además del resultado, los datos oficiales para autocompletar.</summary>
-public sealed record ResultadoAutocompletado(string Estado, string Mensaje, string? Token, string? Nombres, string? Apellidos, string? Nacionalidad);
+/// <summary>Resultado y, si la fuente confirmó el documento, los datos oficiales con que se rellena el formulario.</summary>
+public sealed record ResultadoVerificacion(string Estado, string Mensaje, string? Token, string? Nombres, string? Apellidos, string? Nacionalidad);
 
 /// <summary>Resultado ya comprobado en el servidor, listo para guardarse con la cuenta.</summary>
 public sealed record DocumentoVerificado(string Estado, string? Fuente, DateTime? En);
 
 /// <summary>
 /// Comprueba el documento del huésped: DNI con PeruAPI, CE y CPP con ApisTed (Migraciones) y pasaportes con
-/// Luhnify. Verifica sin revelar: compara los nombres declarados con los oficiales y solo responde si
-/// coinciden, para que el registro público no sirva para averiguar datos de otras personas.
+/// Luhnify. Los nombres de DNI y carnés salen de la fuente oficial, no de lo que escriba el usuario; por eso el
+/// registro público exige consentimiento y tiene poca cuota por IP. Del pasaporte solo se comprueba el formato.
 /// Ni la fecha de nacimiento ni la respuesta de las APIs se guardan, y nada de esto se registra.
 /// </summary>
 public sealed partial class VerificacionDocumentoService(HttpClient http, IConfiguration config, IDistributedCache cache, ILogger<VerificacionDocumentoService> logger)
 {
-    private const int VerificacionesPorHora = 15;
+    private const int VerificacionesPorHora = 5;
     private const int VerificacionesPorHoraPersonal = 40;
     private static readonly DistributedCacheEntryOptions TtlToken = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30) };
     private static readonly DistributedCacheEntryOptions TtlContador = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) };
@@ -64,44 +61,39 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
         };
     }
 
-    public async Task<ResultadoVerificacion> VerificarAsync(SolicitudVerificacion s, string ip, CancellationToken ct = default)
-    {
-        if (ValidarFormato(s.Tipo, s.Numero, s.PaisEmisor) is { } error) return new(EstadosVerificacion.SinVerificar, error, null);
-        if ((s.Tipo is TiposDocumento.Ce or TiposDocumento.Cpp) && s.FechaNacimiento is null)
-            return new(EstadosVerificacion.SinVerificar, "Indique su fecha de nacimiento: Migraciones la pide para verificar el carné.", null);
-        if (!await RegistrarIntentoAsync($"ip:{ip}", VerificacionesPorHora, ct))
-            return new(EstadosVerificacion.SinVerificar, "Se alcanzó el límite de verificaciones por ahora. Puede continuar: recepción revisará su documento.", await GuardarAsync(s, EstadosVerificacion.SinVerificar, null, ct));
+    /// <summary>Registro público: sin sesión, con poca cuota por IP porque devuelve los datos oficiales.</summary>
+    public Task<ResultadoVerificacion> VerificarAsync(SolicitudVerificacion s, string ip, CancellationToken ct = default) =>
+        ConsultarYGuardarAsync(s, $"ip:{ip}", VerificacionesPorHora, publico: true, ct);
 
-        var c = await ConsultarAsync(s, ct);
-        var (estado, fuente, mensaje) = c.Oficial is { } oficial && !Coinciden(s, $"{oficial.Nombres} {oficial.Apellidos}")
-            ? (EstadosVerificacion.SinVerificar, null, NoCoinciden)
-            : (c.Estado, c.Fuente, c.Mensaje);
-        return new(estado, mensaje, await GuardarAsync(s, estado, fuente, ct));
-    }
+    /// <summary>Personal en ventanilla (exige permiso sobre el directorio).</summary>
+    public Task<ResultadoVerificacion> AutocompletarAsync(SolicitudVerificacion s, long usuarioPersonal, CancellationToken ct = default) =>
+        ConsultarYGuardarAsync(s, $"personal:{usuarioPersonal}", VerificacionesPorHoraPersonal, publico: false, ct);
 
     /// <summary>
-    /// Para el personal (exige permiso sobre el directorio): devuelve los datos oficiales para autocompletar el
-    /// formulario. El token queda ligado a esos datos, así que si se cambian después, la ficha queda sin verificar.
+    /// Consulta la fuente oficial y devuelve sus nombres para rellenar el formulario. El token queda ligado a esos
+    /// datos: si se cambian antes de guardar, la ficha queda sin verificar.
     /// </summary>
-    public async Task<ResultadoAutocompletado> AutocompletarAsync(SolicitudVerificacion s, long usuarioPersonal, CancellationToken ct = default)
+    private async Task<ResultadoVerificacion> ConsultarYGuardarAsync(SolicitudVerificacion s, string cuota, int limite, bool publico, CancellationToken ct)
     {
-        if (ValidarFormato(s.Tipo, s.Numero, s.PaisEmisor) is { } error) return new(EstadosVerificacion.SinVerificar, error, null, null, null, null);
+        if (ValidarFormato(s.Tipo, s.Numero, s.PaisEmisor) is { } error) return Sin(error);
         if ((s.Tipo is TiposDocumento.Ce or TiposDocumento.Cpp) && s.FechaNacimiento is null)
-            return new(EstadosVerificacion.SinVerificar, "Indique la fecha de nacimiento: Migraciones la pide para verificar el carné.", null, null, null, null);
-        if (s.Tipo == TiposDocumento.Pasaporte && (string.IsNullOrWhiteSpace(s.Nombres) || string.IsNullOrWhiteSpace(s.Apellidos)))
-            return new(EstadosVerificacion.SinVerificar, "Escriba los nombres y apellidos del pasaporte: Luhnify solo comprueba el formato del número.", null, null, null, null);
-        if (!await RegistrarIntentoAsync($"personal:{usuarioPersonal}", VerificacionesPorHoraPersonal, ct))
-            return new(EstadosVerificacion.SinVerificar, "Se alcanzó el límite de verificaciones por ahora. Inténtelo más tarde.", null, null, null, null);
+            return Sin("Indique la fecha de nacimiento: Migraciones la pide para verificar el carné.");
+        if (!await RegistrarIntentoAsync(cuota, limite, ct))
+            return Sin(publico ? "Se alcanzó el límite de verificaciones por ahora. Puede continuar sin verificar: recepción revisará su documento." : "Se alcanzó el límite de verificaciones por ahora. Inténtelo más tarde.");
 
         var c = await ConsultarAsync(s, ct);
+        var mensaje = publico ? c.Mensaje : c.Mensaje.Replace("Puede continuar: recepción lo revisará.", "Revise el documento en persona.")
+            .Replace("Puede continuar: recepción revisará su documento.", "Revise el documento en persona.")
+            .Replace("Recepción confirmará el pasaporte al llegar.", "Compruebe el pasaporte en persona.");
         if (c.Oficial is not { } o)
-            return new(c.Estado, c.Mensaje.Replace("Puede continuar: recepción lo revisará.", "Revise el documento en persona.").Replace("Recepción confirmará el pasaporte al llegar.", "Compruebe el pasaporte en persona."),
-                await GuardarAsync(s, c.Estado, c.Fuente, ct), null, null, null);
+            return new(c.Estado, mensaje, c.Estado == EstadosVerificacion.SinVerificar ? null : await GuardarAsync(s, c.Estado, c.Fuente, ct), null, null, null);
 
-        var conDatosOficiales = s with { Nombres = o.Nombres, Apellidos = o.Apellidos };
-        var token = await GuardarAsync(conDatosOficiales, c.Estado, c.Fuente, ct);
-        return new(c.Estado, $"Documento confirmado por {c.Fuente}. Se completaron los datos oficiales: revíselos con el huésped.", token, o.Nombres, o.Apellidos, o.Nacionalidad);
+        var token = await GuardarAsync(s with { Nombres = o.Nombres, Apellidos = o.Apellidos }, c.Estado, c.Fuente, ct);
+        return new(c.Estado, publico ? $"Documento confirmado con {c.Fuente}. Completamos sus datos tal como figuran en él." : $"Documento confirmado por {c.Fuente}. Se completaron los datos oficiales: revíselos con el huésped.",
+            token, o.Nombres, o.Apellidos, o.Nacionalidad);
     }
+
+    private static ResultadoVerificacion Sin(string mensaje) => new(EstadosVerificacion.SinVerificar, mensaje, null, null, null, null);
 
     private async Task<Consulta> ConsultarAsync(SolicitudVerificacion s, CancellationToken ct) => s.Tipo switch
     {
@@ -143,7 +135,7 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
         if (json is not { } d || Texto(d, "nombres") is not { } nombres) return Consulta.Fallo(NoDisponible);
 
         var apellidos = $"{Texto(d, "apellido_paterno")} {Texto(d, "apellido_materno")}".Trim();
-        return new(EstadosVerificacion.Confirmado, "RENIEC (PeruAPI)", "Documento confirmado: sus nombres coinciden con su DNI.",
+        return new(EstadosVerificacion.Confirmado, "RENIEC (PeruAPI)", "Documento confirmado.",
             new DatosOficiales(Formatear(nombres), Formatear(apellidos), "Peruana"));
     }
 
@@ -166,7 +158,7 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
         // Migraciones suele escribir «APELLIDOS, NOMBRES». Sin coma no se puede separar con seguridad.
         var partes = completo.Split(',', 2, StringSplitOptions.TrimEntries);
         var (nombres, apellidos) = partes.Length == 2 ? (partes[1], partes[0]) : (completo, "");
-        return new(EstadosVerificacion.Confirmado, "Migraciones (ApisTed)", "Documento confirmado: sus nombres coinciden con su carné.",
+        return new(EstadosVerificacion.Confirmado, "Migraciones (ApisTed)", "Documento confirmado.",
             new DatosOficiales(Formatear(nombres), Formatear(apellidos), Texto(d, "nacionalidad") is { } n ? Formatear(n) : null));
     }
 
@@ -200,8 +192,6 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
     /// <summary>Cuerpo JSON con su tamaño indicado: algunos servidores rechazan los envíos por partes.</summary>
     private static StringContent Json(object cuerpo) => new(JsonSerializer.Serialize(cuerpo), Encoding.UTF8, "application/json");
 
-    private const string NoCoinciden = "Los nombres no coinciden con los del documento. Revíselos; si son correctos, puede continuar y recepción lo verificará.";
-
     private async Task<(HttpStatusCode?, JsonElement?)> EnviarAsync(string servicio, HttpRequestMessage peticion, CancellationToken ct)
     {
         try
@@ -223,18 +213,6 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
         }
     }
 
-    /// <summary>
-    /// Los nombres declarados deben estar todos en el documento oficial, sin importar mayúsculas, tildes ni orden.
-    /// Se admite omitir un segundo nombre o apellido, pero hacen falta al menos un nombre y un apellido.
-    /// </summary>
-    private static bool Coinciden(SolicitudVerificacion s, string oficial)
-    {
-        var oficiales = Palabras(oficial);
-        var nombres = Palabras(s.Nombres);
-        var apellidos = Palabras(s.Apellidos);
-        return nombres.Count > 0 && apellidos.Count > 0 && nombres.Concat(apellidos).All(oficiales.Contains);
-    }
-
     private static HashSet<string> Palabras(string texto)
     {
         var sinTildes = new string(texto.Normalize(NormalizationForm.FormD)
@@ -242,10 +220,16 @@ public sealed partial class VerificacionDocumentoService(HttpClient http, IConfi
         return NoLetras().Split(sinTildes.ToUpperInvariant()).Where(p => p.Length > 0).ToHashSet();
     }
 
-    /// <summary>Resumen de lo verificado: permite comprobarlo después sin guardar los datos en claro.</summary>
-    private static string Huella(string tipo, string numero, string nombres, string apellidos, string? pais) =>
-        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
-            $"{tipo}|{numero}|{string.Join(' ', Palabras(nombres).Order())}|{string.Join(' ', Palabras(apellidos).Order())}|{pais}")));
+    /// <summary>
+    /// Resumen de lo verificado: permite comprobarlo después sin guardar los datos en claro. Luhnify no conoce los
+    /// nombres del pasaporte, así que en ese caso solo cuentan el número y el país.
+    /// </summary>
+    private static string Huella(string tipo, string numero, string nombres, string apellidos, string? pais)
+    {
+        var conNombres = tipo != TiposDocumento.Pasaporte;
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
+            $"{tipo}|{numero}|{(conNombres ? string.Join(' ', Palabras(nombres).Order()) : "")}|{(conNombres ? string.Join(' ', Palabras(apellidos).Order()) : "")}|{pais}")));
+    }
 
     private async Task<string?> GuardarAsync(SolicitudVerificacion s, string estado, string? fuente, CancellationToken ct)
     {
