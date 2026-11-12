@@ -37,6 +37,14 @@ builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<CuentaService>();
 builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
 builder.Services.AddScoped<SelectorHabitaciones>();
+// Solo CSS, JS y SVG: el HTML lleva tokens antifalsificación y comprimirlo bajo HTTPS abriría la puerta a BREACH.
+builder.Services.AddResponseCompression(opciones =>
+{
+    opciones.EnableForHttps = true;
+    opciones.MimeTypes = ["text/css", "application/javascript", "text/javascript", "image/svg+xml"];
+    opciones.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+    opciones.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+});
 // ML.NET: los modelos viven en memoria (singleton) y se entrenan en segundo plano.
 builder.Services.AddSingleton<Hoteleria_App.Services.Ml.RecomendadorHabitaciones>();
 builder.Services.AddSingleton<Hoteleria_App.Services.Ml.OrdenadorHabitaciones>();
@@ -168,7 +176,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseStaticFiles();
+app.UseResponseCompression();
+app.UseStaticFiles(new StaticFileOptions
+{
+    // asp-append-version añade ?v=huella: si el archivo cambia, cambia la dirección, así que se puede guardar un año.
+    OnPrepareResponse = ctx => ctx.Context.Response.Headers.CacheControl =
+        ctx.Context.Request.Query.ContainsKey("v") ? "public,max-age=31536000,immutable" : "public,max-age=3600"
+});
 app.UseVentanaFlotante();
 app.UseRouting();
 app.UseRateLimiter();

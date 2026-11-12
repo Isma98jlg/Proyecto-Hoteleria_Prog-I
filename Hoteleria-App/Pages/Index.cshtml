@@ -3,10 +3,12 @@
 @{
     ViewData["Title"] = "Panel principal";
     var ocupacion = Model.TotalHabitaciones == 0 ? 0 : (int)Math.Round(Model.HabitacionesOcupadas * 100d / Model.TotalHabitaciones);
+    var fecha = Model.Hoy.ToString("dddd d 'de' MMMM 'de' yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-PE"));
+    fecha = char.ToUpper(fecha[0]) + fecha[1..];
 }
 <main class="flex flex-col gap-6 w-full">
     <section class="bg-primary-container text-on-primary rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-5 shadow-sm">
-        <div><span class="text-xs uppercase tracking-[.18em] text-primary-fixed-dim">GRANDSTAY · OPERACIONES</span><h1 class="font-headline-lg text-headline-lg mt-2">Panel principal</h1><p class="text-on-primary/70 mt-1">Resumen actualizado de habitaciones, reservas y huéspedes.</p></div>
+        <div><span class="text-xs uppercase tracking-[.18em] text-secondary-fixed-dim">GrandStay · Operaciones</span><h1 class="font-headline-lg text-headline-lg mt-2">Panel principal</h1><p class="text-on-primary/70 mt-1">@fecha · resumen de habitaciones, reservas y huéspedes.</p></div>
         <a asp-page="/Reservas/Crear" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-semibold"><span class="material-symbols-outlined">add</span>Nueva reserva</a>
     </section>
 
@@ -15,6 +17,67 @@
         <a asp-page="/Habitaciones/Index" asp-route-Estado="LIBRE" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Disponibles</span><strong class="block text-3xl mt-2 text-on-tertiary-container">@Model.HabitacionesLibres</strong><span class="text-xs text-on-surface-variant">Listas para asignar</span></a>
         <a asp-page="/Habitaciones/Index" asp-route-Estado="OCUPADO" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Ocupadas</span><strong class="block text-3xl mt-2 text-secondary">@Model.HabitacionesOcupadas</strong><span class="text-xs text-on-surface-variant">@ocupacion% de ocupación</span></a>
         <a asp-page="/Reservas/Index" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Reservas confirmadas</span><strong class="block text-3xl mt-2">@Model.ReservasConfirmadas</strong><span class="text-xs text-on-surface-variant">@Model.TotalReservas en total</span></a>
+    </section>
+
+    <section class="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Movimientos de hoy">
+        <div class="flex flex-col gap-3 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-5">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-tertiary-fixed text-on-tertiary-fixed"><span class="material-symbols-outlined text-[20px]">login</span></span>
+                    <div><h2 class="font-headline-sm text-headline-sm">Llegadas de hoy</h2><p class="text-xs text-outline">Check-in pendiente</p></div>
+                </div>
+                <span class="rounded-full bg-surface-container px-2.5 py-1 text-xs font-bold tabular-nums">@Model.TotalLlegadas</span>
+            </div>
+            @if (Model.Llegadas.Count == 0)
+            {
+                <p class="rounded-xl bg-surface-container-low px-4 py-5 text-center text-sm text-outline">No hay llegadas programadas para hoy.</p>
+            }
+            else
+            {
+                <ul class="flex flex-col divide-y divide-surface-container">
+                    @foreach (var m in Model.Llegadas)
+                    {
+                        <li class="flex items-center justify-between gap-3 py-2.5">
+                            <div class="min-w-0"><strong class="block truncate text-sm">@m.Huesped</strong><span class="text-xs text-on-surface-variant">Hab. @string.Join(", ", m.Habitaciones) · @m.Noches noche(s) · Reserva #@m.ReservaId</span></div>
+                            <a asp-page="/Reservas/Detalles" asp-route-id="@m.ReservaId" class="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary hover:opacity-90">Hacer check-in</a>
+                        </li>
+                    }
+                </ul>
+                @if (Model.TotalLlegadas > Model.Llegadas.Count)
+                {
+                    <a asp-page="/Reservas/Index" asp-route-Estado="CONFIRMADA" class="text-sm font-semibold text-secondary">Ver las @Model.TotalLlegadas →</a>
+                }
+            }
+        </div>
+        <div class="flex flex-col gap-3 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-5">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-fixed text-on-secondary-fixed"><span class="material-symbols-outlined text-[20px]">logout</span></span>
+                    <div><h2 class="font-headline-sm text-headline-sm">Salidas de hoy</h2><p class="text-xs text-outline">Check-out pendiente</p></div>
+                </div>
+                <span class="rounded-full bg-surface-container px-2.5 py-1 text-xs font-bold tabular-nums">@Model.TotalSalidas</span>
+            </div>
+            @if (Model.Salidas.Count == 0)
+            {
+                <p class="rounded-xl bg-surface-container-low px-4 py-5 text-center text-sm text-outline">No hay salidas programadas para hoy.</p>
+            }
+            else
+            {
+                <ul class="flex flex-col divide-y divide-surface-container">
+                    @foreach (var m in Model.Salidas)
+                    {
+                        <li class="flex items-center justify-between gap-3 py-2.5">
+                            <div class="min-w-0"><strong class="block truncate text-sm">@m.Huesped</strong><span class="text-xs text-on-surface-variant">Hab. @string.Join(", ", m.Habitaciones) · @m.Noches noche(s) · Reserva #@m.ReservaId</span></div>
+                            <a asp-page="/Reservas/Detalles" asp-route-id="@m.ReservaId" class="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary hover:opacity-90">Hacer check-out</a>
+                        </li>
+                    }
+                </ul>
+                @if (Model.TotalSalidas > Model.Salidas.Count)
+                {
+                    <a asp-page="/Reservas/Index" asp-route-Estado="EN_CURSO" class="text-sm font-semibold text-secondary">Ver las @Model.TotalSalidas →</a>
+                }
+            }
+        </div>
     </section>
 
     <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">

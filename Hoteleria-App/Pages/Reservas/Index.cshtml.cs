@@ -29,6 +29,15 @@ public class IndexModel(IReservaService reservaService, SelectorHabitaciones sel
     [BindProperty(SupportsGet = true)]
     public long? UsuarioId { get; set; }
 
+    /// <summary>El libro crece sin límite: se muestra por páginas.</summary>
+    public const int TamanoPagina = 25;
+
+    [BindProperty(SupportsGet = true)]
+    public int Pagina { get; set; } = 1;
+
+    public int Total { get; private set; }
+    public int TotalPaginas => Math.Max(1, (int)Math.Ceiling(Total / (double)TamanoPagina));
+
     public async Task OnGetAsync()
     {
         await CargarPaginaAsync();
@@ -66,7 +75,13 @@ public class IndexModel(IReservaService reservaService, SelectorHabitaciones sel
 
     private async Task CargarPaginaAsync()
     {
-        Reservas = await reservaService.GetAllAsync(Buscar, Estado, UsuarioId);
+        Pagina = Math.Max(1, Pagina);
+        (Reservas, Total) = await reservaService.GetPaginaAsync(Buscar, Estado, UsuarioId, Pagina, TamanoPagina);
+        if (Reservas.Count == 0 && Pagina > TotalPaginas)
+        {
+            Pagina = TotalPaginas;
+            (Reservas, Total) = await reservaService.GetPaginaAsync(Buscar, Estado, UsuarioId, Pagina, TamanoPagina);
+        }
         Usuarios = await reservaService.GetHuespedesAsync();
     }
 }

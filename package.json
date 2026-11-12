@@ -1,0 +1,13 @@
+{
+  "name": "hoteleria-app-estilos",
+  "private": true,
+  "description": "Solo compila los estilos de Tailwind; la app es .NET.",
+  "scripts": {
+    "css": "tailwindcss -c tailwind.config.js -i Hoteleria-App/Styles/tailwind.css -o Hoteleria-App/wwwroot/css/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "0.1.1",
+    "@tailwindcss/forms": "0.5.9",
+    "tailwindcss": "3.4.17"
+  }
+}

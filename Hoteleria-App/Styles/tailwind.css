@@ -1,0 +1,4 @@
+/* Entrada de Tailwind. Se compila con `npm run css` a wwwroot/css/tailwind.css (ese archivo sí se versiona). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

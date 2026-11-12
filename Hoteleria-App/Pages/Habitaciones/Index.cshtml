@@ -11,13 +11,13 @@
         <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
             <div class="flex flex-col gap-1.5">
                 <div class="flex items-center gap-2">
-                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold bg-secondary-fixed/50 px-2.5 py-0.5 rounded-full">• MÓDULO CANÓNICO 2 · EN VIVO</span>
+                    <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">Inventario</span>
                     <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Sincronizado en tiempo real
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Se actualiza en tiempo real
                     </span>
                 </div>
-                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Gestión de Habitaciones y Pisos</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Control de inventario inmobiliario, configuración de capacidad de camas por habitación (<strong>1 Cama = 1 Persona</strong>) y zonificación física por niveles bajo las categorías canónicas <strong>Estándar</strong> y <strong>VIP</strong>.</p>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Habitaciones y pisos</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Habitaciones del hotel por piso y categoría, con su estado actual. Cada cama aloja a una persona.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 @if (Model.PuedeAdministrarPisos) { <button class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold transition-all shadow-sm" onclick="abrirModalPisos()" type="button">
@@ -39,8 +39,8 @@
         <div class="w-full bg-surface-container-lowest border border-surface-container rounded-xl p-3 shadow-sm flex flex-col gap-2 shrink-0 transition-all duration-300" id="kpi-ribbon-container">
             <div class="flex items-center justify-between pb-1.5 border-b border-surface-container">
                 <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-on-primary uppercase tracking-wider">Cinta de KPIs Operativos</span>
-                    <span class="text-body-sm text-outline font-medium">Resumen consolidado de inventario y distribución canónica de tarifas</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-on-primary uppercase tracking-wider">Resumen</span>
+                    <span class="text-body-sm text-outline font-medium">Inventario y tarifas por categoría</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] text-outline font-numeric-table">Actualizado: ahora</span>
@@ -314,8 +314,8 @@
                         <span class="material-symbols-outlined text-[22px]">stairs</span>
                     </div>
                     <div class="flex flex-col">
-                        <h2 class="font-headline-sm text-headline-sm text-on-surface">Estructura de Pisos Registrados</h2>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant">Tabla maestra de zonificación vertical (Entidad de Base de Datos: <code class="font-mono text-outline font-semibold">PISOS</code>)</p>
+                        <h2 class="font-headline-sm text-headline-sm text-on-surface">Pisos del hotel</h2>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Cada piso con su nombre y la cantidad de habitaciones.</p>
                     </div>
                 </div>
                 @if (Model.PuedeAdministrarPisos) { <button class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors" onclick="abrirModalPisos()" type="button">

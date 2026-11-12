@@ -16,6 +16,7 @@ public sealed record ResultadoOperacion(bool Ok, string? Error = null)
 public interface IReservaService
 {
     Task<List<ReservaViewModel>> GetAllAsync(string? buscar = null, string? estado = null, long? usuarioId = null);
+    Task<(List<ReservaViewModel> Pagina, int Total)> GetPaginaAsync(string? buscar, string? estado, long? usuarioId, int pagina, int tamano);
     Task<ReservaDetalleViewModel?> GetByIdAsync(long id);
     Task<List<UsuarioComboViewModel>> GetHuespedesAsync();
     Task<List<HabitacionDisponibleViewModel>> GetHabitacionesDisponiblesAsync(DateTime inicio, DateTime fin, long? excluirReservaId = null);
@@ -116,7 +117,19 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
 {
     private const string MensajeNoDisponible = "Alguna habitación ya no está disponible en esas fechas.";
 
-    public async Task<List<ReservaViewModel>> GetAllAsync(string? buscar = null, string? estado = null, long? usuarioId = null)
+    public async Task<List<ReservaViewModel>> GetAllAsync(string? buscar = null, string? estado = null, long? usuarioId = null) =>
+        await Proyectar(Filtrar(buscar, estado, usuarioId)).ToListAsync();
+
+    /// <summary>Una página del libro de reservas y el total que cumple los filtros (dos consultas cortas).</summary>
+    public async Task<(List<ReservaViewModel> Pagina, int Total)> GetPaginaAsync(string? buscar, string? estado, long? usuarioId, int pagina, int tamano)
+    {
+        var filtradas = Filtrar(buscar, estado, usuarioId);
+        var total = await filtradas.CountAsync();
+        var lista = await Proyectar(filtradas).Skip((Math.Max(1, pagina) - 1) * tamano).Take(tamano).ToListAsync();
+        return (lista, total);
+    }
+
+    private IQueryable<Reserva> Filtrar(string? buscar, string? estado, long? usuarioId)
     {
         var query = context.Reservas.AsNoTracking().AsQueryable();
 
@@ -134,9 +147,13 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
 
         if (usuarioId.HasValue)
             query = query.Where(r => r.UsuarioId == usuarioId.Value);
+        return query;
+    }
 
-        return await query
+    private static IQueryable<ReservaViewModel> Proyectar(IQueryable<Reserva> query) =>
+        query
             .OrderByDescending(r => r.FechaReservaCreacion)
+            .ThenByDescending(r => r.ReservaId)
             .Select(r => new ReservaViewModel
             {
                 ReservaId = r.ReservaId,
@@ -151,9 +168,7 @@ public class ReservaService(HoteleriaDbContext context, RelojHotel reloj, INotif
                 PrecioTotal = r.ReservaHabitaciones.Sum(rh => rh.PrecioNochePactado) * r.TotalNoches,
                 EstadoEtiqueta = EstadosReserva.Etiqueta(r.EstadoReserva),
                 BadgeEstado = GetBadgeEstado(r.EstadoReserva)
-            })
-            .ToListAsync();
-    }
+            });
 
     public async Task<ReservaDetalleViewModel?> GetByIdAsync(long id)
     {

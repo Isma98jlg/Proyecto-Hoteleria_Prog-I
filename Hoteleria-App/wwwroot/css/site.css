@@ -1,7 +1,18 @@
 /* ==========================================================================
-   GrandStay HMS v3.2 — "Stitch" Design System · Base / Reset
-   Fuente de verdad: Resources/Front-End/design/.../code.html (reset base)
+   GrandStay HMS · estilos propios (Tailwind está precompilado en tailwind.css)
+   Paleta formal: azul marino institucional, latón como acento y grises fríos.
    ========================================================================== */
+:root {
+    --gs-marino: #0f2742;
+    --gs-marino-profundo: #0b1d33;
+    --gs-marino-medio: #1f3d63;
+    --gs-laton: #c9a24e;
+    --gs-laton-oscuro: #8a6418;
+    --gs-linea: #c3cad3;
+    --gs-fondo-suave: #eef1f5;
+    --gs-texto-suave: #4a5563;
+    --gs-sombra: 11 29 51;
+}
 
 @layer base {
     html,
@@ -26,9 +37,32 @@
     }
 }
 
-/* Sin barra de scroll visible (igual que el diseño de referencia) */
+/* Barras de desplazamiento finas y discretas: se nota que hay más contenido sin estorbar. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gs-linea) transparent;
+}
+
 ::-webkit-scrollbar {
-    display: none;
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background: var(--gs-linea) padding-box;
+}
+
+/* Foco visible y coherente con la paleta en todos los controles. */
+:focus-visible {
+    outline: 2px solid var(--gs-laton);
+    outline-offset: 2px;
+}
+
+/* Cifras alineadas en tablas e indicadores. */
+table {
+    font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
@@ -36,7 +70,7 @@
    ========================================================================== */
 .vf-fondo {
     padding: 1.5rem;
-    background: rgb(19 27 46 / 0.32);
+    background: rgb(var(--gs-sombra) / 0.36);
     backdrop-filter: blur(4px);
     animation: vf-fondo-entra 180ms ease-out both;
 }
@@ -57,8 +91,8 @@
     outline: none;
     border-radius: 1rem;
     box-shadow:
-        0 0 0 1px rgb(19 27 46 / 0.06),
-        0 24px 60px -16px rgb(19 27 46 / 0.35);
+        0 0 0 1px rgb(var(--gs-sombra) / 0.06),
+        0 24px 60px -16px rgb(var(--gs-sombra) / 0.35);
     transition: height 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
     animation: vf-panel-entra 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -74,7 +108,7 @@ html.en-ventana .chat-huesped {
 }
 
 .vf-cabecera {
-    box-shadow: 0 1px 0 rgb(19 27 46 / 0.07);
+    box-shadow: 0 1px 0 rgb(var(--gs-sombra) / 0.07);
 }
 
 /* Barra de carga: Render puede tardar en responder si el servicio estaba dormido. */
@@ -84,7 +118,7 @@ html.en-ventana .chat-huesped {
     left: 0;
     width: 35%;
     height: 2px;
-    background: #fe932c;
+    background: var(--gs-laton);
     animation: vf-carga 1100ms ease-in-out infinite;
 }
 
@@ -163,28 +197,17 @@ html.en-ventana .chat-huesped {
     box-shadow: none !important;
 }
 
-/* Hay barra visible porque, si el contenido no cabe, debe notarse que se puede desplazar. */
-html.en-ventana::-webkit-scrollbar {
-    display: block;
-    width: 8px;
-}
-
-html.en-ventana::-webkit-scrollbar-thumb {
-    border: 2px solid transparent;
-    border-radius: 9999px;
-    background: #c6c6cd padding-box;
-}
 
 /* ==========================================================================
    Panel del clima del huésped
    ========================================================================== */
 .clima-boton,
 .clima-panel {
-    background: linear-gradient(150deg, #131b2e 0%, #2d3f6b 60%, #904d00 135%);
+    background: linear-gradient(150deg, var(--gs-marino-profundo) 0%, var(--gs-marino-medio) 70%, var(--gs-laton-oscuro) 150%);
 }
 
 .clima-boton {
-    box-shadow: -6px 8px 24px -8px rgb(19 27 46 / 0.55);
+    box-shadow: -6px 8px 24px -8px rgb(var(--gs-sombra) / 0.5);
     transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease-out, padding 160ms ease-out;
 }
 
@@ -201,7 +224,7 @@ html.en-ventana::-webkit-scrollbar-thumb {
 .clima-panel {
     visibility: hidden;
     opacity: 0;
-    box-shadow: 0 24px 60px -16px rgb(19 27 46 / 0.6);
+    box-shadow: 0 24px 60px -16px rgb(var(--gs-sombra) / 0.6);
     transform: translateX(calc(100% + 1.5rem));
     transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out, visibility 0s linear 280ms;
 }
@@ -215,8 +238,8 @@ html.en-ventana::-webkit-scrollbar-thumb {
 
 .clima-icono {
     font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 48;
-    color: #ffb77d;
-    filter: drop-shadow(0 6px 16px rgb(255 183 125 / 0.35));
+    color: var(--gs-laton);
+    filter: drop-shadow(0 6px 16px rgb(201 162 78 / 0.3));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -232,33 +255,31 @@ html.en-ventana::-webkit-scrollbar-thumb {
    ========================================================================== */
 .explora-boton,
 .explora-banner {
-    background: linear-gradient(135deg, #9a3412 0%, #ea580c 55%, #f59e0b 120%);
+    background: linear-gradient(135deg, var(--gs-marino-profundo) 0%, var(--gs-marino-medio) 65%, var(--gs-laton-oscuro) 140%);
 }
 
 .explora-boton {
-    box-shadow: -6px 8px 24px -8px rgb(154 52 18 / 0.7);
+    box-shadow: -6px 8px 24px -8px rgb(var(--gs-sombra) / 0.5);
     transition: padding 160ms ease-out;
-    animation: explora-llamada 2.6s ease-in-out 1s infinite;
 }
 
 .explora-boton:hover {
     padding-right: 1.1rem;
-    animation-play-state: paused;
 }
 
 .explora-banner {
-    box-shadow: 0 16px 36px -18px rgb(154 52 18 / 0.75);
+    box-shadow: 0 16px 36px -20px rgb(var(--gs-sombra) / 0.6);
     transition: transform 180ms ease-out, box-shadow 180ms ease-out;
 }
 
 .explora-banner:hover {
     transform: translateY(-2px);
-    box-shadow: 0 22px 40px -18px rgb(154 52 18 / 0.85);
+    box-shadow: 0 22px 40px -20px rgb(var(--gs-sombra) / 0.7);
 }
 
 .explora-banner-icono {
-    font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 48;
-    animation: explora-brujula 5s ease-in-out infinite;
+    font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 24;
+    color: var(--gs-laton);
 }
 
 html.en-ventana .explora-huesped {
@@ -267,7 +288,7 @@ html.en-ventana .explora-huesped {
 
 .explora-mapa {
     isolation: isolate;
-    background: #e9e8e6;
+    background: var(--gs-fondo-suave);
 }
 
 /* Pin del punto de búsqueda: distinto de cualquier resultado y siempre visible */
@@ -287,8 +308,8 @@ html.en-ventana .explora-huesped {
     height: 26px;
     border: 3px solid #ffffff;
     border-radius: 50% 50% 50% 0;
-    background: #131b2e;
-    box-shadow: 0 4px 10px rgb(19 27 46 / 0.55);
+    background: var(--gs-marino);
+    box-shadow: 0 4px 10px rgb(var(--gs-sombra) / 0.55);
     transform: rotate(-45deg);
     transform-origin: center;
 }
@@ -300,7 +321,7 @@ html.en-ventana .explora-huesped {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #fb923c;
+    background: var(--gs-laton);
     content: "";
     transform: translate(-50%, -50%);
 }
@@ -312,23 +333,23 @@ html.en-ventana .explora-huesped {
     width: 34px;
     height: 34px;
     background: #ffffff;
-    color: #131b2e;
+    color: var(--gs-marino);
     cursor: pointer;
 }
 
 .explora-centrar:hover {
-    background: #f4f3f1;
+    background: var(--gs-fondo-suave);
 }
 
 .explora-filtro {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    border: 1px solid #c6c6cd;
+    border: 1px solid var(--gs-linea);
     border-radius: 9999px;
     background: #ffffff;
     padding: 0.25rem 0.625rem;
-    color: #45464d;
+    color: var(--gs-texto-suave);
     font-size: 0.75rem;
     font-weight: 600;
     transition: background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out;
@@ -350,23 +371,12 @@ html.en-ventana .explora-huesped {
 }
 
 .explora-tarjeta:hover {
-    border-color: #c6c6cd;
+    border-color: var(--gs-linea);
 }
 
 .explora-activa {
-    border-color: #ea580c;
-    box-shadow: 0 0 0 1px #ea580c;
-}
-
-@keyframes explora-llamada {
-    0%, 70%, 100% { box-shadow: -6px 8px 24px -8px rgb(154 52 18 / 0.7), 0 0 0 0 rgb(234 88 12 / 0.45); }
-    85% { box-shadow: -6px 8px 24px -8px rgb(154 52 18 / 0.7), 0 0 0 10px rgb(234 88 12 / 0); }
-}
-
-@keyframes explora-brujula {
-    0%, 80%, 100% { transform: rotate(0deg); }
-    88% { transform: rotate(20deg); }
-    94% { transform: rotate(-12deg); }
+    border-color: var(--gs-laton-oscuro);
+    box-shadow: 0 0 0 1px var(--gs-laton-oscuro);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -382,7 +392,7 @@ html.en-ventana .explora-huesped {
 .material-symbols-outlined {
     font-variation-settings:
         "FILL" 0,
-        "wght" 100,
+        "wght" 300,
         "GRAD" 0,
         "opsz" 24;
 }

@@ -87,7 +87,8 @@
 
             const marcadas = datos.habitaciones.filter(h => seleccion.has(h.habitacionId));
             const visibles = [...marcadas, ...datos.habitaciones.filter(h => h.coincide && !seleccion.has(h.habitacionId))];
-            motor.textContent = `Búsqueda: ${datos.motor}` + (datos.orden ? ` · Orden: ${datos.orden}` : '');
+            // Al huésped no se le habla del motor: se le dice qué significa el orden. El personal ve qué buscador se usó.
+            motor.textContent = datos.busquedaId ? (datos.orden ? 'Ordenadas según sus preferencias.' : '') : `Búsqueda: ${datos.motor}`;
             if (busqueda) busqueda.value = datos.busquedaId ?? '';
             actualizarTotal();
 

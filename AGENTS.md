@@ -45,6 +45,12 @@ Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
 
 Los formularios y detalles se abren sobre la página actual. Para sumar una ruta, añádela a `RUTAS_FLOTANTES` en `wwwroot/js/ventana-flotante.js`: los enlaces se interceptan solos y la página se muestra con `_LayoutModal`. `VentanaFlotanteMiddleware` convierte las redirecciones de `?modal=1` en un aviso a la página principal.
 
+## Estilos
+
+- Tailwind está **precompilado** en `Hoteleria-App/wwwroot/css/tailwind.css` (se versiona); el navegador ya no descarga Tailwind. Tras cambiar clases en vistas o JavaScript, regenera con Node: `npm install` (una vez) y `npm run css`. La paleta y la tipografía viven en `tailwind.config.js`; `site.css` usa las mismas variables (`--gs-marino`, `--gs-laton`…).
+- Paleta formal: azul marino para las acciones, latón como acento y grises fríos. No uses colores sueltos (`bg-orange-500`, `#ea580c`): usa los tokens (`bg-primary`, `text-secondary`, `bg-tertiary-fixed`…).
+- Los archivos con `asp-append-version` se guardan un año en el navegador; CSS, JS y SVG van comprimidos (Brotli/Gzip). El HTML no se comprime a propósito (BREACH).
+
 ## Avisos y envíos
 
 - **Resultado de cada acción:** después de crear, guardar o eliminar, deja el mensaje en `TempData["MensajeExito"]` o `TempData["MensajeError"]`. `_AvisoGlobal` (en los tres layouts y en el login) lo muestra arriba en cualquier página, también al cerrarse una ventana flotante. `_Mensajes` solo muestra enlaces que hay que copiar.
