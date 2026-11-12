@@ -109,3 +109,5 @@
         };
     </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @* Sin defer: debe estar listo antes que los scripts de cada página, que usan window.envioSeguro. *@
+    <script src="~/js/envio-seguro.js" asp-append-version="true"></script>

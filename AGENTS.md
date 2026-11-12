@@ -45,6 +45,11 @@ Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
 
 Los formularios y detalles se abren sobre la página actual. Para sumar una ruta, añádela a `RUTAS_FLOTANTES` en `wwwroot/js/ventana-flotante.js`: los enlaces se interceptan solos y la página se muestra con `_LayoutModal`. `VentanaFlotanteMiddleware` convierte las redirecciones de `?modal=1` en un aviso a la página principal.
 
+## Avisos y envíos
+
+- **Resultado de cada acción:** después de crear, guardar o eliminar, deja el mensaje en `TempData["MensajeExito"]` o `TempData["MensajeError"]`. `_AvisoGlobal` (en los tres layouts y en el login) lo muestra arriba en cualquier página, también al cerrarse una ventana flotante. `_Mensajes` solo muestra enlaces que hay que copiar.
+- **Sin envíos dobles:** `wwwroot/js/envio-seguro.js` (cargado desde `_Head`) bloquea los botones de todo formulario hasta la respuesta y muestra «Guardando…», «Creando…», etc. Los botones que hacen `fetch` usan `window.envioSeguro.bloquear(boton)` o `mientras(boton, promesa)`. Un formulario que no deba bloquearse lleva `data-sin-bloqueo`.
+
 ## Primera ejecución
 
 Requisito: Docker Desktop.

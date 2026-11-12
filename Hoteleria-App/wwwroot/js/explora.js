@@ -305,19 +305,23 @@
             return;
         }
         avisar('Obteniendo su ubicación…');
+        const liberar = window.envioSeguro?.bloquear(parte('ubicacion'), 'Buscando…') ?? (() => {});
         navigator.geolocation.getCurrentPosition(
             p => {
+                liberar();
                 ciudad.value = '';
                 fijarPunto(p.coords.latitude, p.coords.longitude, '');
             },
-            () => avisar('No pudimos obtener su ubicación. Escriba una ciudad.'),
+            () => { liberar(); avisar('No pudimos obtener su ubicación. Escriba una ciudad.'); },
             { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 });
     });
 
     parte('formulario').addEventListener('submit', evento => {
         evento.preventDefault();
         const nombre = ciudad.value.trim();
-        if (nombre) buscarCiudad(nombre);
+        if (!nombre) return;
+        const liberar = window.envioSeguro?.bloquear(evento.target.querySelector('button[type="submit"]')) ?? (() => {});
+        buscarCiudad(nombre).finally(liberar);
     });
     ciudad.addEventListener('focus', () => ciudad.select());
     radio.addEventListener('change', () => {

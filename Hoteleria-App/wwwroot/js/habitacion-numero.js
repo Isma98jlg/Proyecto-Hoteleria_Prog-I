@@ -12,6 +12,8 @@
     const existentes = new Set((raiz.dataset.existentes || '').split(',').filter(Boolean).map(Number));
     const siglas = Object.fromEntries((raiz.dataset.siglas || '').split(',').filter(Boolean).map(par => par.split(':')));
     let sugerido = null;
+    // El formulario llega con 0 (número sin elegir): se muestra vacío para que se vea el ejemplo y la sugerencia.
+    if (Number(numero.value) === 0) numero.value = '';
 
     function siguienteLibre(p) {
         for (let n = p * 100 + 1; n <= p * 100 + 99; n++) if (!existentes.has(n)) return n;
@@ -35,7 +37,7 @@
             numero.min = p * 100 + 1;
             numero.max = p * 100 + 99;
             // Solo se reemplaza si está vacío o si era la sugerencia anterior: nunca lo que escribió la persona.
-            if (!numero.value || Number(numero.value) === sugerido) {
+            if (!Number(numero.value) || Number(numero.value) === sugerido) {
                 sugerido = siguienteLibre(p);
                 if (sugerido) numero.value = sugerido;
             }

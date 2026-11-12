@@ -1,5 +1,4 @@
-@if (TempData["MensajeExito"] is string exito) { <div class="rounded-xl bg-green-100 text-green-900 p-3">@exito</div> }
-@if (TempData["MensajeError"] is string fallo) { <div class="rounded-xl bg-error-container text-on-error-container p-3">@fallo</div> }
+@* Éxitos y errores se muestran como aviso flotante (_AvisoGlobal, en los layouts). Aquí solo queda lo que hay que copiar. *@
 @if (TempData["EnlaceGenerado"] is string enlace)
 {
     <div class="rounded-xl bg-secondary-fixed text-on-secondary-fixed p-4 flex flex-col gap-2">

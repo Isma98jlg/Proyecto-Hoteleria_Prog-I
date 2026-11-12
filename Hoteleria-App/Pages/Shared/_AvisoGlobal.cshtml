@@ -1,0 +1,27 @@
+@* Aviso flotante con el resultado de la última acción (TempData). Está en los tres layouts, así que se ve en
+   cualquier página, también al cerrarse una ventana flotante. Lo anima y lo cierra envio-seguro.js. *@
+@{
+    var exito = TempData["MensajeExito"] as string;
+    var error = TempData["MensajeError"] as string;
+}
+@if (exito is not null || error is not null)
+{
+    <div class="pointer-events-none fixed inset-x-0 top-3 z-[80] flex flex-col items-center gap-2 px-4" role="status" aria-live="polite">
+        @if (exito is not null)
+        {
+            <div data-aviso="ok" class="aviso-entrando pointer-events-auto flex w-full max-w-lg items-start gap-3 rounded-2xl bg-emerald-700 px-4 py-3 text-white shadow-2xl">
+                <span class="material-symbols-outlined mt-0.5 text-[22px]" aria-hidden="true">check_circle</span>
+                <p class="flex-1 text-sm font-semibold leading-snug">@exito</p>
+                <button type="button" data-aviso-cerrar aria-label="Cerrar aviso" class="-mr-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full hover:bg-white/15"><span class="material-symbols-outlined text-[18px]">close</span></button>
+            </div>
+        }
+        @if (error is not null)
+        {
+            <div data-aviso="error" role="alert" class="aviso-entrando pointer-events-auto flex w-full max-w-lg items-start gap-3 rounded-2xl bg-red-700 px-4 py-3 text-white shadow-2xl">
+                <span class="material-symbols-outlined mt-0.5 text-[22px]" aria-hidden="true">error</span>
+                <p class="flex-1 text-sm font-semibold leading-snug">@error</p>
+                <button type="button" data-aviso-cerrar aria-label="Cerrar aviso" class="-mr-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full hover:bg-white/15"><span class="material-symbols-outlined text-[18px]">close</span></button>
+            </div>
+        }
+    </div>
+}

@@ -84,19 +84,23 @@
             return;
         }
         avisar('Obteniendo su ubicación…');
+        const liberar = window.envioSeguro?.bloquear(parte('ubicacion'), 'Buscando…') ?? (() => {});
         navigator.geolocation.getCurrentPosition(
-            posicion => {
+            async posicion => {
                 guardarCiudad(null);
-                consultar({ lat: posicion.coords.latitude, lon: posicion.coords.longitude });
+                await consultar({ lat: posicion.coords.latitude, lon: posicion.coords.longitude });
+                liberar();
             },
-            () => avisar('No pudimos obtener su ubicación. Escriba su ciudad.'),
+            () => { liberar(); avisar('No pudimos obtener su ubicación. Escriba su ciudad.'); },
             { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
     });
 
     parte('formulario').addEventListener('submit', async evento => {
         evento.preventDefault();
         const nombre = ciudad.value.trim();
-        if (nombre && await consultar({ ciudad: nombre })) guardarCiudad(nombre);
+        if (!nombre) return;
+        const liberar = window.envioSeguro?.bloquear(evento.target.querySelector('button[type="submit"]')) ?? (() => {});
+        try { if (await consultar({ ciudad: nombre })) guardarCiudad(nombre); } finally { liberar(); }
     });
 
     const recordada = leerCiudad();
