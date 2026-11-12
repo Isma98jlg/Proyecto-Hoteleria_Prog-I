@@ -1,29 +1,17 @@
-using Hoteleria_App.Models;
 using Hoteleria_App.Security;
 using Microsoft.AspNetCore.Authorization;
-using Hoteleria_App.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hoteleria_App.Pages.Habitaciones;
 
+/// <summary>
+/// Dirección antigua: la vista principal de habitaciones ya filtra por piso y muestra la situación real
+/// de cada habitación, así que esta solo redirige (con el filtro, si llega).
+/// </summary>
 [Authorize(Policy = HotelPermissionPolicies.Ver)]
 public class PorPisoModel : PageModel
 {
-    private readonly IHabitacionService _habitacionService;
-
-    public PorPisoModel(IHabitacionService habitacionService)
-    {
-        _habitacionService = habitacionService;
-    }
-
-    public Dictionary<long, List<Habitacion>> PisosConHabitaciones { get; set; } = new();
-
-    public async Task OnGetAsync()
-    {
-        var habitaciones = await _habitacionService.GetAllAsync();
-        PisosConHabitaciones = habitaciones
-            .GroupBy(h => h.NroPiso)
-            .OrderBy(g => g.Key)
-            .ToDictionary(g => g.Key, g => g.ToList());
-    }
+    public IActionResult OnGet(string? piso) =>
+        RedirectToPage("/Habitaciones/Index", string.IsNullOrWhiteSpace(piso) ? null : new { Piso = piso });
 }

@@ -1,30 +1,17 @@
-using Hoteleria_App.Models;
 using Hoteleria_App.Security;
 using Microsoft.AspNetCore.Authorization;
-using Hoteleria_App.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hoteleria_App.Pages.Habitaciones;
 
+/// <summary>
+/// Dirección antigua: la vista principal de habitaciones ya filtra por categoria y muestra la situación real
+/// de cada habitación, así que esta solo redirige (con el filtro, si llega).
+/// </summary>
 [Authorize(Policy = HotelPermissionPolicies.Ver)]
 public class PorTipoVipModel : PageModel
 {
-    private readonly IHabitacionService _habitacionService;
-
-    public PorTipoVipModel(IHabitacionService habitacionService)
-    {
-        _habitacionService = habitacionService;
-    }
-
-    public Dictionary<TipoVip, List<Habitacion>> TiposVipConHabitaciones { get; set; } = new();
-
-    public async Task OnGetAsync()
-    {
-        var habitaciones = await _habitacionService.GetAllAsync();
-        TiposVipConHabitaciones = habitaciones
-            .Where(h => h.TipoVip != null)
-            .GroupBy(h => h.TipoVip!)
-            .OrderBy(g => g.Key.TipoVipNombre)
-            .ToDictionary(g => g.Key, g => g.ToList());
-    }
+    public IActionResult OnGet(string? categoria) =>
+        RedirectToPage("/Habitaciones/Index", string.IsNullOrWhiteSpace(categoria) ? null : new { Categoria = categoria });
 }

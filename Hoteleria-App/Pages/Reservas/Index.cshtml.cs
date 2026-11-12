@@ -70,7 +70,7 @@ public class IndexModel(IReservaService reservaService, SelectorHabitaciones sel
     {
         var resultado = await reservaService.EliminarAsync(id);
         TempData[resultado.Ok ? "MensajeExito" : "MensajeError"] = resultado.Ok ? "Reserva eliminada correctamente." : resultado.Error;
-        return RedirectToPage("Index");
+        return RedirectToPage("Index", FiltrosActuales.Con(Request, conservarPagina: true));
     }
 
     private async Task CargarPaginaAsync()

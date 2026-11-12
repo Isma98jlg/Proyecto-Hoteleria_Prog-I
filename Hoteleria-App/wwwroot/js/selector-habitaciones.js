@@ -87,36 +87,58 @@
             pendientes.splice(0).forEach(id => { if (libres.has(id)) seleccion.set(id, libres.get(id).precioNoche); });
             [...seleccion.keys()].forEach(id => { if (!libres.has(id)) seleccion.delete(id); });
 
+            // Primero lo marcado, luego lo que coincide con los filtros y, debajo, el resto de lo libre:
+            // ninguna habitación libre queda oculta (sirven para combinar o si cambia el número de personas).
             const marcadas = datos.habitaciones.filter(h => seleccion.has(h.habitacionId));
-            const visibles = [...marcadas, ...datos.habitaciones.filter(h => h.coincide && !seleccion.has(h.habitacionId))];
+            const coincidentes = datos.habitaciones.filter(h => h.coincide && !seleccion.has(h.habitacionId));
+            const otras = datos.habitaciones.filter(h => !h.coincide && !seleccion.has(h.habitacionId));
             // Al huésped no se le habla del motor: se le dice qué significa el orden. El personal ve qué buscador se usó.
             motor.textContent = datos.busquedaId ? (datos.orden ? 'Ordenadas según sus preferencias.' : '') : `Búsqueda: ${datos.motor}`;
             if (busqueda) busqueda.value = datos.busquedaId ?? '';
             actualizarTotal();
 
-            if (visibles.length) {
-                lista.replaceChildren(...visibles.map(opcion));
-                return;
-            }
             if (!datos.habitaciones.length) {
                 aviso('No hay habitaciones libres para esas fechas.');
                 return;
             }
-            const cantidad = personas.value;
-            const caja = elemento('div', 'flex flex-col items-center gap-2 py-5 text-center text-sm text-outline');
-            caja.append(elemento('p', '', cantidad && !categoria.value && !texto.value.trim()
-                ? `No hay habitaciones de exactamente ${cantidad} cama(s). Puede combinar varias.`
-                : 'Ninguna habitación libre coincide con esos filtros.'));
-            const verTodas = elemento('button', 'rounded-lg bg-surface-container px-3 py-1.5 text-xs font-semibold text-on-surface', 'Ver todas las disponibles');
-            verTodas.type = 'button';
-            verTodas.addEventListener('click', () => {
-                personas.value = '';
-                categoria.value = '';
-                texto.value = '';
-                cargar();
-            });
-            caja.append(verTodas);
-            lista.replaceChildren(caja);
+
+            const nodos = marcadas.map(opcion);
+            if (coincidentes.length) {
+                nodos.push(...coincidentes.map(opcion));
+            } else {
+                const cantidad = personas.value;
+                nodos.push(elemento('p', 'rounded-lg bg-surface-container-lowest px-3 py-2.5 text-center text-xs text-on-surface-variant',
+                    cantidad && !categoria.value && !texto.value.trim()
+                        ? `No hay habitaciones de exactamente ${cantidad} cama(s): puede elegir otra o combinar varias.`
+                        : 'Ninguna habitación libre coincide con esos filtros. Estas son las demás libres en esas fechas.'));
+            }
+            if (otras.length) {
+                const titulo = elemento('div', 'mt-1 flex flex-wrap items-center justify-between gap-2 border-t border-surface-container-high px-1 pt-3');
+                const textos = elemento('div', 'flex flex-col');
+                textos.append(
+                    elemento('strong', 'text-xs font-bold uppercase tracking-wide text-on-surface-variant', 'Otras habitaciones libres en esas fechas'),
+                    elemento('small', 'text-[11px] text-outline', describirFiltros()));
+                const quitar = elemento('button', 'rounded-lg bg-surface-container px-2.5 py-1 text-[11px] font-semibold text-on-surface hover:bg-surface-container-high', 'Quitar filtros');
+                quitar.type = 'button';
+                quitar.addEventListener('click', () => {
+                    personas.value = '';
+                    categoria.value = '';
+                    texto.value = '';
+                    cargar();
+                });
+                titulo.append(textos, quitar);
+                nodos.push(titulo, ...otras.map(opcion));
+            }
+            lista.replaceChildren(...nodos);
+        }
+
+        // Explica por qué estas no coinciden, con los filtros que hay puestos.
+        function describirFiltros() {
+            const partes = [];
+            if (Number(personas.value) >= 1) partes.push(`${personas.value} persona(s) = ${personas.value} cama(s)`);
+            if (categoria.value) partes.push(`categoría ${categoria.value}`);
+            if (texto.value.trim()) partes.push(`«${texto.value.trim()}»`);
+            return partes.length ? `No coinciden con ${partes.join(', ')}. Sirven para combinar habitaciones.` : 'Sirven para combinar habitaciones.';
         }
 
         async function cargar() {

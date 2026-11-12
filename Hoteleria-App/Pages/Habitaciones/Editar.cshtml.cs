@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Hoteleria_App.Pages.Habitaciones;
 
 [Authorize(Policy = HotelPermissionPolicies.CrudHabitaciones)]
-public class EditarModel(HoteleriaDbContext context, IBuscadorHabitaciones buscador, INotificadorHotel notificador) : PageModel
+public class EditarModel(HoteleriaDbContext context, IBuscadorHabitaciones buscador, INotificadorHotel notificador, RelojHotel reloj) : PageModel
 {
     [BindProperty]
     public Habitacion Habitacion { get; set; } = new();
@@ -49,6 +49,17 @@ public class EditarModel(HoteleriaDbContext context, IBuscadorHabitaciones busca
             ModelState.AddModelError("Habitacion.Estado", "La habitación está ocupada; se libera con el check-out de la reserva.");
         else if (actual.Estado != EstadosHabitacion.Ocupado && Habitacion.Estado is not (EstadosHabitacion.Libre or EstadosHabitacion.Mantenimiento))
             ModelState.AddModelError("Habitacion.Estado", "Seleccione libre o mantenimiento.");
+        // No se manda a mantenimiento una habitación con una reserva que cubre hoy: el check-in fallaría.
+        else if (Habitacion.Estado == EstadosHabitacion.Mantenimiento && actual.Estado != EstadosHabitacion.Mantenimiento)
+        {
+            var hoy = reloj.Hoy;
+            var reservaHoy = await context.ReservaHabitaciones.AsNoTracking()
+                .Where(rh => rh.HabitacionId == id && rh.Activa && rh.Inicio <= hoy && rh.Fin > hoy)
+                .Select(rh => (long?)rh.ReservaId)
+                .FirstOrDefaultAsync();
+            if (reservaHoy is { } reservaId)
+                ModelState.AddModelError("Habitacion.Estado", $"La habitación tiene una reserva para hoy (#{reservaId}). Cámbiela de habitación o cancélela antes de ponerla en mantenimiento.");
+        }
 
         if (!ModelState.IsValid) return Page();
 

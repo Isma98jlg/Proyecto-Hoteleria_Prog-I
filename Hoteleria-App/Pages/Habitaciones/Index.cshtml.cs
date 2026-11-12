@@ -38,6 +38,7 @@ public class IndexModel : PageModel
 
     public bool PuedeAdministrarHabitaciones { get; private set; }
     public bool PuedeAdministrarPisos { get; private set; }
+    public bool PuedeVerReservas { get; private set; }
 
     // ---------------------------------------------------------------
     // Datos calculados para el renderizado
@@ -46,6 +47,10 @@ public class IndexModel : PageModel
     public List<Habitacion> Habitaciones { get; private set; } = new();
     public List<PisoResumen> Pisos { get; private set; } = new();
     public List<int> CamasDisponibles { get; private set; } = new();
+
+    /// <summary>Situación real de hoy de cada habitación (estado + reservas). Ver HabitacionService.</summary>
+    public Dictionary<long, SituacionHabitacion> Situaciones { get; private set; } = new();
+    public SituacionHabitacion Situacion(Habitacion h) => Situaciones[h.HabitacionId];
 
     // ---------------------------------------------------------------
     // Filtros (GET) — espejo exacto de los controles del diseño
@@ -60,9 +65,10 @@ public class IndexModel : PageModel
     // KPIs operativos (cinta colapsable)
     // ---------------------------------------------------------------
     public int TotalHabitaciones => Todas.Count;
-    public int Ocupadas => Todas.Count(h => h.Estado == "OCUPADO");
-    public int Libres => Todas.Count(h => h.Estado == "LIBRE");
-    public int EnMantenimiento => Todas.Count(h => h.Estado == "MANTENIMIENTO");
+    public int Ocupadas => Situaciones.Values.Count(s => s.Clave == SituacionesHabitacion.Ocupada);
+    public int Reservadas => Situaciones.Values.Count(s => s.Clave == SituacionesHabitacion.Reservada);
+    public int Libres => Situaciones.Values.Count(s => s.Clave == SituacionesHabitacion.Libre);
+    public int EnMantenimiento => Situaciones.Values.Count(s => s.Clave == SituacionesHabitacion.Mantenimiento);
     public int CategoriaEstandar => Todas.Count(h => h.TipoVipNombre == "ESTANDAR");
     public int CategoriaVip => Todas.Count(h => h.TipoVipNombre != "ESTANDAR");
 
@@ -111,45 +117,22 @@ public class IndexModel : PageModel
     {
         PuedeAdministrarHabitaciones = (await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudHabitaciones)).Succeeded;
         PuedeAdministrarPisos = (await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudPisos)).Succeeded;
+        PuedeVerReservas = (await _authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudRequerimientos)).Succeeded;
         Todas = (await _habitacionService.GetAllAsync())
             .OrderBy(h => h.NroPiso)
             .ThenBy(h => h.HabitacionId)
             .ToList();
 
+        Situaciones = await _habitacionService.SituacionesHoyAsync(Todas);
         CamasDisponibles = Todas.Select(h => h.NroCamas).Distinct().OrderBy(c => c).ToList();
+        CategoriasDisponibles = Todas.Where(h => h.TipoVip is not null)
+            .GroupBy(h => h.TipoVipNombre)
+            .Select(g => (g.Key, g.First().TipoVip!.PrecioCama))
+            .OrderBy(c => c.PrecioCama)
+            .ToList();
 
-        IEnumerable<Habitacion> query = Todas;
+        Habitaciones = Filtrar(Todas).OrderBy(h => h.NroPiso).ThenBy(h => h.HabitacionId).ToList();
 
-        if (Piso.HasValue)
-            query = query.Where(h => h.NroPiso == Piso.Value);
-
-        if (!string.IsNullOrWhiteSpace(Estado))
-        {
-            var e = Estado.Trim().ToUpperInvariant();
-            query = query.Where(h => string.Equals(h.Estado, e, StringComparison.OrdinalIgnoreCase));
-        }
-
-        if (!string.IsNullOrWhiteSpace(Categoria))
-        {
-            if (Categoria.Equals("VIP", StringComparison.OrdinalIgnoreCase))
-                query = query.Where(h => h.TipoVipNombre != "ESTANDAR");
-            else
-                query = query.Where(h => h.TipoVipNombre == Categoria);
-        }
-
-        if (Camas.HasValue)
-            query = query.Where(h => h.NroCamas == Camas.Value);
-
-        if (!string.IsNullOrWhiteSpace(Buscar))
-        {
-            var term = Buscar.Trim();
-            query = query.Where(h =>
-                Codigo(h).Contains(term, StringComparison.OrdinalIgnoreCase)
-                || (h.TipoVipNombre?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (h.Piso?.RefPiso?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false));
-        }
-
-        Habitaciones = query.OrderBy(h => h.NroPiso).ThenBy(h => h.HabitacionId).ToList();
 
         // Estructura de pisos (Entidad PISOS) derivada de las habitaciones reales.
         var habitacionesPorPiso = Todas.GroupBy(h => h.NroPiso).ToDictionary(g => g.Key, g => g.ToList());
@@ -162,7 +145,7 @@ public class IndexModel : PageModel
                     NroPiso = p.NroPiso,
                     RefPiso = p.RefPiso,
                     Cantidad = habitaciones.Count,
-                    Ocupadas = habitaciones.Count(h => h.Estado == "OCUPADO"),
+                    Ocupadas = habitaciones.Count(h => Situacion(h).Clave == SituacionesHabitacion.Ocupada),
                     EsVipPiso = habitaciones.Any(h => h.TipoVipNombre != "ESTANDAR"),
                 };
             })
@@ -172,15 +155,44 @@ public class IndexModel : PageModel
     /// <summary>
     /// Exportación CSV real del catálogo (sustituye al alert() de maqueta "exportData()").
     /// </summary>
+    /// <summary>Todos los filtros a la vez: piso, estado, categoría, camas y texto. Lo usan la lista y la exportación.</summary>
+    private IEnumerable<Habitacion> Filtrar(IEnumerable<Habitacion> habitaciones)
+    {
+        var query = habitaciones;
+        if (Piso.HasValue)
+            query = query.Where(h => h.NroPiso == Piso.Value);
+        if (!string.IsNullOrWhiteSpace(Estado))
+            query = query.Where(h => string.Equals(Situacion(h).Clave, Estado.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(Categoria))
+            query = query.Where(h => string.Equals(h.TipoVipNombre, Categoria.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (Camas.HasValue)
+            query = query.Where(h => h.NroCamas == Camas.Value);
+        if (!string.IsNullOrWhiteSpace(Buscar))
+        {
+            var term = Buscar.Trim();
+            query = query.Where(h =>
+                Codigo(h).Contains(term, StringComparison.OrdinalIgnoreCase)
+                || (h.TipoVipNombre?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (h.Piso?.RefPiso?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false));
+        }
+        return query;
+    }
+
+    /// <summary>Categorías que existen, de la más barata a la más cara (incluye las que cree el administrador).</summary>
+    public List<(string Nombre, decimal PrecioCama)> CategoriasDisponibles { get; set; } = [];
+
     public async Task<IActionResult> OnGetExportAsync()
     {
-        var todas = (await _habitacionService.GetAllAsync())
+        // Exporta lo que se está viendo: con los mismos filtros que la lista.
+        var base_ = await _habitacionService.GetAllAsync();
+        Situaciones = await _habitacionService.SituacionesHoyAsync(base_);
+        var todas = Filtrar(base_)
             .OrderBy(h => h.NroPiso)
             .ThenBy(h => h.HabitacionId)
             .ToList();
 
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("Codigo,Piso,Referencia,Categoria,Camas,Estado,PrecioCama,PrecioTotal");
+        sb.AppendLine("Codigo,Piso,Referencia,Categoria,Camas,Situacion,PrecioCama,PrecioTotal");
         foreach (var h in todas)
         {
             sb.AppendLine(string.Join(",",
@@ -189,7 +201,7 @@ public class IndexModel : PageModel
                 (h.Piso?.RefPiso ?? string.Empty).Replace(',', ' '),
                 h.TipoVipNombre,
                 h.NroCamas,
-                h.Estado,
+                Situacion(h).Etiqueta,
                 PrecioCama(h).ToString("0.00"),
                 PrecioTotal(h).ToString("0.00")));
         }
@@ -215,7 +227,7 @@ public class IndexModel : PageModel
         if (PisoNro is null || PisoNro < 0 || PisoNro > 99 || string.IsNullOrWhiteSpace(PisoRef) || PisoRef.Trim().Length > 20)
         {
             TempData["MensajeError"] = "Indica un número de piso entre 0 y 99 y una referencia de hasta 20 caracteres.";
-            return RedirectToPage();
+            return RedirectToPage(FiltrosActuales.Con(Request));
         }
 
         var piso = await _db.Pisos.SingleOrDefaultAsync(p => p.NroPiso == PisoNro.Value);
@@ -225,7 +237,7 @@ public class IndexModel : PageModel
             piso.RefPiso = PisoRef.Trim();
         await _db.SaveChangesAsync();
         TempData["MensajeExito"] = piso is null ? "Piso registrado correctamente." : "Referencia del piso actualizada.";
-        return RedirectToPage();
+        return RedirectToPage(FiltrosActuales.Con(Request));
     }
 
     public async Task<IActionResult> OnPostEliminarPisoAsync(long nroPiso)
@@ -238,13 +250,13 @@ public class IndexModel : PageModel
         if (await _db.Habitaciones.AnyAsync(h => h.NroPiso == nroPiso))
         {
             TempData["MensajeError"] = "No se puede eliminar un piso con habitaciones.";
-            return RedirectToPage();
+            return RedirectToPage(FiltrosActuales.Con(Request));
         }
 
         _db.Pisos.Remove(piso);
         await _db.SaveChangesAsync();
         TempData["MensajeExito"] = "Piso eliminado.";
-        return RedirectToPage();
+        return RedirectToPage(FiltrosActuales.Con(Request));
     }
 }
 

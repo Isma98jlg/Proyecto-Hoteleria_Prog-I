@@ -40,8 +40,8 @@
                 <input class="w-full pl-10 pr-4 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-inner" name="Buscar" value="@Model.Buscar" placeholder="Buscar huésped por nombre..." type="text">
             </div>
             <div class="min-w-[200px]">
-                <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="Estado">
-                    <option value="">Todos los Estados</option>
+                <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="Estado" onchange="this.form.submit()">
+                    <option value="">Todos los estados</option>
                     @foreach (var e in Model.Estados)
                     {
                         <option value="@e" selected="@(Model.Estado == e)">@EstadosReserva.Etiqueta(e)</option>
@@ -49,8 +49,8 @@
                 </select>
             </div>
             <div class="min-w-[220px]">
-                <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="UsuarioId">
-                    <option value="">Todos los Huéspedes</option>
+                <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="UsuarioId" onchange="this.form.submit()">
+                    <option value="">Todos los huéspedes</option>
                     @foreach (var u in Model.Usuarios)
                     {
                         <option value="@u.UsuarioId" selected="@(Model.UsuarioId == u.UsuarioId)">@u.NombreCompleto · @u.Documento</option>
@@ -61,7 +61,7 @@
         <div class="flex items-center gap-3 justify-end shrink-0">
             <span class="font-label-sm text-label-sm text-outline">@(Model.Total == 0 ? "Sin reservas" : $"{(Model.Pagina - 1) * Hoteleria_App.Pages.Reservas.IndexModel.TamanoPagina + 1}–{(Model.Pagina - 1) * Hoteleria_App.Pages.Reservas.IndexModel.TamanoPagina + Model.Reservas.Count} de {Model.Total} reservas")</span>
             <button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" type="submit">Aplicar</button>
-            <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" asp-page="Index">Limpiar Filtros</a>
+            <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" asp-page="Index">Limpiar filtros</a>
         </div>
     </form>
 
@@ -123,7 +123,7 @@
                                     </a>
                                     @if (r.EstadoReserva == "PENDIENTE")
                                     {
-                                        <form method="post" asp-page-handler="Eliminar" asp-route-id="@r.ReservaId" onsubmit="return confirm('¿Está seguro de eliminar esta reserva?')" class="inline">
+                                        <form method="post" asp-page-handler="Eliminar" asp-all-route-data="@FiltrosActuales.Con(HttpContext.Request, conservarPagina: true)" asp-route-id="@r.ReservaId" onsubmit="return confirm('¿Está seguro de eliminar esta reserva?')" class="inline">
                                             <button class="p-2 rounded hover:bg-error-container text-error hover:text-on-error transition-colors" type="submit" title="Eliminar reserva">
                                                 <span class="material-symbols-outlined text-[18px]">delete</span>
                                             </button>

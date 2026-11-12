@@ -24,7 +24,7 @@
                     <span class="material-symbols-outlined text-[20px]">layers</span>
                     <span>Gestionar Pisos (@Model.Pisos.Count)</span>
                 </button> }
-                <a class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page-handler="Export" title="Exportar CSV">
+                <a class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all shadow-sm" asp-page-handler="Export" asp-all-route-data="@FiltrosActuales.Con(HttpContext.Request)" title="Exportar CSV">
                     <span class="material-symbols-outlined text-[19px]">file_download</span>
                     <span>Exportar</span>
                 </a>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="flex flex-col items-end">
                         <span class="text-[10px] font-bold text-secondary bg-secondary-fixed px-2 py-0.5 rounded">@Model.Pct(Model.Ocupadas)% ocupación</span>
-                        <span class="text-[10px] text-outline mt-1">@Model.Libres libres • @Model.EnMantenimiento mant.</span>
+                        <span class="text-[10px] text-outline mt-1">@Model.Libres libres • @Model.Reservadas reservadas hoy • @Model.EnMantenimiento mant.</span>
                     </div>
                 </div>
                 <div class="bg-surface-container-low/80 p-3 rounded-lg border border-surface-container flex items-center justify-between">
@@ -124,13 +124,13 @@
                 </div>
             </div>
             <div class="flex items-center gap-2 overflow-x-auto pb-1" id="floorPills">
-                <a class="floor-pill px-4 py-2 rounded-xl @(Model.Piso is null ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant hover:text-on-surface") font-body-sm text-body-sm font-semibold whitespace-nowrap transition-all shadow-sm" asp-page="Index">
+                <a class="floor-pill px-4 py-2 rounded-xl @(Model.Piso is null ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant hover:text-on-surface") font-body-sm text-body-sm font-semibold whitespace-nowrap transition-all shadow-sm" asp-page="Index" asp-all-route-data="@FiltrosActuales.Con(HttpContext.Request, ("Piso", null))">
                     Todos los pisos (@Model.TotalHabitaciones habs)
                 </a>
                 @foreach (var p in Model.Pisos)
                 {
                     var activo = Model.Piso == p.NroPiso;
-                    <a class="floor-pill px-4 py-2 rounded-xl @(activo ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant hover:text-on-surface") font-body-sm text-body-sm whitespace-nowrap transition-all shadow-sm flex items-center gap-2" asp-page="Index" asp-route-piso="@p.NroPiso">
+                    <a class="floor-pill px-4 py-2 rounded-xl @(activo ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant hover:text-on-surface") font-body-sm text-body-sm whitespace-nowrap transition-all shadow-sm flex items-center gap-2" asp-page="Index" asp-all-route-data="@FiltrosActuales.Con(HttpContext.Request, ("Piso", p.NroPiso))">
                         <span class="w-2 h-2 rounded-full @(p.EsVipPiso ? "bg-secondary-container" : "bg-outline")"></span>
                         <span>Piso @p.NroPiso @(string.IsNullOrWhiteSpace(p.RefPiso) ? "" : "· " + p.RefPiso)</span>
                         <span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded @(activo ? "bg-on-tertiary-container text-surface-container-lowest" : "bg-surface-container text-outline")">@p.Cantidad habs</span>
@@ -141,6 +141,8 @@
 
         <!-- Barra de Filtros Operativos -->
         <form method="get" class="bg-surface-container-lowest border border-surface-container-high p-4 rounded-2xl shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            @* El piso elegido arriba viaja con la búsqueda: todos los filtros son una sola consulta. *@
+            <input type="hidden" name="Piso" value="@Model.Piso" />
             <div class="flex-1 flex flex-wrap sm:flex-nowrap items-center gap-3">
                 <div class="relative flex-1 min-w-[220px]">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
@@ -148,17 +150,20 @@
                 </div>
                 <div class="min-w-[210px]">
                     <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="Categoria" onchange="this.form.submit()">
-                        <option value="">Todas las Categorías</option>
-                        <option value="ESTANDAR" selected="@(Model.Categoria == "ESTANDAR")">Estándar (EST) · @Soles.Formatear(Model.PrecioCamaEstandar)/cama</option>
-                        <option value="VIP" selected="@(Model.Categoria == "VIP")">VIP (Premium) · @Soles.Formatear(Model.PrecioCamaVip)/cama máx</option>
+                        <option value="">Todas las categorías</option>
+                        @foreach (var c in Model.CategoriasDisponibles)
+                        {
+                            <option value="@c.Nombre" selected="@(string.Equals(Model.Categoria, c.Nombre, StringComparison.OrdinalIgnoreCase))">@c.Nombre · @Soles.Formatear(c.PrecioCama)/cama</option>
+                        }
                     </select>
                 </div>
                 <div class="min-w-[150px]">
                     <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none" name="Estado" onchange="this.form.submit()">
-                        <option value="">Todos los Estados</option>
-                        <option value="LIBRE" selected="@(Model.Estado == "LIBRE")">Libre / Disponible</option>
-                        <option value="OCUPADO" selected="@(Model.Estado == "OCUPADO")">Ocupado</option>
-                        <option value="MANTENIMIENTO" selected="@(Model.Estado == "MANTENIMIENTO")">Mantenimiento</option>
+                        <option value="">Todos los estados</option>
+                        @foreach (var (clave, etiqueta) in SituacionesHabitacion.Todas)
+                        {
+                            <option value="@clave" selected="@(string.Equals(Model.Estado, clave, StringComparison.OrdinalIgnoreCase))">@etiqueta</option>
+                        }
                     </select>
                 </div>
                 <div class="min-w-[150px]">
@@ -174,7 +179,7 @@
             <div class="flex items-center gap-3 justify-end shrink-0">
                 <span class="font-label-sm text-label-sm text-outline">Mostrando @Model.Habitaciones.Count de @Model.TotalHabitaciones</span>
                 <button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" type="submit">Aplicar</button>
-                <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" asp-page="Index">Limpiar Filtros</a>
+                <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-sm text-label-sm transition-colors" asp-page="Index">Limpiar filtros</a>
             </div>
         </form>
 
@@ -192,19 +197,22 @@
             @foreach (var h in Model.Habitaciones)
             {
                 var esVip = Model.EsVip(h);
-                var topBar = h.Estado == "MANTENIMIENTO" ? "bg-error glow-border" : (esVip ? "bg-secondary glow-border" : "bg-on-tertiary-container glow-border");
+                var situacion = Model.Situacion(h);
+                var topBar = situacion.Clave == SituacionesHabitacion.Mantenimiento ? "bg-error glow-border" : (esVip ? "bg-secondary glow-border" : "bg-on-tertiary-container glow-border");
                 var codeChip = esVip ? "bg-primary-container text-surface-container-lowest shadow-inner" : "bg-surface-container-high text-on-surface";
-                var estado = h.Estado;
+                var estado = situacion.Clave;
                 var badgeEstado = estado switch
                 {
-                    "LIBRE" => "bg-surface-container text-on-tertiary-container",
-                    "OCUPADO" => "bg-secondary-fixed text-on-secondary-fixed",
+                    SituacionesHabitacion.Libre => "bg-tertiary-fixed text-on-tertiary-fixed",
+                    SituacionesHabitacion.Reservada => "bg-primary-fixed text-on-primary-fixed",
+                    SituacionesHabitacion.Ocupada => "bg-secondary-fixed text-on-secondary-fixed",
                     _ => "bg-error-container text-on-error-container"
                 };
                 var dotEstado = estado switch
                 {
-                    "LIBRE" => "bg-on-tertiary-container",
-                    "OCUPADO" => "bg-secondary",
+                    SituacionesHabitacion.Libre => "bg-on-tertiary-fixed-variant",
+                    SituacionesHabitacion.Reservada => "bg-primary",
+                    SituacionesHabitacion.Ocupada => "bg-secondary",
                     _ => "bg-error"
                 };
                 var precio = Model.PrecioCama(h);
@@ -228,8 +236,22 @@
                                     <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Piso @h.NroPiso @(string.IsNullOrWhiteSpace(h.Piso?.RefPiso) ? "" : "· " + h.Piso.RefPiso)</span>
                                 </div>
                             </div>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold"><span class="w-2 h-2 rounded-full @dotEstado"></span>@Model.EstadoEtiqueta(estado)</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold"><span class="w-2 h-2 rounded-full @dotEstado"></span>@situacion.Etiqueta</span>
                         </div>
+                        @if (situacion.Detalle is not null)
+                        {
+                            <p class="flex items-center gap-1.5 text-xs @(situacion.Inconsistente ? "font-semibold text-error" : "text-on-surface-variant")">
+                                <span class="material-symbols-outlined text-[15px]">@(situacion.Inconsistente ? "warning" : situacion.Clave == SituacionesHabitacion.Ocupada ? "hotel" : "event")</span>
+                                @if (situacion.ReservaId is { } reservaId && Model.PuedeVerReservas)
+                                {
+                                    <a asp-page="/Reservas/Detalles" asp-route-id="@reservaId" class="hover:underline">@situacion.Detalle · reserva #@reservaId</a>
+                                }
+                                else
+                                {
+                                    <span>@situacion.Detalle</span>
+                                }
+                            </p>
+                        }
                         <div class="flex items-center gap-4 pt-2 text-on-surface-variant">
                             <span class="flex items-center gap-1.5 font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">bed</span> @h.NroCamas camas</span>
                             <span class="flex items-center gap-1.5 font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">group</span> @h.NroCamas @(h.NroCamas == 1 ? "persona" : "personas")</span>
@@ -272,11 +294,13 @@
                         {
                             var esVip = Model.EsVip(h);
                             var precioTotal = Model.PrecioTotal(h);
-                            var estado = h.Estado;
+                            var situacion = Model.Situacion(h);
+                            var estado = situacion.Clave;
                             var badgeEstado = estado switch
                             {
-                                "LIBRE" => "bg-surface-container text-on-tertiary-container",
-                                "OCUPADO" => "bg-secondary-fixed text-on-secondary-fixed",
+                                SituacionesHabitacion.Libre => "bg-tertiary-fixed text-on-tertiary-fixed",
+                                SituacionesHabitacion.Reservada => "bg-primary-fixed text-on-primary-fixed",
+                                SituacionesHabitacion.Ocupada => "bg-secondary-fixed text-on-secondary-fixed",
                                 _ => "bg-error-container text-on-error-container"
                             };
                             <tr class="hover:bg-surface-container-low/60 transition-colors">
@@ -294,7 +318,7 @@
                                 </td>
                                 <td class="py-3 px-4 font-semibold text-on-surface">@h.NroCamas Camas (@h.NroCamas pers.)</td>
                                 <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">@Soles.Formatear(precioTotal) / noche</td>
-                                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold">@Model.EstadoEtiqueta(estado)</span></td>
+                                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold">@situacion.Etiqueta</span>@if (situacion.Detalle is not null) { <span class="mt-1 block text-[11px] @(situacion.Inconsistente ? "font-semibold text-error" : "text-outline")">@situacion.Detalle</span> }</td>
                                 <td class="py-3 px-4 text-right">
                                     <a class="p-1 hover:text-on-surface text-outline" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Ver detalle"><span class="material-symbols-outlined text-[18px]">visibility</span></a>
                                     @if (Model.PuedeAdministrarHabitaciones) { <a class="p-1 hover:text-on-surface text-outline" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Editar"><span class="material-symbols-outlined text-[18px]">edit</span></a> }
@@ -320,17 +344,17 @@
                 </div>
                 @if (Model.PuedeAdministrarPisos) { <button class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors" onclick="abrirModalPisos()" type="button">
                     <span class="material-symbols-outlined text-[18px]">add_circle</span>
-                    <span>Registrar Nuevo Nivel</span>
+                    <span>Registrar piso</span>
                 </button> }
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead class="bg-surface-container-low font-label-md text-label-md text-outline uppercase tracking-wider">
                         <tr>
-                            <th class="py-3 px-4">Número de Piso (<span class="font-mono">nro_piso</span>)</th>
-                            <th class="py-3 px-4">Referencia / Denominación (<span class="font-mono">ref_piso</span>)</th>
-                            <th class="py-3 px-4">Habitaciones Activas</th>
-                            <th class="py-3 px-4">Ocupación por Nivel</th>
+                            <th class="py-3 px-4">Piso</th>
+                            <th class="py-3 px-4">Nombre</th>
+                            <th class="py-3 px-4">Habitaciones</th>
+                            <th class="py-3 px-4">Ocupación hoy</th>
                             <th class="py-3 px-4 text-right">Acciones</th>
                         </tr>
                     </thead>
@@ -384,7 +408,7 @@
         <div class="p-6 flex flex-col gap-4">
             @if (Model.PuedeAdministrarPisos)
             {
-            <form method="post" asp-page-handler="GuardarPiso" class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3">
+            <form method="post" asp-page-handler="GuardarPiso" asp-all-route-data="@FiltrosActuales.Con(HttpContext.Request)" class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3">
                 <span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">Añadir / Actualizar Nivel</span>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
@@ -406,7 +430,7 @@
                             <span class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center font-bold text-on-surface">@p.NroPiso</span>
                             <span class="font-body-sm text-body-sm font-semibold text-on-surface">@(string.IsNullOrWhiteSpace(p.RefPiso) ? "Nivel " + p.NroPiso : p.RefPiso)</span>
                         </div>
-                        <span class="flex items-center gap-3"><span class="font-label-sm text-label-sm @(p.EsVipPiso ? "text-secondary font-bold" : "text-outline")">@p.Cantidad habs@(p.EsVipPiso ? " VIP" : "")</span>@if (Model.PuedeAdministrarPisos && p.Cantidad == 0) { <form method="post" asp-page-handler="EliminarPiso" asp-route-nroPiso="@p.NroPiso" onsubmit="return confirm('¿Eliminar este piso?')"><button type="submit" class="text-error text-xs font-semibold hover:underline">Eliminar</button></form> }</span>
+                        <span class="flex items-center gap-3"><span class="font-label-sm text-label-sm @(p.EsVipPiso ? "text-secondary font-bold" : "text-outline")">@p.Cantidad habs@(p.EsVipPiso ? " VIP" : "")</span>@if (Model.PuedeAdministrarPisos && p.Cantidad == 0) { <form method="post" asp-page-handler="EliminarPiso" asp-all-route-data="@FiltrosActuales.Con(HttpContext.Request)" asp-route-nroPiso="@p.NroPiso" onsubmit="return confirm('¿Eliminar este piso?')"><button type="submit" class="text-error text-xs font-semibold hover:underline">Eliminar</button></form> }</span>
                     </div>
                 }
             </div>
@@ -439,7 +463,9 @@
         }
 
         // Vista cuadrícula / tabla
+        // La vista elegida se recuerda: filtrar no debe devolver a la cuadrícula.
         function switchView(view) {
+            try { localStorage.setItem('habitaciones-vista', view); } catch { /* sin almacenamiento, no se recuerda */ }
             const grid = document.getElementById('roomsGrid');
             const table = document.getElementById('roomsTableWrapper');
             const btnGrid = document.getElementById('btnViewGrid');
@@ -459,6 +485,8 @@
                 btnGrid.classList.add('text-outline');
             }
         }
+
+        try { if (localStorage.getItem('habitaciones-vista') === 'table') switchView('table'); } catch { }
 
         // Modal Gestionar Pisos
         function abrirModalPisos() {

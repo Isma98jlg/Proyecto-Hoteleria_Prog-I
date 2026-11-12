@@ -78,7 +78,7 @@ public sealed class SelectorHabitaciones(
 
         var lista = ordenadas.Select(h => Seleccionable(h, posiciones.ContainsKey(h.HabitacionId), destacadas.Contains(h.HabitacionId) ? etiqueta : null)).ToList();
         var busquedaId = await historial.RegistrarAsync(usuarioId, entrada, noches, personas, categoria, conTexto,
-            lista.Where(h => h.Coincide).Select(h => h.HabitacionId).ToList(), ct);
+            lista.Select(h => h.HabitacionId).ToList(), ct);
         var orden = ordenador.Activo ? "personalizado (ranking ML.NET)" : recomendador.Estado.Activo ? "por afinidad (ML.NET)" : null;
         return new(motor, categorias, lista, busquedaId, orden);
     }

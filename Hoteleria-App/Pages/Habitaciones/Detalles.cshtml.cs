@@ -13,6 +13,7 @@ public class DetallesModel(IHabitacionService habitacionService, IAuthorizationS
     public Habitacion? Habitacion { get; set; }
     public bool PuedeEditar { get; private set; }
     public bool PuedeVerReservas { get; private set; }
+    public SituacionHabitacion? Situacion { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(long id)
     {
@@ -20,6 +21,8 @@ public class DetallesModel(IHabitacionService habitacionService, IAuthorizationS
         // El historial muestra nombres de huéspedes: solo para quien gestiona reservas.
         PuedeVerReservas = (await authorization.AuthorizeAsync(User, HotelPermissionPolicies.CrudRequerimientos)).Succeeded;
         Habitacion = await habitacionService.GetByIdAsync(id);
-        return Habitacion is null ? NotFound() : Page();
+        if (Habitacion is null) return NotFound();
+        Situacion = (await habitacionService.SituacionesHoyAsync([Habitacion]))[id];
+        return Page();
     }
 }

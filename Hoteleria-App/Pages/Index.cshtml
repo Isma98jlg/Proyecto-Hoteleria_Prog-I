@@ -14,9 +14,36 @@
 
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <a asp-page="/Habitaciones/Index" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Habitaciones</span><strong class="block text-3xl mt-2">@Model.TotalHabitaciones</strong><span class="text-xs text-on-surface-variant">Inventario total</span></a>
-        <a asp-page="/Habitaciones/Index" asp-route-Estado="LIBRE" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Disponibles</span><strong class="block text-3xl mt-2 text-on-tertiary-container">@Model.HabitacionesLibres</strong><span class="text-xs text-on-surface-variant">Listas para asignar</span></a>
+        <a asp-page="/Habitaciones/Index" asp-route-Estado="LIBRE" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Disponibles hoy</span><strong class="block text-3xl mt-2 text-on-tertiary-container">@Model.HabitacionesLibres</strong><span class="text-xs text-on-surface-variant">Sin reserva hoy · @Model.HabitacionesReservadas reservada(s) por llegar</span></a>
         <a asp-page="/Habitaciones/Index" asp-route-Estado="OCUPADO" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Ocupadas</span><strong class="block text-3xl mt-2 text-secondary">@Model.HabitacionesOcupadas</strong><span class="text-xs text-on-surface-variant">@ocupacion% de ocupación</span></a>
         <a asp-page="/Reservas/Index" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5 hover:shadow-md transition-shadow"><span class="text-sm text-outline">Reservas confirmadas</span><strong class="block text-3xl mt-2">@Model.ReservasConfirmadas</strong><span class="text-xs text-on-surface-variant">@Model.TotalReservas en total</span></a>
+    </section>
+
+    <section class="flex flex-col gap-3 rounded-2xl border @(Model.Alertas.Count == 0 ? "border-surface-container-high" : "border-error/40") bg-surface-container-lowest p-5" aria-label="Revisión de consistencia">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="flex h-9 w-9 items-center justify-center rounded-lg @(Model.Alertas.Count == 0 ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-error-container text-on-error-container")"><span class="material-symbols-outlined text-[20px]">@(Model.Alertas.Count == 0 ? "verified" : "report")</span></span>
+                <div><h2 class="font-headline-sm text-headline-sm">Revisión de consistencia</h2><p class="text-xs text-outline">Reservas y estados de las habitaciones, comprobados al abrir el panel</p></div>
+            </div>
+            @if (Model.Alertas.Count > 0) { <span class="rounded-full bg-error-container px-2.5 py-1 text-xs font-bold text-on-error-container tabular-nums">@Model.Alertas.Count</span> }
+        </div>
+        @if (Model.Alertas.Count == 0)
+        {
+            <p class="text-sm text-on-surface-variant">Todo en orden: cada habitación coincide con sus reservas.</p>
+        }
+        else
+        {
+            <ul class="flex flex-col divide-y divide-surface-container">
+                @foreach (var alerta in Model.Alertas.Take(8))
+                {
+                    <li class="flex items-center justify-between gap-3 py-2.5">
+                        <span class="flex items-start gap-2 text-sm"><span class="material-symbols-outlined mt-0.5 text-[18px] text-error">warning</span>@alerta.Texto</span>
+                        <a href="@alerta.Pagina/@alerta.Id" class="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-on-primary hover:opacity-90">Revisar</a>
+                    </li>
+                }
+            </ul>
+            @if (Model.Alertas.Count > 8) { <p class="text-xs text-outline">Y @(Model.Alertas.Count - 8) más.</p> }
+        }
     </section>
 
     <section class="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Movimientos de hoy">
@@ -88,11 +115,12 @@
             @foreach (var item in Model.HabitacionesPorPiso)
             {
                 var total = item.Value.Count;
-                var libres = item.Value.Count(h => h.Estado == "LIBRE");
-                var ocupadas = item.Value.Count(h => h.Estado == "OCUPADO");
-                var mantenimiento = item.Value.Count(h => h.Estado == "MANTENIMIENTO");
+                var libres = item.Value.Count(h => Model.Situacion(h).Clave == SituacionesHabitacion.Libre);
+                var reservadas = item.Value.Count(h => Model.Situacion(h).Clave == SituacionesHabitacion.Reservada);
+                var ocupadas = item.Value.Count(h => Model.Situacion(h).Clave == SituacionesHabitacion.Ocupada);
+                var mantenimiento = item.Value.Count(h => Model.Situacion(h).Clave == SituacionesHabitacion.Mantenimiento);
                 var pct = total == 0 ? 0 : (int)Math.Round(ocupadas * 100d / total);
-                <div><div class="flex justify-between text-sm mb-1"><strong>Piso @item.Key</strong><span class="text-outline">@ocupadas ocupadas · @libres libres · @mantenimiento mantenimiento</span></div><div class="h-2 rounded-full bg-surface-container-high overflow-hidden"><div class="h-full bg-secondary-container rounded-full" style="width:@(pct)%"></div></div></div>
+                <div><div class="flex justify-between text-sm mb-1"><strong>Piso @item.Key</strong><span class="text-outline">@ocupadas ocupadas · @reservadas reservadas · @libres libres · @mantenimiento mant.</span></div><div class="h-2 rounded-full bg-surface-container-high overflow-hidden"><div class="h-full bg-secondary-container rounded-full" style="width:@(pct)%"></div></div></div>
             }
             </div>
         </div>

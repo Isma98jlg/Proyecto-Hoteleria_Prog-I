@@ -87,8 +87,9 @@ def id_huesped(c, doc):
 
 
 def estado_hab(c, h):
-    m = re.search(r"Estado</span><strong[^>]*>([A-Z]+)", c.get(f"/Habitaciones/Detalles/{h}")[1])
-    return m.group(1) if m else "?"
+    """Situación de hoy de la habitación: LIBRE, RESERVADA, OCUPADO o MANTENIMIENTO."""
+    m = re.search(r"Situación hoy</span><strong[^>]*>([^<]+)<", c.get(f"/Habitaciones/Detalles/{h}")[1])
+    return {"Libre": "LIBRE", "Reservada": "RESERVADA", "Ocupada": "OCUPADO", "Mantenimiento": "MANTENIMIENTO"}.get(m.group(1).strip(), "?") if m else "?"
 
 
 def enlace(body):
@@ -201,7 +202,7 @@ worker.post(p, p, {"Habitacion.NroPiso": 2, "Habitacion.NroCamas": 2, "Habitacio
 s, _, _ = crear_reserva(worker, gid, hoy, 202, noches=2)
 rc = ultima_reserva(worker, gid)
 check("reserva de hoy", s == 302, str(s))
-check("confirmar no ocupa la habitación", estado_hab(worker, 202) == "LIBRE")
+check("confirmar para hoy la deja reservada, sin ocuparla", estado_hab(worker, 202) == "RESERVADA")
 check("check-in", estado_reserva(worker, rc, "EN_CURSO")[0] == 302)
 check("check-in ocupa la habitación", estado_hab(worker, 202) == "OCUPADO")
 check("ocupada no se cambia a mano", worker.post("/Habitaciones/Editar/202", "/Habitaciones/Editar/202", {"Habitacion.NroPiso": 2, "Habitacion.NroCamas": 2, "Habitacion.TipoVipNombre": "VIP", "Habitacion.Estado": "LIBRE"})[0] == 200)
@@ -412,9 +413,14 @@ check("filtro desconocido rechazado", guest.get("/Portal/Explora?handler=Buscar&
 check("coordenadas de lugares fuera de rango rechazadas", guest.get("/Portal/Explora?handler=Buscar&lat=500&lon=1")[0] == 400)
 
 # Vistas restantes
-for ruta in ["/Habitaciones/PorPiso", "/Habitaciones/PorTipoVip", "/Privacy", "/Reservas/Crear", "/Portal/Perfil", "/Account/CambiarContrasena"]:
+for ruta in ["/Privacy", "/Reservas/Crear", "/Portal/Perfil", "/Account/CambiarContrasena"]:
     s = admin.get(ruta)[0]
     check(f"carga {ruta}", s == 200, str(s))
+# Las vistas antiguas «por piso» y «por categoría» llevan a la vista principal, con el filtro equivalente.
+s, _, loc = admin.get("/Habitaciones/PorPiso?piso=2")
+check("«por piso» lleva a habitaciones filtradas", s == 302 and loc.endswith("/Habitaciones?Piso=2"), f"{s} {loc}")
+s, _, loc = admin.get("/Habitaciones/PorTipoVip")
+check("«por categoría» lleva a habitaciones", s == 302 and loc.endswith("/Habitaciones"), f"{s} {loc}")
 check("exportar CSV", "Codigo,Piso" in admin.get("/Habitaciones?handler=Export")[1])
 s, body, _ = guest.post("/Account/CambiarContrasena", "/Account/CambiarContrasena", {"Actual": GUEST[1], "Nueva": "Guest-Nueva-12!", "Confirmacion": "Guest-Nueva-12!"})
 check("cambiar contraseña", s == 302 and login(GUEST[0], "Guest-Nueva-12!")[1] == 302, f"{s}")
