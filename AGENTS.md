@@ -100,6 +100,10 @@ Para el recorrido completo, levanta la app contra una **base vacía** con `DEMO_
 python .\scripts\smoke_test.py
 ```
 
+### Pruebas en un entorno desechable
+
+`bash scripts/pruebas/correr.sh <prueba>` compila, levanta PostgreSQL y Redis en Docker, APIs falsas (`apis_falsas.py`) y la app en `localhost:5077` con contraseñas generadas, corre la prueba, imprime solo el resumen y lo borra todo. Pruebas: `smoke` (el recorrido completo, unos 12 s), `registro`, `ml`, `situacion`, `eliminar`, `asistente` y `explora`. Con `MANTENER=1` el entorno queda vivo para revisarlo en el navegador; se detiene con `correr.sh parar`. No usa ninguna clave real.
+
 ## Despliegue en Render
 
 1. Sube la rama a GitHub.
