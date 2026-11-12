@@ -39,6 +39,9 @@ public class EditarModel(HoteleriaDbContext context, IBuscadorHabitaciones busca
 
         if (Habitacion.NroCamas < 1) ModelState.AddModelError("Habitacion.NroCamas", "Debe registrar al menos una cama.");
         if (!await context.Pisos.AnyAsync(p => p.NroPiso == Habitacion.NroPiso)) ModelState.AddModelError("Habitacion.NroPiso", "Seleccione un piso válido.");
+        // El número no cambia: si se cambia el piso, debe seguir coincidiendo con él (la 401 va en el piso 4).
+        else if (Habitacion.NroPiso != actual.NroPiso && !CodigoHabitacion.EncajaConPiso(id, Habitacion.NroPiso))
+            ModelState.AddModelError("Habitacion.NroPiso", $"La habitación {id} va en el piso {id / 100}: el número empieza por el piso.");
         if (!await context.TiposVip.AnyAsync(t => t.TipoVipNombre == Habitacion.TipoVipNombre)) ModelState.AddModelError("Habitacion.TipoVipNombre", "Seleccione una categoría válida.");
 
         // «Ocupado» refleja una estancia real: lo cambian el check-in y el check-out.

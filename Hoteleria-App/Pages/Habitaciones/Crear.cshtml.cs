@@ -20,6 +20,10 @@ public class CrearModel(HoteleriaDbContext context, IBuscadorHabitaciones buscad
     public SelectList TiposVipDisponibles { get; set; } = default!;
     public SelectList EstadosDisponibles { get; set; } = default!;
 
+    /// <summary>Para sugerir el siguiente número libre del piso y mostrar el código en vivo.</summary>
+    public List<long> NumerosExistentes { get; set; } = [];
+    public Dictionary<string, char> Siglas { get; set; } = [];
+
     public async Task OnGetAsync()
     {
         await CargarDatosAsync();
@@ -30,6 +34,8 @@ public class CrearModel(HoteleriaDbContext context, IBuscadorHabitaciones buscad
         await CargarDatosAsync();
 
         if (Habitacion.HabitacionId < 1) ModelState.AddModelError("Habitacion.HabitacionId", "Indique el número de la habitación.");
+        else if (Habitacion.NroPiso >= 1 && !CodigoHabitacion.EncajaConPiso(Habitacion.HabitacionId, Habitacion.NroPiso))
+            ModelState.AddModelError("Habitacion.HabitacionId", $"El número empieza por el piso: en el piso {Habitacion.NroPiso} va del {CodigoHabitacion.Rango(Habitacion.NroPiso)}.");
         else if (await context.Habitaciones.AnyAsync(h => h.HabitacionId == Habitacion.HabitacionId)) ModelState.AddModelError("Habitacion.HabitacionId", "Ya existe una habitación con ese número.");
         if (Habitacion.NroCamas < 1) ModelState.AddModelError("Habitacion.NroCamas", "Debe registrar al menos una cama.");
         if (!await context.Pisos.AnyAsync(p => p.NroPiso == Habitacion.NroPiso)) ModelState.AddModelError("Habitacion.NroPiso", "Seleccione un piso válido.");
@@ -61,5 +67,7 @@ public class CrearModel(HoteleriaDbContext context, IBuscadorHabitaciones buscad
         PisosDisponibles = new SelectList(pisos, "NroPiso", "NroPiso");
         TiposVipDisponibles = new SelectList(tiposVip, "TipoVipNombre", "TipoVipNombre");
         EstadosDisponibles = new SelectList(new[] { EstadosHabitacion.Libre, EstadosHabitacion.Mantenimiento });
+        NumerosExistentes = await context.Habitaciones.Select(h => h.HabitacionId).ToListAsync();
+        Siglas = tiposVip.ToDictionary(t => t.TipoVipNombre, t => t.Sigla);
     }
 }

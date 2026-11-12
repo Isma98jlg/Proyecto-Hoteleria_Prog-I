@@ -20,6 +20,11 @@ public static class CargosSistema
 public static class CodigoHabitacion
 {
     public static string Formatear(long nroPiso, char sigla, long habitacionId) => $"{nroPiso}{sigla}-{habitacionId:D3}";
+
+    /// <summary>El número empieza por su piso y sigue con dos dígitos: en el piso 4 van del 401 al 499.</summary>
+    public static bool EncajaConPiso(long numero, long nroPiso) => numero / 100 == nroPiso && numero % 100 >= 1;
+
+    public static string Rango(long nroPiso) => $"{nroPiso * 100 + 1} al {nroPiso * 100 + 99}";
 }
 
 /// <summary>Documentos que se aceptan en el registro de huéspedes.</summary>

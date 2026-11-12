@@ -7,9 +7,13 @@
     <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="font-label-sm uppercase tracking-wider text-secondary font-bold">HABITACIONES · REGISTRO</span><h1 class="font-headline-lg text-headline-lg mt-1">Nueva habitación</h1><p class="text-on-surface-variant">Agrega una habitación al inventario del hotel.</p></section>
     @if (!ViewData.ModelState.IsValid) { <div asp-validation-summary="All" class="rounded-xl bg-error-container text-on-error-container p-3"></div> }
     <form method="post" class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-6 shadow-sm flex flex-col gap-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1">Número de habitación<input asp-for="Habitacion.HabitacionId" type="number" min="1" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Habitacion.HabitacionId" class="text-error text-sm"></span></label>
-            <label class="flex flex-col gap-1">Piso<select asp-for="Habitacion.NroPiso" asp-items="Model.PisosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="">Seleccione un piso</option></select><span asp-validation-for="Habitacion.NroPiso" class="text-error text-sm"></span></label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="numero-habitacion" data-existentes="@string.Join(",", Model.NumerosExistentes)" data-siglas="@string.Join(",", Model.Siglas.Select(s => $"{s.Key}:{s.Value}"))">
+            <label class="flex flex-col gap-1">Piso<select asp-for="Habitacion.NroPiso" asp-items="Model.PisosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg" data-numero-piso><option value="">Seleccione un piso</option></select><span asp-validation-for="Habitacion.NroPiso" class="text-error text-sm"></span></label>
+            <label class="flex flex-col gap-1">Número de habitación<input asp-for="Habitacion.HabitacionId" type="number" min="1" class="px-3 py-2 bg-surface-container-low rounded-lg" data-numero-valor /><span asp-validation-for="Habitacion.HabitacionId" class="text-error text-sm"></span></label>
+            <div class="md:col-span-2 flex flex-col gap-2 rounded-xl bg-surface-container-low p-3 text-sm">
+                <p class="flex items-start gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-[18px] text-secondary">info</span><span>El número es <b>el piso seguido de dos dígitos</b>. Ejemplo: en el piso <b>4</b>, la primera habitación es la <b>401</b>, luego la <b>402</b>, y así hasta la 499. Al elegir el piso se propone el siguiente número libre.</span></p>
+                <p class="flex flex-wrap items-center gap-2"><span class="text-on-surface-variant">Así se verá en reservas y búsquedas:</span><code class="rounded-md bg-surface-container-lowest px-2 py-1 font-semibold text-primary" data-numero-codigo>—</code><span class="text-xs text-outline" data-numero-aviso></span></p>
+            </div>
             <label class="flex flex-col gap-1">Número de camas<input asp-for="Habitacion.NroCamas" type="number" min="1" max="20" class="px-3 py-2 bg-surface-container-low rounded-lg" /><span asp-validation-for="Habitacion.NroCamas" class="text-error text-sm"></span></label>
             <label class="flex flex-col gap-1">Categoría<select asp-for="Habitacion.TipoVipNombre" asp-items="Model.TiposVipDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"><option value="">Seleccione una categoría</option></select><span asp-validation-for="Habitacion.TipoVipNombre" class="text-error text-sm"></span></label>
             <label class="flex flex-col gap-1">Estado inicial<select asp-for="Habitacion.Estado" asp-items="Model.EstadosDisponibles" class="px-3 py-2 bg-surface-container-low rounded-lg"></select><span asp-validation-for="Habitacion.Estado" class="text-error text-sm"></span></label>
@@ -17,4 +21,4 @@
         <div class="flex justify-between border-t border-surface-container-high pt-4"><a asp-page="Index" class="px-4 py-2 rounded-lg bg-surface-container">Cancelar</a><button type="submit" class="px-5 py-2 rounded-lg bg-primary text-on-primary font-semibold">Guardar habitación</button></div>
     </form>
 </main>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script src="~/js/habitacion-numero.js" asp-append-version="true"></script> }
