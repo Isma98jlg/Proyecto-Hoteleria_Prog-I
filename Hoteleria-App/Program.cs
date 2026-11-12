@@ -37,6 +37,12 @@ builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<CuentaService>();
 builder.Services.AddScoped<IBuscadorHabitaciones, BuscadorHabitaciones>();
 builder.Services.AddScoped<SelectorHabitaciones>();
+// ML.NET: los modelos viven en memoria (singleton) y se entrenan en segundo plano.
+builder.Services.AddSingleton<Hoteleria_App.Services.Ml.RecomendadorHabitaciones>();
+builder.Services.AddSingleton<Hoteleria_App.Services.Ml.OrdenadorHabitaciones>();
+builder.Services.AddScoped<Hoteleria_App.Services.Ml.HistorialBusquedas>();
+builder.Services.AddSingleton<Hoteleria_App.Services.Ml.EntrenamientoModelos>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<Hoteleria_App.Services.Ml.EntrenamientoModelos>());
 builder.Services.AddHttpClient<ClimaService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(5));
 builder.Services.AddHttpClient<LugaresService>(cliente => cliente.Timeout = TimeSpan.FromSeconds(8));
 // Cada consulta fija su propia espera (Migraciones tarda más); este es solo el tope.
@@ -212,6 +218,10 @@ if (GetBool(config, "DB_AUTO_MIGRATE", true))
             CorreoPermitido(config, "DEMO_USER_EMAIL", dominio), Requerida(config, "DEMO_USER_PASSWORD"),
             "Huesped", "Demostracion", CargosSistema.Huesped, esPersonal: false);
     }
+
+    // Historial de demostración para ML.NET (huéspedes, reservas pasadas y búsquedas): solo si se pide.
+    if (GetBool(config, "DEMO_HISTORIAL", false))
+        await DbSeeder.HistorialDemoAsync(db, dominio, app.Logger);
 }
 
 // Sin bloquear el arranque: si Algolia falla, la búsqueda usa PostgreSQL.

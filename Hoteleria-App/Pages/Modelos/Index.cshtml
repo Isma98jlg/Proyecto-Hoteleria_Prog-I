@@ -1,0 +1,60 @@
+@page
+@model Hoteleria_App.Pages.Modelos.IndexModel
+@inject Hoteleria_App.Services.RelojHotel Reloj
+@{
+    ViewData["Title"] = "Modelos de recomendación";
+    string Fecha(DateTime? utc) => utc is { } f ? Reloj.ALocal(f).ToString("dd/MM/yyyy HH:mm") : "—";
+    string Porcentaje(double? v) => v is { } x ? $"{x * 100:0}%" : "—";
+    const string tarjeta = "flex flex-col gap-4 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-5";
+    const string dato = "flex flex-col rounded-xl bg-surface-container-low p-3";
+}
+<main class="flex w-full flex-col gap-6">
+    <section class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+            <span class="font-label-sm font-bold uppercase tracking-wider text-secondary">ADMINISTRACIÓN · ML.NET</span>
+            <h1 class="mt-1 font-headline-lg text-headline-lg">Modelos de recomendación</h1>
+            <p class="text-on-surface-variant">Ordenan y destacan las habitaciones libres para cada huésped del portal. Algolia filtra y PostgreSQL decide qué está libre: esto solo ordena.</p>
+        </div>
+        <form method="post" asp-page-handler="Entrenar">
+            <button type="submit" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-on-primary"><span class="material-symbols-outlined text-[18px]">model_training</span>Reentrenar ahora</button>
+        </form>
+    </section>
+    <partial name="_Mensajes" />
+    @if (Model.Error is not null)
+    {
+        <p class="rounded-xl bg-error-container p-3 text-sm text-on-error-container">El último entrenamiento falló (@Model.Error). El selector sigue funcionando con el orden de siempre.</p>
+    }
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section class="@tarjeta">
+            <div class="flex items-center justify-between gap-2">
+                <h2 class="flex items-center gap-2 font-headline-sm text-headline-sm"><span class="material-symbols-outlined">auto_awesome</span>Recomendación</h2>
+                <span class="rounded-full px-3 py-1 text-xs font-bold @(Model.Recomendador.Activo ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container text-on-surface-variant")">@(Model.Recomendador.Activo ? "Activo" : "Sin modelo")</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Factorización de matrices: aprende qué habitaciones reservan huéspedes parecidos y marca «Para ti». Sin historial, marca la «Más reservada».</p>
+            <div class="grid grid-cols-3 gap-2 text-sm">
+                <div class="@dato"><small class="text-outline">Reservas</small><strong class="text-lg">@Model.Recomendador.Interacciones</strong></div>
+                <div class="@dato"><small class="text-outline">Huéspedes</small><strong class="text-lg">@Model.Recomendador.Huespedes</strong></div>
+                <div class="@dato"><small class="text-outline">Habitaciones</small><strong class="text-lg">@Model.Recomendador.Habitaciones</strong></div>
+            </div>
+            <small class="text-outline">@Model.Recomendador.Detalle · Entrenado: @Fecha(Model.Recomendador.EntrenadoEn)</small>
+        </section>
+
+        <section class="@tarjeta">
+            <div class="flex items-center justify-between gap-2">
+                <h2 class="flex items-center gap-2 font-headline-sm text-headline-sm"><span class="material-symbols-outlined">sort</span>Ranking</h2>
+                <span class="rounded-full px-3 py-1 text-xs font-bold @(Model.Ranking.Activo ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container text-on-surface-variant")">@(Model.Ranking.Activo ? "Activo" : "Sin modelo")</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">LightGBM: aprende de cada búsqueda qué se mostró y qué se reservó, y ordena primero lo que más probablemente se elegirá.</p>
+            <div class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+                <div class="@dato"><small class="text-outline">Búsquedas</small><strong class="text-lg">@Model.Busquedas</strong></div>
+                <div class="@dato"><small class="text-outline">Con reserva</small><strong class="text-lg">@Model.BusquedasConReserva</strong></div>
+                <div class="@dato"><small class="text-outline">NDCG@3 modelo</small><strong class="text-lg">@Porcentaje(Model.Ranking.NdcgModelo)</strong></div>
+                <div class="@dato"><small class="text-outline">NDCG@3 orden anterior</small><strong class="text-lg">@Porcentaje(Model.Ranking.NdcgOrdenActual)</strong></div>
+            </div>
+            <small class="text-outline">@Model.Ranking.Detalle · Entrenado: @Fecha(Model.Ranking.EntrenadoEn)</small>
+            <small class="text-outline">NDCG@3 mide, en búsquedas que el modelo no vio, si la habitación reservada sale entre las tres primeras (100 % = siempre la primera).</small>
+        </section>
+    </div>
+    <p class="text-xs text-outline">Se reentrenan solos al arrancar y cada 6 horas. Las búsquedas sin reserva se borran a los 30 días; las demás, a los 180.</p>
+</main>

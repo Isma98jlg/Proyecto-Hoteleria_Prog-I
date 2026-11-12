@@ -17,6 +17,8 @@ public class HoteleriaDbContext : IdentityDbContext<HotelUser, HotelRole, long>,
     public DbSet<ReservaHabitacion> ReservaHabitaciones => Set<ReservaHabitacion>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Invitacion> Invitaciones => Set<Invitacion>();
+    public DbSet<Busqueda> Busquedas => Set<Busqueda>();
+    public DbSet<BusquedaResultado> BusquedaResultados => Set<BusquedaResultado>();
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -178,6 +180,47 @@ public class HoteleriaDbContext : IdentityDbContext<HotelUser, HotelRole, long>,
                   .HasForeignKey(e => e.HabitacionId)
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("fk_habitacion_rh");
+        });
+
+        // Historial de búsquedas del portal: lo que aprende el ranking de ML.NET.
+        modelBuilder.Entity<Busqueda>(entity =>
+        {
+            entity.ToTable("Busquedas", t =>
+            {
+                t.HasCheckConstraint("ck_busqueda_noches", "noches BETWEEN 1 AND 365");
+                t.HasCheckConstraint("ck_busqueda_personas", "personas IS NULL OR personas >= 1");
+            });
+            entity.HasKey(e => e.BusquedaId);
+            entity.Property(e => e.BusquedaId).HasColumnName("busqueda_id").UseIdentityByDefaultColumn();
+            entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
+            entity.Property(e => e.CreadaEn).HasColumnName("creada_en").HasColumnType("timestamp with time zone");
+            entity.Property(e => e.Inicio).HasColumnName("inicio").HasColumnType("date");
+            entity.Property(e => e.Noches).HasColumnName("noches");
+            entity.Property(e => e.Personas).HasColumnName("personas");
+            entity.Property(e => e.Categoria).HasColumnName("categoria").HasMaxLength(30);
+            entity.Property(e => e.ConTexto).HasColumnName("con_texto");
+            entity.Property(e => e.ReservadaEn).HasColumnName("reservada_en").HasColumnType("timestamp with time zone");
+
+            // Al eliminar al huésped se borran sus búsquedas: no queda rastro suyo.
+            entity.HasOne(e => e.Usuario).WithMany().HasForeignKey(e => e.UsuarioId)
+                  .OnDelete(DeleteBehavior.Cascade).HasConstraintName("fk_busqueda_usuario");
+            entity.HasIndex(e => e.UsuarioId).HasDatabaseName("IX_Busquedas_Usuario");
+            entity.HasIndex(e => e.CreadaEn).HasDatabaseName("IX_Busquedas_Fecha");
+        });
+
+        modelBuilder.Entity<BusquedaResultado>(entity =>
+        {
+            entity.ToTable("Busqueda Resultados", t => t.HasCheckConstraint("ck_resultado_posicion", "posicion >= 1"));
+            entity.HasKey(e => new { e.BusquedaId, e.HabitacionId });
+            entity.Property(e => e.BusquedaId).HasColumnName("busqueda_id");
+            entity.Property(e => e.HabitacionId).HasColumnName("habitacion_id");
+            entity.Property(e => e.Posicion).HasColumnName("posicion");
+            entity.Property(e => e.Elegida).HasColumnName("elegida");
+
+            entity.HasOne(e => e.Busqueda).WithMany(b => b.Resultados).HasForeignKey(e => e.BusquedaId)
+                  .OnDelete(DeleteBehavior.Cascade).HasConstraintName("fk_resultado_busqueda");
+            entity.HasOne(e => e.Habitacion).WithMany().HasForeignKey(e => e.HabitacionId)
+                  .OnDelete(DeleteBehavior.Cascade).HasConstraintName("fk_resultado_habitacion");
         });
 
         modelBuilder.Entity<Invitacion>(entity =>

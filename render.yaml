@@ -27,6 +27,9 @@ services:
         value: grandstay.com
       - key: DEMO_ACCOUNTS
         value: "false"
+      # Historial de demostración para ML.NET (36 huéspedes y sus reservas pasadas). Se crea una sola vez.
+      - key: DEMO_HISTORIAL
+        sync: false
       - key: ALGOLIA_APP_ID
         sync: false
       - key: ALGOLIA_ADMIN_KEY

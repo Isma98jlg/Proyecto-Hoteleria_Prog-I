@@ -1,5 +1,7 @@
 @model Hoteleria_App.Services.SelectorHabitacionesVista
 <div class="flex flex-col gap-3" data-selector-habitaciones data-campo="@Model.Campo" data-inicio="@Model.Inicio" data-noches="@Model.Noches" data-seleccionadas="@string.Join(",", Model.Seleccionadas)">
+    @* Solo el portal la usa: identifica la búsqueda que termina en reserva (ranking de ML.NET). *@
+    <input type="hidden" name="BusquedaId" data-busqueda />
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <label class="flex flex-col gap-1 text-xs font-medium text-on-surface">Personas
             <input data-filtro-personas type="number" min="1" max="50" value="1" class="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm font-normal" />

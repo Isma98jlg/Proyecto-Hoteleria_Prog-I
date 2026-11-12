@@ -9,6 +9,7 @@ Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
   - `Security/`: políticas de permisos y su caché.
   - `Hubs/`: SignalR. `Api/`: API REST `/api/v1`.
   - `Migrations/`: fuente de verdad del esquema.
+  - `Services/Ml/`: recomendación y ranking de habitaciones con ML.NET.
 - `docker-compose.yml`: entorno local completo (app, PostgreSQL y Redis) en una red propia de Docker.
 - `Dockerfile` y `render.yaml`: imagen de la app y Blueprint de Render.
 - `Resources/DDBB/`: script SQL generado desde las migraciones y consultas de verificación.
@@ -35,6 +36,7 @@ Pasos y reglas para preparar, ejecutar, probar y desplegar Hoteleria-App.
 - **Eliminar huéspedes:** solo con `CuentaService.EliminarHuespedAsync`. Sin reservas ni cuenta, cualquiera con `crud_usuarios`; con ellas, solo el administrador, y se borran sus reservas, sus invitaciones y su cuenta en la misma transacción (no se puede deshacer). Si está alojado (reserva «En curso»), primero el check-out.
 - **Disponibilidad:** la decide PostgreSQL. La restricción `ex_habitacion_sin_solapes` impide solapes; las columnas `inicio`, `fin` y `activa` de `Reserva Habitaciones` deben coincidir siempre con la reserva.
 - **Elegir habitación:** usa siempre `_SelectorHabitaciones` y `SelectorHabitaciones`. Personas equivale a camas (coincidencia exacta), aunque una reserva puede combinar habitaciones. Algolia filtra y PostgreSQL decide qué está libre.
+- **ML.NET (recomendación y ranking):** solo en el portal del huésped, y solo ordena y destaca: Algolia filtra y PostgreSQL decide qué está libre. La recomendación (factorización de matrices) aprende de las reservas no canceladas y marca «Para ti» (sin historial, «Más reservada»). El ranking (LightGBM) aprende de `Busquedas` y `Busqueda Resultados`: qué se mostró en cada búsqueda del portal y qué se reservó. Las búsquedas no guardan el texto escrito, se borran con el huésped, y se conservan 30 días sin reserva y 180 con ella. Los modelos viven en memoria y se reentrenan al arrancar, cada 6 horas o desde `/Modelos` (admin). Si fallan o faltan datos, el selector ordena como antes. El personal no ve insignias ni se registran sus búsquedas.
 - **Estado de la habitación:** `OCUPADO` solo lo cambian el check-in y el check-out.
 - **IA (asistente del huésped, `/Portal/Asistente`; el personal no tiene chat):** disponibilidad y precios salen de `ReservaService`, y el modelo no crea reservas. `preparar_reserva` deja una propuesta validada en el servidor, y solo el botón «Confirmar reserva» la crea, a nombre de quien inició sesión. Solo atiende reservas y dudas del sistema: otros temas reciben una respuesta fija del servidor (`fuera_de_tema`) y no se reenvían al modelo. El saldo de la API es escaso: cuida los tokens en cada cambio (instrucciones cortas, resultados compactos, sin llamadas innecesarias) y mantén los límites `ASISTENTE_LIMITE_USUARIO` y `ASISTENTE_LIMITE_DIARIO`. La conversación vive en Redis 30 minutos y nunca se registra su contenido.
 
@@ -51,7 +53,7 @@ Copy-Item .env.example .env   # y cambia todos los valores
 docker compose up -d --build
 ```
 
-Abre `http://localhost:5003`. Para depurar con .NET SDK 10, levanta solo `postgres` y `redis` y ejecuta la app en el host con `dotnet run --project .\Hoteleria-App\Hoteleria-App.csproj --launch-profile http`; en ese caso usa `DATABASE_URL` y `REDIS_URL` de `.env`. Con `DB_AUTO_MIGRATE=true` (valor por defecto), el arranque aplica migraciones y crea los datos de referencia y el administrador. `DEMO_ACCOUNTS=true` crea además un trabajador y un huésped de prueba.
+Abre `http://localhost:5003`. Para depurar con .NET SDK 10, levanta solo `postgres` y `redis` y ejecuta la app en el host con `dotnet run --project .\Hoteleria-App\Hoteleria-App.csproj --launch-profile http`; en ese caso usa `DATABASE_URL` y `REDIS_URL` de `.env`. Con `DB_AUTO_MIGRATE=true` (valor por defecto), el arranque aplica migraciones y crea los datos de referencia y el administrador. `DEMO_ACCOUNTS=true` crea además un trabajador y un huésped de prueba. `DEMO_HISTORIAL=true` crea una sola vez 36 huéspedes con nombres comunes, DNI del rango 99xxxxxx (sin asignar por RENIEC) y sin correo de contacto, con reservas pasadas y búsquedas para entrenar ML.NET.
 
 Si la clave de `DATABASE_URL` tiene símbolos, escríbela con formato URL (`@` es `%40`).
 

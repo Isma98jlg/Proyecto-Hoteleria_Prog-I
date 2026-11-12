@@ -23,6 +23,92 @@ namespace Hoteleria_App.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "btree_gist");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Hoteleria_App.Models.Busqueda", b =>
+                {
+                    b.Property<long>("BusquedaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("busqueda_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("BusquedaId"));
+
+                    b.Property<string>("Categoria")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("categoria");
+
+                    b.Property<bool>("ConTexto")
+                        .HasColumnType("boolean")
+                        .HasColumnName("con_texto");
+
+                    b.Property<DateTime>("CreadaEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("creada_en");
+
+                    b.Property<DateTime>("Inicio")
+                        .HasColumnType("date")
+                        .HasColumnName("inicio");
+
+                    b.Property<int>("Noches")
+                        .HasColumnType("integer")
+                        .HasColumnName("noches");
+
+                    b.Property<int?>("Personas")
+                        .HasColumnType("integer")
+                        .HasColumnName("personas");
+
+                    b.Property<DateTime?>("ReservadaEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reservada_en");
+
+                    b.Property<long>("UsuarioId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("usuario_id");
+
+                    b.HasKey("BusquedaId");
+
+                    b.HasIndex("CreadaEn")
+                        .HasDatabaseName("IX_Busquedas_Fecha");
+
+                    b.HasIndex("UsuarioId")
+                        .HasDatabaseName("IX_Busquedas_Usuario");
+
+                    b.ToTable("Busquedas", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_busqueda_noches", "noches BETWEEN 1 AND 365");
+
+                            t.HasCheckConstraint("ck_busqueda_personas", "personas IS NULL OR personas >= 1");
+                        });
+                });
+
+            modelBuilder.Entity("Hoteleria_App.Models.BusquedaResultado", b =>
+                {
+                    b.Property<long>("BusquedaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("busqueda_id");
+
+                    b.Property<long>("HabitacionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("habitacion_id");
+
+                    b.Property<bool>("Elegida")
+                        .HasColumnType("boolean")
+                        .HasColumnName("elegida");
+
+                    b.Property<int>("Posicion")
+                        .HasColumnType("integer")
+                        .HasColumnName("posicion");
+
+                    b.HasKey("BusquedaId", "HabitacionId");
+
+                    b.HasIndex("HabitacionId");
+
+                    b.ToTable("Busqueda Resultados", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_resultado_posicion", "posicion >= 1");
+                        });
+                });
+
             modelBuilder.Entity("Hoteleria_App.Models.Employee", b =>
                 {
                     b.Property<long>("UsuarioId")
@@ -608,6 +694,39 @@ namespace Hoteleria_App.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Hoteleria_App.Models.Busqueda", b =>
+                {
+                    b.HasOne("Hoteleria_App.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_busqueda_usuario");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Hoteleria_App.Models.BusquedaResultado", b =>
+                {
+                    b.HasOne("Hoteleria_App.Models.Busqueda", "Busqueda")
+                        .WithMany("Resultados")
+                        .HasForeignKey("BusquedaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_resultado_busqueda");
+
+                    b.HasOne("Hoteleria_App.Models.Habitacion", "Habitacion")
+                        .WithMany()
+                        .HasForeignKey("HabitacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_resultado_habitacion");
+
+                    b.Navigation("Busqueda");
+
+                    b.Navigation("Habitacion");
+                });
+
             modelBuilder.Entity("Hoteleria_App.Models.Employee", b =>
                 {
                     b.HasOne("Hoteleria_App.Models.Usuario", "Usuario")
@@ -755,6 +874,11 @@ namespace Hoteleria_App.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Hoteleria_App.Models.Busqueda", b =>
+                {
+                    b.Navigation("Resultados");
                 });
 
             modelBuilder.Entity("Hoteleria_App.Models.Habitacion", b =>

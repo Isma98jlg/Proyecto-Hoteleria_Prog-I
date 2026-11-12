@@ -9,7 +9,7 @@ namespace Hoteleria_App.Data;
 /// Datos de referencia y cuentas iniciales (idempotente). No hay contraseñas por defecto:
 /// una cuenta solo se crea si su contraseña llega por configuración.
 /// </summary>
-public static class DbSeeder
+public static partial class DbSeeder
 {
     public static async Task SeedAsync(HoteleriaDbContext db)
     {

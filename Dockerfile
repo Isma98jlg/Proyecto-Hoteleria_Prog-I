@@ -8,6 +8,8 @@ COPY Hoteleria-App/ Hoteleria-App/
 RUN dotnet publish Hoteleria-App/Hoteleria-App.csproj -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+# ML.NET (LightGBM y factorización de matrices) necesita OpenMP en Linux.
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app .
 ENV ASPNETCORE_ENVIRONMENT=Production

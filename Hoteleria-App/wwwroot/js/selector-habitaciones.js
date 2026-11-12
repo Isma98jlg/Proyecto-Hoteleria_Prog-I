@@ -17,6 +17,7 @@
         const texto = raiz.querySelector('[data-filtro-texto]');
         const lista = raiz.querySelector('[data-lista]');
         const motor = raiz.querySelector('[data-motor]');
+        const busqueda = raiz.querySelector('[data-busqueda]');
         const seleccion = new Map(); // id → precio por noche; se conserva al cambiar los filtros.
         const pendientes = (raiz.dataset.seleccionadas || '').split(',').filter(Boolean).map(Number);
         let consulta = 0;
@@ -53,8 +54,16 @@
                 actualizarTotal();
             });
             const datos = elemento('span', 'flex min-w-0 flex-col');
+            const titulo = elemento('span', 'flex flex-wrap items-center gap-1.5');
+            titulo.append(elemento('strong', 'truncate text-sm font-semibold text-on-surface', `Habitación ${h.codigo}`));
+            if (h.destacado) {
+                // Lo marca ML.NET: afinidad con el historial del huésped, o lo más reservado si aún no tiene.
+                const insignia = elemento('span', 'inline-flex items-center gap-0.5 rounded-full bg-tertiary-fixed px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-on-tertiary-fixed');
+                insignia.append(elemento('span', 'material-symbols-outlined text-[12px]', h.destacado === 'Para ti' ? 'auto_awesome' : 'trending_up'), document.createTextNode(h.destacado));
+                titulo.append(insignia);
+            }
             datos.append(
-                elemento('strong', 'truncate text-sm font-semibold text-on-surface', `Habitación ${h.codigo}`),
+                titulo,
                 elemento('small', 'text-xs text-on-surface-variant', `${h.categoria} · ${h.camas} cama(s)`),
                 elemento('small', 'flex items-center gap-1 text-xs text-on-surface-variant', h.ubicacion));
             izquierda.append(casilla, datos);
@@ -78,7 +87,8 @@
 
             const marcadas = datos.habitaciones.filter(h => seleccion.has(h.habitacionId));
             const visibles = [...marcadas, ...datos.habitaciones.filter(h => h.coincide && !seleccion.has(h.habitacionId))];
-            motor.textContent = `Búsqueda: ${datos.motor}`;
+            motor.textContent = `Búsqueda: ${datos.motor}` + (datos.orden ? ` · Orden: ${datos.orden}` : '');
+            if (busqueda) busqueda.value = datos.busquedaId ?? '';
             actualizarTotal();
 
             if (visibles.length) {

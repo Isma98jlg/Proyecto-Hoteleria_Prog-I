@@ -1,6 +1,7 @@
 using Hoteleria_App.Models;
 using Hoteleria_App.Security;
 using Hoteleria_App.Services;
+using Hoteleria_App.Services.Ml;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,18 +10,21 @@ namespace Hoteleria_App.Pages.Portal;
 
 /// <summary>Reserva para huéspedes. El titular es siempre quien inició sesión.</summary>
 [Authorize(Roles = CargosSistema.Huesped)]
-public class ReservarModel(IReservaService reservas, SelectorHabitaciones selector, RelojHotel reloj) : PageModel
+public class ReservarModel(IReservaService reservas, SelectorHabitaciones selector, HistorialBusquedas historial, RelojHotel reloj) : PageModel
 {
     [BindProperty] public DateTime? Inicio { get; set; }
     [BindProperty] public int Noches { get; set; } = 1;
     [BindProperty] public List<long> HabitacionIds { get; set; } = [];
+
+    /// <summary>Última búsqueda del selector: al reservar se marca qué se eligió, para el ranking.</summary>
+    [BindProperty] public long? BusquedaId { get; set; }
 
     public DateTime Hoy => reloj.Hoy;
 
     public void OnGet() => Inicio = reloj.Hoy.AddDays(1);
 
     public async Task<IActionResult> OnGetDisponiblesAsync(DateTime inicio, int noches = 1, int? personas = null, string? categoria = null, string? q = null) =>
-        await selector.BuscarAsync(inicio, noches, personas, categoria, q, HttpContext.RequestAborted) is { } resultado ? new JsonResult(resultado) : BadRequest();
+        await selector.BuscarAsync(inicio, noches, personas, categoria, q, HttpContext.RequestAborted, huesped: User.Id()) is { } resultado ? new JsonResult(resultado) : BadRequest();
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -33,6 +37,7 @@ public class ReservarModel(IReservaService reservas, SelectorHabitaciones select
         });
         if (resultado.Ok)
         {
+            await historial.MarcarReservaAsync(BusquedaId, User.Id() ?? 0, HabitacionIds);
             TempData["MensajeExito"] = "Su reserva está confirmada.";
             return RedirectToPage("Index");
         }
