@@ -46,12 +46,12 @@
             dato('Salida', `${propuesta.salida} · ${propuesta.noches} noche(s)`),
             dato('Personas', String(propuesta.personas)));
         propuesta.habitaciones.forEach(h =>
-            datos.append(dato(`Habitación ${h.codigo}`, `${h.categoria} · ${h.camas} cama(s) · $${h.precio}/noche${h.ubicacion ? ` · ${h.ubicacion}` : ''}`)));
+            datos.append(dato(`Habitación ${h.codigo}`, `${h.categoria} · ${h.camas} cama(s) · ${h.precio}/noche${h.ubicacion ? ` · ${h.ubicacion}` : ''}`)));
         caja.append(datos);
 
         const pie = elemento('div', 'flex items-center justify-between gap-3 border-t border-surface-container-high pt-3');
         const total = elemento('div');
-        total.append(elemento('small', 'block text-outline', 'Total'), elemento('strong', 'text-headline-md', `$${propuesta.total}`));
+        total.append(elemento('small', 'block text-outline', 'Total'), elemento('strong', 'text-headline-md', `${propuesta.total}`));
         const confirmar = elemento('button', 'rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary transition-opacity disabled:opacity-40', 'Confirmar reserva');
         confirmar.type = 'button';
         confirmar.disabled = ocupado;

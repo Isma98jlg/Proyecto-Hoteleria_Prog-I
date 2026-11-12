@@ -99,8 +99,8 @@
                                         <td class="py-3 px-4 font-mono text-on-surface">@h.CodigoHabitacion</td>
                                         <td class="py-3 px-4 text-on-surface-variant">@h.TipoVip</td>
                                         <td class="py-3 px-4 text-on-surface">@h.NroCamas</td>
-                                        <td class="py-3 px-4 text-right text-on-surface">$@h.PrecioNochePactado.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
-                                        <td class="py-3 px-4 text-right font-numeric-table text-numeric-table font-bold text-on-surface">$@((h.PrecioNochePactado * Model.Detalle.TotalNoches).ToString("N0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                        <td class="py-3 px-4 text-right text-on-surface">@Soles.Formatear(h.PrecioNochePactado)</td>
+                                        <td class="py-3 px-4 text-right font-numeric-table text-numeric-table font-bold text-on-surface">@Soles.Formatear(h.PrecioNochePactado * Model.Detalle.TotalNoches)</td>
                                     </tr>
                                 }
                             </tbody>
@@ -112,17 +112,17 @@
                             <legend class="px-1 font-label-sm text-label-sm text-on-surface-variant">Habitaciones de la reserva (las fechas se revisan al guardar)</legend>
                             @foreach (var h in Model.Detalle.Habitaciones)
                             {
-                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" checked class="h-4 w-4 accent-primary" />@h.CodigoHabitacion · @h.TipoVip · @h.Ubicacion · $@h.PrecioNochePactado.ToString("N0") / noche</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" checked class="h-4 w-4 accent-primary" />@h.CodigoHabitacion · @h.TipoVip · @h.Ubicacion · @Soles.Formatear(h.PrecioNochePactado) / noche</label>
                             }
                             @foreach (var h in Model.OtrasHabitaciones)
                             {
-                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" class="h-4 w-4 accent-primary" />@h.Codigo · @h.TipoVip · @h.Ubicacion · $@h.PrecioNoche.ToString("N0") / noche</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="Reserva.HabitacionIds" value="@h.HabitacionId" class="h-4 w-4 accent-primary" />@h.Codigo · @h.TipoVip · @h.Ubicacion · @Soles.Formatear(h.PrecioNoche) / noche</label>
                             }
                         </fieldset>
                     }
                     <div class="mt-2 text-right">
                         <span class="font-body-sm text-body-sm font-bold text-on-surface">Total de la reserva: </span>
-                        <span class="font-body-sm text-body-sm font-mono text-on-surface">$@Model.Detalle.PrecioTotal.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</span>
+                        <span class="font-body-sm text-body-sm font-mono text-on-surface">@Soles.Formatear(Model.Detalle.PrecioTotal)</span>
                     </div>
                 </div>
             </div>

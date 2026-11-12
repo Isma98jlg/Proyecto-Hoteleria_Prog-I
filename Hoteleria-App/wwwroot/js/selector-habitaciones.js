@@ -1,6 +1,8 @@
 // Selector de habitaciones al reservar. El texto se pinta con textContent: nunca se interpreta como HTML.
 (() => {
-    const moneda = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+    // Mismo formato que Soles.Formatear en el servidor: «S/ 1,500.00».
+    const cifras = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const soles = monto => 'S/ ' + cifras.format(monto);
 
     function elemento(etiqueta, clases, texto) {
         const nodo = document.createElement(etiqueta);
@@ -29,7 +31,7 @@
             const cuenta = document.getElementById('selected-room-count');
             const estimado = document.getElementById('reservation-estimate');
             if (cuenta) cuenta.textContent = seleccion.size;
-            if (estimado) estimado.textContent = '$' + moneda.format(total);
+            if (estimado) estimado.textContent = soles(total);
         }
 
         function aviso(mensaje, clases = 'text-outline') {
@@ -69,7 +71,7 @@
             izquierda.append(casilla, datos);
             const precio = elemento('span', 'shrink-0 text-right');
             precio.append(
-                elemento('strong', 'block text-sm font-bold tabular-nums text-primary', '$' + moneda.format(h.precioNoche)),
+                elemento('strong', 'block text-sm font-bold tabular-nums text-primary', soles(h.precioNoche)),
                 elemento('small', 'text-[11px] text-outline', 'por noche'));
             fila.append(izquierda, precio);
             return fila;

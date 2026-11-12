@@ -24,7 +24,7 @@
                 <h5 class="mb-0">
                     <span class="badge bg-warning text-dark me-2">@grupo.Key.TipoVipNombre</span>
                     Sigla: <span class="badge bg-dark">@grupo.Key.Sigla</span>
-                    Precio/cama: <span class="text-success fw-bold">@precioCama.ToString("C")</span>
+                    Precio/cama: <span class="text-success fw-bold">@Soles.Formatear(precioCama)</span>
                 </h5>
                 <div class="btn-group btn-group-sm">
                     <span class="badge bg-success me-1">✅ @libres</span>
@@ -62,7 +62,7 @@
                                     <td><span class="badge bg-secondary">@($"{h.NroPiso:D4}{h.TipoVip?.Sigla}")</span></td>
                                     <td>@h.NroPiso</td>
                                     <td>@h.NroCamas</td>
-                                    <td>@precioTotal.ToString("C")</td>
+                                    <td>@Soles.Formatear(precioTotal)</td>
                                     <td><span class="badge @badgeClass">@h.Estado</span></td>
                                     <td>
                                         <a asp-page="Detalles" asp-route-id="@h.HabitacionId" class="btn btn-sm btn-outline-primary">👁️</a>

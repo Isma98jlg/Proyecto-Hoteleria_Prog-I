@@ -13,7 +13,7 @@
         <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Entrada</span><strong class="block mt-1">@r.InicioReserva.ToString("dd/MM/yyyy")</strong></div>
         <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Salida</span><strong class="block mt-1">@r.FinReserva.ToString("dd/MM/yyyy")</strong></div>
         <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Noches</span><strong class="block mt-1">@r.TotalNoches</strong></div>
-        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Total</span><strong class="block mt-1">$@r.PrecioTotal.ToString("N0")</strong></div>
+        <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-4"><span class="text-sm text-outline">Total</span><strong class="block mt-1">@Soles.Formatear(r.PrecioTotal)</strong></div>
     </section>
     <section class="flex flex-col gap-3">
         <h2 class="font-headline-sm text-headline-sm">@(r.Habitaciones.Count == 1 ? "Su habitación" : "Sus habitaciones")</h2>
@@ -24,7 +24,7 @@
                 <div><span class="text-sm text-outline">Categoría</span><strong class="block mt-1">@h.TipoVip</strong></div>
                 <div><span class="text-sm text-outline">Ubicación</span><strong class="block mt-1">@h.ReferenciaPiso</strong></div>
                 <div><span class="text-sm text-outline">Camas</span><strong class="block mt-1">@h.NroCamas</strong></div>
-                <div><span class="text-sm text-outline">Precio por noche</span><strong class="block mt-1">$@h.PrecioNochePactado.ToString("N0")</strong></div>
+                <div><span class="text-sm text-outline">Precio por noche</span><strong class="block mt-1">@Soles.Formatear(h.PrecioNochePactado)</strong></div>
             </div>
         }
     </section>

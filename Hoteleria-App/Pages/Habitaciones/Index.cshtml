@@ -86,7 +86,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col items-end">
-                        <span class="text-[11px] font-bold text-on-surface font-mono">$@Model.Dinero(Model.PrecioCamaEstandar)</span>
+                        <span class="text-[11px] font-bold text-on-surface font-mono">@Soles.Formatear(Model.PrecioCamaEstandar)</span>
                         <span class="text-[10px] text-outline">por cama / noche</span>
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col items-end">
-                        <span class="text-[11px] font-bold text-secondary font-mono">$@Model.Dinero(Model.PrecioCamaVip)</span>
+                        <span class="text-[11px] font-bold text-secondary font-mono">@Soles.Formatear(Model.PrecioCamaVip)</span>
                         <span class="text-[10px] text-secondary">tarifa máx / cama</span>
                     </div>
                 </div>
@@ -149,8 +149,8 @@
                 <div class="min-w-[210px]">
                     <select class="w-full px-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-body-sm text-body-sm focus:outline-none font-medium" name="Categoria" onchange="this.form.submit()">
                         <option value="">Todas las Categorías</option>
-                        <option value="ESTANDAR" selected="@(Model.Categoria == "ESTANDAR")">Estándar (EST) · $@Model.Dinero(Model.PrecioCamaEstandar)/cama</option>
-                        <option value="VIP" selected="@(Model.Categoria == "VIP")">VIP (Premium) · $@Model.Dinero(Model.PrecioCamaVip)/cama máx</option>
+                        <option value="ESTANDAR" selected="@(Model.Categoria == "ESTANDAR")">Estándar (EST) · @Soles.Formatear(Model.PrecioCamaEstandar)/cama</option>
+                        <option value="VIP" selected="@(Model.Categoria == "VIP")">VIP (Premium) · @Soles.Formatear(Model.PrecioCamaVip)/cama máx</option>
                     </select>
                 </div>
                 <div class="min-w-[150px]">
@@ -235,17 +235,17 @@
                             <span class="flex items-center gap-1.5 font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">group</span> @h.NroCamas @(h.NroCamas == 1 ? "persona" : "personas")</span>
                         </div>
                     </div>
-                    <div class="pt-3 mt-3 flex items-center justify-between bg-surface-container-lowest border-t border-surface-container">
+                    <div class="pt-3 mt-3 flex flex-wrap items-center justify-between gap-2 bg-surface-container-lowest border-t border-surface-container">
                         <div class="flex flex-col">
-                            <span class="font-label-sm text-label-sm text-outline">@h.NroCamas × $@Model.Dinero(precio)</span>
-                            <div class="flex items-baseline gap-1"><span class="font-headline-sm text-headline-sm font-bold text-on-surface">$@Model.Dinero(precioTotal)</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
+                            <span class="font-label-sm text-label-sm text-outline">@h.NroCamas × @Soles.Formatear(precio)</span>
+                            <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="font-headline-sm text-headline-sm font-bold text-on-surface">@Soles.Formatear(precioTotal)</span><span class="font-label-sm text-label-sm text-outline">/noche</span></div>
                         </div>
                         <div class="flex gap-2"><a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Ver detalle">
                             <span class="material-symbols-outlined text-[16px]">visibility</span><span>Detalle</span>
                         </a>
                         @if (Model.PuedeAdministrarHabitaciones) { <a class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors" asp-page="Editar" asp-route-id="@h.HabitacionId" title="Editar habitación">
                             <span class="material-symbols-outlined text-[16px]">edit</span>
-                            <span>Editar habitación</span>
+                            <span>Editar</span>
                         </a> }</div>
                     </div>
                 </div>
@@ -285,15 +285,15 @@
                                 <td class="py-3 px-4">
                                     @if (esVip)
                                     {
-                                        <span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed/60 px-2 py-0.5 rounded font-bold">@h.TipoVipNombre ($@Model.Dinero(Model.PrecioCama(h))/cama)</span>
+                                        <span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed/60 px-2 py-0.5 rounded font-bold">@h.TipoVipNombre (@Soles.Formatear(Model.PrecioCama(h))/cama)</span>
                                     }
                                     else
                                     {
-                                        <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded font-semibold">Estándar ($@Model.Dinero(Model.PrecioCama(h))/cama)</span>
+                                        <span class="font-label-sm text-label-sm text-outline bg-surface-container px-2 py-0.5 rounded font-semibold">Estándar (@Soles.Formatear(Model.PrecioCama(h))/cama)</span>
                                     }
                                 </td>
                                 <td class="py-3 px-4 font-semibold text-on-surface">@h.NroCamas Camas (@h.NroCamas pers.)</td>
-                                <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">$@Model.Dinero(precioTotal) / noche</td>
+                                <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">@Soles.Formatear(precioTotal) / noche</td>
                                 <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full @badgeEstado font-label-sm text-label-sm font-semibold">@Model.EstadoEtiqueta(estado)</span></td>
                                 <td class="py-3 px-4 text-right">
                                     <a class="p-1 hover:text-on-surface text-outline" asp-page="Detalles" asp-route-id="@h.HabitacionId" title="Ver detalle"><span class="material-symbols-outlined text-[18px]">visibility</span></a>

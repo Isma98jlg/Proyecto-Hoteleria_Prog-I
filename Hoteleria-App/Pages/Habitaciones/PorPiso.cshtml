@@ -57,7 +57,7 @@
                                     <td><span class="badge bg-secondary">@($"{h.NroPiso:D4}{h.TipoVip?.Sigla}")</span></td>
                                     <td>@h.NroCamas</td>
                                     <td>@(h.TipoVip?.TipoVipNombre ?? "-")</td>
-                                    <td>@precioTotal.ToString("C")</td>
+                                    <td>@Soles.Formatear(precioTotal)</td>
                                     <td><span class="badge @badgeClass">@h.Estado</span></td>
                                     <td>
                                         <a asp-page="Detalles" asp-route-id="@h.HabitacionId" class="btn btn-sm btn-outline-primary">👁️</a>

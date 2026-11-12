@@ -39,7 +39,7 @@
                     <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold @r.BadgeEstado">@r.EstadoEtiqueta</span></td>
                     <td class="p-3">@r.InicioReserva.ToString("dd/MM/yyyy") – @r.FinReserva.ToString("dd/MM/yyyy")<small class="block text-outline">@r.TotalNoches noche(s)</small></td>
                     <td class="p-3">@r.TotalHabitaciones</td>
-                    <td class="p-3 text-right font-semibold">$@r.PrecioTotal.ToString("N0")</td>
+                    <td class="p-3 text-right font-semibold">@Soles.Formatear(r.PrecioTotal)</td>
                     <td class="p-3 text-right flex justify-end items-center gap-4">
                         <a asp-page="Detalle" asp-route-id="@r.ReservaId" class="text-secondary font-semibold hover:underline">Ver detalle</a>
                         @if (EstadosReserva.Editable(r.EstadoReserva))

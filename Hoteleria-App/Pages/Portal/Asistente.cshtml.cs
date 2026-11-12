@@ -38,8 +38,8 @@ public class AsistenteModel(AsistenteHuespedService asistente) : PageModel
                 salida = p.Inicio.AddDays(p.Noches).ToString("dd/MM/yyyy"),
                 noches = p.Noches,
                 personas = p.Personas,
-                total = p.Total.ToString("N0"),
-                habitaciones = p.Lineas.Select(l => new { codigo = l.Codigo, categoria = l.Categoria, camas = l.Camas, precio = l.PrecioNoche.ToString("N0"), ubicacion = l.Ubicacion })
+                total = Soles.Formatear(p.Total),
+                habitaciones = p.Lineas.Select(l => new { codigo = l.Codigo, categoria = l.Categoria, camas = l.Camas, precio = Soles.Formatear(l.PrecioNoche), ubicacion = l.Ubicacion })
             }
             : null,
         error = r.Error,

@@ -112,7 +112,7 @@
                             <td class="py-3 px-4 text-on-surface">@r.FinReserva.ToString("dd/MM/yyyy")</td>
                             <td class="py-3 px-4 font-numeric-table text-numeric-table text-on-surface">@r.TotalNoches</td>
                             <td class="py-3 px-4 text-on-surface">@r.TotalHabitaciones</td>
-                            <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">@r.PrecioTotal.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</td>
+                            <td class="py-3 px-4 font-numeric-table text-numeric-table font-bold text-on-surface">@Soles.Formatear(r.PrecioTotal)</td>
                             <td class="py-3 px-4 text-right">
                                 <div class="flex items-center gap-1.5">
                                     <a class="p-2 rounded hover:bg-surface-container-low text-outline hover:text-on-surface transition-colors" asp-page="Detalles" asp-route-id="@r.ReservaId" title="Ver detalle">
@@ -227,7 +227,7 @@
                     <span class="flex items-center gap-2 text-xs text-on-surface-variant"><span class="material-symbols-outlined text-lg">hotel</span><span><strong id="selected-room-count" class="text-on-surface">0</strong> habitaciones</span></span>
                     <span class="hidden h-6 w-px bg-surface-container-high md:block"></span>
                     <span class="text-xs font-semibold text-on-surface-variant">Total estimado</span>
-                    <strong id="reservation-estimate" class="text-lg font-bold tabular-nums text-primary">$0</strong>
+                    <strong id="reservation-estimate" class="text-lg font-bold tabular-nums text-primary">S/ 0.00</strong>
                 </div>
                 <div class="flex items-center justify-end gap-2">
                     <button type="button" onclick="cerrarModalReserva()" class="rounded-lg border border-surface-container-high bg-surface-container-lowest px-4 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container">Cancelar</button>

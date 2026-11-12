@@ -96,8 +96,7 @@ public class IndexModel : PageModel
     public decimal PrecioCama(Habitacion h) => h.TipoVip?.PrecioCama ?? 0m;
     public decimal PrecioTotal(Habitacion h) => h.NroCamas * PrecioCama(h);
 
-    public string Dinero(decimal monto) =>
-        monto.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+    public string Dinero(decimal monto) => Soles.Formatear(monto);
 
     public decimal Porcentaje(int cantidad) =>
         TotalHabitaciones == 0 ? 0m : Math.Round(cantidad * 100m / TotalHabitaciones, 1);

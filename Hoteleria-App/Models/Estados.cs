@@ -17,6 +17,16 @@ public static class CargosSistema
     public static bool DeSistema(string? nombre) => nombre is Admin or Trabajador or Huesped;
 }
 
+/// <summary>
+/// Precios en soles con un formato fijo, «S/ 1,500.00», igual en el servidor (Linux o Windows) y en el navegador
+/// (selector-habitaciones.js usa el mismo).
+/// </summary>
+public static class Soles
+{
+    public static string Formatear(decimal monto) =>
+        "S/ " + monto.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture);
+}
+
 public static class CodigoHabitacion
 {
     public static string Formatear(long nroPiso, char sigla, long habitacionId) => $"{nroPiso}{sigla}-{habitacionId:D3}";

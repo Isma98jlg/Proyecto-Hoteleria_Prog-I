@@ -17,8 +17,8 @@
         <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Estado</span><strong class="block text-xl mt-2">@room.Estado</strong></div>
             <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Capacidad</span><strong class="block text-xl mt-2">@room.NroCamas cama(s)</strong></div>
-            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa por cama / noche</span><strong class="block text-xl mt-2">$@room.TipoVip?.PrecioCama.ToString("N0")</strong></div>
-            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa total / noche</span><strong class="block text-xl mt-2">$@rate.ToString("N0")</strong></div>
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa por cama / noche</span><strong class="block text-xl mt-2">@Soles.Formatear(room.TipoVip?.PrecioCama ?? 0m)</strong></div>
+            <div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-5"><span class="text-sm text-outline">Tarifa total / noche</span><strong class="block text-xl mt-2">@Soles.Formatear(rate)</strong></div>
         </section>
         @if (Model.PuedeVerReservas) {
         <section class="bg-surface-container-lowest border border-surface-container-high rounded-2xl overflow-hidden">
@@ -30,7 +30,7 @@
                 var reservation = line.Reserva;
                 if (reservation is not null)
                 {
-                    <tr><td class="p-3 font-mono">#@reservation.ReservaId</td><td class="p-3">@(reservation.Usuario?.Nombres) @(reservation.Usuario?.Apellidos)</td><td class="p-3">@reservation.EstadoReserva</td><td class="p-3">@reservation.InicioReserva.ToString("dd/MM/yyyy") – @reservation.FinReserva.ToString("dd/MM/yyyy")</td><td class="p-3 text-right">$@line.PrecioNochePactado.ToString("N0")</td><td class="p-3 text-right"><a asp-page="/Reservas/Detalles" asp-route-id="@reservation.ReservaId" class="text-secondary underline">Ver</a></td></tr>
+                    <tr><td class="p-3 font-mono">#@reservation.ReservaId</td><td class="p-3">@(reservation.Usuario?.Nombres) @(reservation.Usuario?.Apellidos)</td><td class="p-3">@reservation.EstadoReserva</td><td class="p-3">@reservation.InicioReserva.ToString("dd/MM/yyyy") – @reservation.FinReserva.ToString("dd/MM/yyyy")</td><td class="p-3 text-right">@Soles.Formatear(line.PrecioNochePactado)</td><td class="p-3 text-right"><a asp-page="/Reservas/Detalles" asp-route-id="@reservation.ReservaId" class="text-secondary underline">Ver</a></td></tr>
                 }
             }
             </tbody></table></div>
